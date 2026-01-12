@@ -1,1 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>El Duende 420 | App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- ESTILOS GENERALES --- */
+        :root {
+            --primary: #00ff41; /* Verde Matrix */
+            --bg: #050505;
+            --card: #111;
+            --glass: rgba(0, 255, 65, 0.1);
+        }
 
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* --- SISTEMA DE PANTALLAS --- */
+        .screen {
+            display: none;
+            flex: 1;
+            padding: 20px;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- ESTILOS DE LA PANTALLA 1 (HOME / HUB) --- */
+        .profile-container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .duende-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 20px var(--primary);
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px var(--primary);
+            color: var(--primary);
+        }
+
+        .username-tag {
+            background: var(--glass);
+            color: var(--primary);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .description {
+            color: #ccc;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        /* GRID DE BOTONES (2x2) */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .btn-action {
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            gap: 10px;
+        }
+
+        .btn-action:active { transform: scale(0.98); background: var(--glass); }
+        .btn-action i { font-size: 24px; color: var(--primary); }
+        .btn-action span { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* BOTÓN WALLET GRANDE */
+        .btn-wallet {
+            width: 100%;
+            background: #111;
+            color: white;
+            border: 1px solid var(--primary);
+            padding: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 0 10px rgba(0,255,65,0.1);
+            transition: all 0.3s;
+        }
+
+        /* --- ESTILOS DE LA PANTALLA 2 (MINERÍA) --- */
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        .score-val { font-size: 48px; font-weight: bold; text-shadow: 0 0 15px var(--primary); margin: 20px 0; }
+        
+        .clicker-circle {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,255,65,0.15) 0%, rgba(0,0,0,0) 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .clicker-circle:active img { transform: scale(0.95); }
+        
+        .clicker-img {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 30px rgba(0,255,65,0.5);
+            pointer-events: none;
+            transition: transform 0.1s;
+        }
+
+        /* --- BARRA DE NAVEGACIÓN INFERIOR --- */
+        .bottom-nav {
+            background: #0a0a0a;
+            border-top: 1px solid #222;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            padding-bottom: 25px; /* Ajuste para móviles modernos */
+        }
+        .nav-item {
+            color: #555;
+            text-align: center;
+            font-size: 10px;
+            cursor: pointer;
+            flex: 1;
+            text-transform: uppercase;
+        }
+        .nav-item.active { color: var(--primary); text-shadow: 0 0 5px var(--primary); }
+        .nav-item i { font-size: 22px; margin-bottom: 5px; display: block; }
+
+        /* Efectos flotantes */
+        .floating-number {
+            position: absolute;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
+            text-shadow: 0 0 5px black;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.5); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="screen-home" class="screen active">
+        <div class="profile-container">
+            <img src="{{ url_for('static', filename='logo.png') }}" class="duende-avatar">
+            
+            <h1>EL DUENDE 420</h1>
+            <div class="username-tag">@elduendepnp</div>
+            
+            <p class="description">
+                Comunidad Oficial.<br>
+                Crypto, Señales y Tecnología.<br>
+                Lima, Perú 🇵🇪
+            </p>
+
+            <div class="menu-grid">
+                <a href="https://t.me/elduende420peru" class="btn-action">
+                    <i class="fab fa-telegram-plane"></i>
+                    <span>Canal VIP</span>
+                </a>
+                <a href="https://wa.me/51900877863" class="btn-action">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>Contacto</span>
+                </a>
+                <a href="https://www.facebook.com/profile.php?id=61586213196155" class="btn-action">
+                    <i class="fab fa-facebook-f"></i>
+                    <span>Facebook</span>
+                </a>
+                <div class="btn-action" onclick="alert('Sistema de Señales en Mantenimiento 🛠️')">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Señales</span>
+                </div>
+            </div>
+
+            <button class="btn-wallet" id="wallet-btn" onclick="conectarWallet()">
+                <i class="fas fa-wallet"></i> CONECTAR WALLET
+            </button>
+        </div>
+    </div>
+
+    <div id="screen-mine" class="screen">
+        <div class="game-area">
+            <div style="color:#888; font-size:12px; letter-spacing:2px;">BALANCE ACTUAL</div>
+            <div class="score-val" id="score">0</div>
+            
+            <div class="clicker-circle" id="clicker-btn">
+                <img src="{{ url_for('static', filename='logo.png') }}" class="clicker-img">
+            </div>
+
+            <div style="margin-top:30px; width:80%; background:#222; height:6px; border-radius:10px;">
+                <div id="energy-bar" style="width:100%; background:var(--primary); height:100%; border-radius:10px; transition: width 0.2s;"></div>
+            </div>
+            <p style="color:#666; font-size:12px; margin-top:10px;">⚡ ENERGÍA: <span id="energy-val">1000</span>/1000</p>
+        </div>
+    </div>
+
+    <div id="screen-rank" class="screen">
+        <h2 style="color:var(--primary); margin-bottom:20px;">🏆 TOP MINEROS</h2>
+        
+        <div style="background:#111; width:100%; border-radius:15px; padding:10px;">
+            <div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid #222;">
+                <span>🥇 Jhuan (Admin)</span>
+                <span style="color:var(--primary)">999,999</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid #222;">
+                <span>🥈 ElDuendeBot</span>
+                <span>540,000</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:15px;">
+                <span>🥉 Usuario420</span>
+                <span>120,200</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home', this)">
+            <i class="fas fa-home"></i> Inicio
+        </div>
+        <div class="nav-item" onclick="switchTab('mine', this)">
+            <i class="fas fa-hammer"></i> Minar
+        </div>
+        <div class="nav-item" onclick="switchTab('rank', this)">
+            <i class="fas fa-trophy"></i> Ranking
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        // --- PESTAÑAS ---
+        function switchTab(screenName, navElement) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById('screen-' + screenName).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            navElement.classList.add('active');
+            
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        // --- JUEGO ---
+        let score = parseInt(localStorage.getItem('duende_score')) || 0;
+        let energy = 1000;
+        const scoreEl = document.getElementById('score');
+        const energyVal = document.getElementById('energy-val');
+        const energyBar = document.getElementById('energy-bar');
+
+        scoreEl.innerText = score.toLocaleString();
+
+        document.getElementById('clicker-btn').addEventListener('click', (e) => {
+            if (energy > 0) {
+                score += 10;
+                energy -= 5;
+                updateUI();
+                localStorage.setItem('duende_score', score);
+                tg.HapticFeedback.impactOccurred('medium');
+                showFloatingNumber(e.clientX, e.clientY);
+            } else {
+                tg.HapticFeedback.notificationOccurred('error');
+            }
+        });
+
+        function updateUI() {
+            scoreEl.innerText = score.toLocaleString();
+            energyVal.innerText = energy;
+            energyBar.style.width = (energy / 1000 * 100) + "%";
+        }
+
+        function showFloatingNumber(x, y) {
+            const el = document.createElement('div');
+            el.innerText = '+10';
+            el.className = 'floating-number';
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        setInterval(() => {
+            if (energy < 1000) {
+                energy += 2;
+                updateUI();
+            }
+        }, 1000);
+
+        // --- SIMULACIÓN WALLET ---
+        function conectarWallet() {
+            const btn = document.getElementById('wallet-btn');
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> VINCULANDO...';
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> WALLET VINCULADA';
+                btn.style.background = "var(--primary)";
+                btn.style.color = "black";
+                btn.style.boxShadow = "0 0 20px var(--primary)";
+                tg.HapticFeedback.notificationOccurred('success');
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
