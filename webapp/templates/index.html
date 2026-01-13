@@ -43,7 +43,7 @@
 
         /* Stats Header */
         .header-stats {
-            margin-top: 60px; /* Espacio para el botón de wallet */
+            margin-top: 70px;
             text-align: center;
         }
 
@@ -65,8 +65,8 @@
         }
 
         .main-button {
-            width: 200px;
-            height: 200px;
+            width: 220px;
+            height: 220px;
             background: radial-gradient(circle, #2a2a2a 0%, #000000 100%);
             border-radius: 50%;
             border: 4px solid var(--neon-green);
@@ -77,13 +77,13 @@
             cursor: pointer;
             transition: transform 0.1s;
             position: relative;
+            -webkit-tap-highlight-color: transparent; /* Quita el flash azul en Android */
         }
 
         .main-button:active {
             transform: scale(0.95);
         }
 
-        /* Cuando no hay energía */
         .main-button.disabled {
             border-color: #555;
             box-shadow: none;
@@ -91,29 +91,31 @@
             pointer-events: none;
         }
 
-        .button-icon { font-size: 5rem; }
+        .button-icon { font-size: 6rem; }
 
         /* Barra de Energía */
         .energy-container {
-            width: 80%;
-            max-width: 300px;
-            margin-bottom: 30px;
+            width: 85%;
+            max-width: 320px;
+            margin-bottom: 40px;
             text-align: center;
         }
 
         .energy-text {
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-size: 1.1rem;
             color: #fff;
+            display: flex;
+            justify-content: space-between;
         }
 
         .progress-bar-bg {
             width: 100%;
-            height: 15px;
-            background-color: #333;
+            height: 18px;
+            background-color: #222;
             border-radius: 10px;
             overflow: hidden;
-            border: 1px solid #555;
+            border: 1px solid #444;
         }
 
         .progress-bar-fill {
@@ -121,24 +123,22 @@
             width: 100%;
             background: linear-gradient(90deg, var(--neon-gold), var(--neon-red));
             box-shadow: 0 0 10px var(--neon-gold);
-            transition: width 0.2s ease;
+            transition: width 0.2s ease, background 0.3s;
         }
 
-        /* Efecto flotante */
         .floating-text {
             position: absolute;
             font-weight: bold;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: var(--neon-gold);
-            animation: floatUp 0.8s ease-out forwards;
             pointer-events: none;
+            animation: floatUp 0.8s ease-out forwards;
         }
 
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-80px); }
+            100% { opacity: 0; transform: translateY(-100px); }
         }
-
     </style>
 </head>
 <body>
@@ -146,7 +146,7 @@
     <div id="ton-connect"></div>
 
     <div class="header-stats">
-        <div style="color:#888; font-size:0.9rem;">BALANCE DUENDE</div>
+        <div style="color:#888; letter-spacing: 2px; font-size:0.9rem;">$ELDUENDE BALANCE</div>
         <div class="balance-amount"><span id="score">0</span></div>
     </div>
 
@@ -157,7 +157,10 @@
     </div>
 
     <div class="energy-container">
-        <div class="energy-text">⚡ Energía: <span id="energyVal">500</span>/500</div>
+        <div class="energy-text">
+            <span>⚡ Energía</span>
+            <span><span id="energyVal">500</span>/500</span>
+        </div>
         <div class="progress-bar-bg">
             <div class="progress-bar-fill" id="energyBar"></div>
         </div>
@@ -165,43 +168,45 @@
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand();
+        tg.expand(); // Pantalla completa
 
-        // --- CONFIGURACIÓN DE TON CONNECT ---
+        // --- CONFIGURACIÓN CORRECTA DE LA WALLET ---
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://el-duende-app.onrender.com/tonconnect-manifest.json', // Esto lo crearemos luego
+            // Esta ruta busca el archivo en la carpeta static automáticamente
+            manifestUrl: window.location.origin + '/static/tonconnect-manifest.json',
             buttonRootId: 'ton-connect'
         });
 
-        // --- VARIABLES DEL JUEGO ---
+        // --- LÓGICA DEL JUEGO ---
         let score = 0;
         let energy = 500;
         const maxEnergy = 500;
         
-        // Elementos DOM
         const scoreDisplay = document.getElementById('score');
         const energyValDisplay = document.getElementById('energyVal');
         const energyBar = document.getElementById('energyBar');
         const clickBtn = document.getElementById('clickBtn');
 
-        // Lógica de Clic
+        // Al hacer Clic
         clickBtn.addEventListener('click', (e) => {
             if (energy > 0) {
-                // Ganar punto
+                // Sumar punto y restar energía
                 score++;
                 energy--;
                 updateUI();
                 
-                // Efectos
-                if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+                // Vibración táctil
+                if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+                
+                // Efecto visual +1
                 createFloatingText(e);
             } else {
-                // Sin energía (Vibración de error)
+                // Sin energía
                 if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
             }
         });
 
-        // Recargar energía automáticamente (1 punto cada segundo)
+        // Recarga de Energía (1 cada segundo)
         setInterval(() => {
             if (energy < maxEnergy) {
                 energy++;
@@ -213,14 +218,12 @@
             scoreDisplay.innerText = score.toLocaleString();
             energyValDisplay.innerText = energy;
             
-            // Calcular porcentaje de barra
             const percentage = (energy / maxEnergy) * 100;
             energyBar.style.width = percentage + '%';
 
-            // Cambiar visualmente si no hay energía
             if (energy <= 0) {
                 clickBtn.classList.add('disabled');
-                energyBar.style.background = '#333';
+                energyBar.style.background = '#444'; // Gris si está vacío
             } else {
                 clickBtn.classList.remove('disabled');
                 energyBar.style.background = 'linear-gradient(90deg, var(--neon-gold), var(--neon-red))';
@@ -232,16 +235,27 @@
             floater.classList.add('floating-text');
             floater.innerText = '+1';
             
-            // Usar coordenadas de toque o centro si falla
-            let x = e.clientX || window.innerWidth / 2;
-            let y = e.clientY || window.innerHeight / 2;
+            // Posición del toque
+            let x = e.clientX;
+            let y = e.clientY;
             
-            floater.style.left = `${x - 10}px`;
-            floater.style.top = `${y - 20}px`;
+            // Si es un clic sin coordenadas (raro pero posible), usar centro
+            if (!x || !y) {
+                const rect = clickBtn.getBoundingClientRect();
+                x = rect.left + rect.width / 2;
+                y = rect.top + rect.height / 2;
+            }
+
+            floater.style.left = `${x - 20}px`;
+            floater.style.top = `${y - 40}px`;
 
             document.body.appendChild(floater);
             setTimeout(() => floater.remove(), 800);
         }
+
+        // Colores de la App en Telegram
+        tg.setHeaderColor('#0a0a0a');
+        tg.setBackgroundColor('#0a0a0a');
     </script>
 </body>
 </html>
