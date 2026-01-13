@@ -36,67 +36,81 @@
         .screen.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
-        /* --- HEADER COMÚN --- */
+        /* --- HEADER --- */
         .top-bar {
             width: 100%; display: flex; justify-content: space-between;
             align-items: center; padding: 10px 20px; box-sizing: border-box;
             background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
         }
         .user-balance { font-size: 1.2rem; color: var(--neon-green); font-weight: bold; }
-        
-        /* --- ESTILOS TAP (MINERO) --- */
+
+        /* --- ESTILOS TAP --- */
         .main-button {
-            width: 200px; height: 200px;
+            width: 180px; height: 180px;
             background: radial-gradient(circle, #222 0%, #000 100%);
-            border-radius: 50%; border: 4px solid var(--neon-green);
-            box-shadow: 0 0 30px rgba(57, 255, 20, 0.2);
+            border-radius: 50%; border: 3px solid var(--neon-green);
+            box-shadow: 0 0 25px rgba(57, 255, 20, 0.2);
             display: flex; justify-content: center; align-items: center;
-            margin: 40px 0; cursor: pointer; position: relative;
-            transition: transform 0.1s;
+            margin: 30px 0; cursor: pointer; position: relative;
         }
         .main-button:active { transform: scale(0.95); }
-        .button-icon { font-size: 6rem; }
+        .button-icon { font-size: 5rem; }
         
-        .energy-bar-container { width: 80%; text-align: center; margin-top: 20px; }
-        .energy-fill { 
-            height: 10px; background: linear-gradient(90deg, var(--neon-gold), var(--neon-red)); 
-            width: 100%; border-radius: 5px; transition: width 0.5s;
+        /* --- ESTILOS ARENA (CANVAS) --- */
+        .arena-container {
+            position: relative;
+            width: 100%;
+            max-width: 340px;
+            height: 450px;
+            margin-top: 10px;
+            border: 2px solid #333;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #111;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px; /* Efecto Grid */
         }
 
-        /* --- ESTILOS TIENDA (SHOP) --- */
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .arena-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex; /* Flex para centrar contenido */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .btn-start {
+            background: linear-gradient(45deg, var(--neon-green), #228b22);
+            color: #000; border: none; padding: 15px 30px;
+            font-size: 1.2rem; font-weight: bold; border-radius: 30px;
+            cursor: pointer; box-shadow: 0 0 20px var(--neon-green);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* --- TIENDA --- */
         .shop-item {
             background: var(--card-bg); width: 100%; max-width: 320px;
             padding: 15px; margin-bottom: 10px; border-radius: 12px;
             border: 1px solid #333; display: flex; justify-content: space-between; align-items: center;
         }
-        .shop-info h4 { margin: 0; color: var(--neon-gold); }
-        .shop-info p { margin: 5px 0 0; font-size: 0.8rem; color: #888; }
-        .buy-btn {
-            background: var(--neon-green); color: black; border: none;
-            padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer;
-        }
-        .buy-btn:disabled { background: #555; color: #888; }
+        .buy-btn { background: var(--neon-green); border:none; padding:8px 12px; border-radius:5px; font-weight:bold; }
 
-        /* --- ESTILOS ARENA (SURVIVOR) --- */
-        #gameCanvas {
-            background: #111; border: 2px solid #333; border-radius: 10px;
-            touch-action: none; /* Crucial para móviles */
-        }
-        .arena-overlay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            text-align: center; display: none; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px;
-        }
-
-        /* --- MENÚ INFERIOR --- */
+        /* --- NAV --- */
         .bottom-nav {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 350px; height: 65px;
             background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px);
             border-radius: 35px; border: 1px solid #444;
             display: flex; justify-content: space-around; align-items: center;
-            z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            z-index: 1000;
         }
-        .nav-item { color: #666; font-size: 0.7rem; text-align: center; transition: 0.2s; }
+        .nav-item { color: #666; font-size: 0.7rem; text-align: center; }
         .nav-icon { font-size: 1.5rem; display: block; margin-bottom: 3px; }
         .nav-item.active { color: var(--neon-green); transform: translateY(-3px); }
 
@@ -112,221 +126,163 @@
     </div>
 
     <div id="screen-tap" class="screen active">
-        <h2 style="color: #888; font-weight: normal;">MINERO CUÁNTICO</h2>
-        
+        <h2 style="color: #888; font-weight: normal;">MINERO CENTRAL</h2>
         <div class="main-button" id="clickBtn">
             <div class="button-icon">👹</div>
         </div>
-
-        <div class="energy-bar-container">
+        <div style="width: 80%; text-align: center;">
             <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                 <span>⚡ Energía</span>
                 <span><span id="energyVal">500</span>/<span id="maxEnergyVal">500</span></span>
             </div>
             <div style="background:#333; height:10px; border-radius:5px;">
-                <div class="energy-fill" id="energyBar"></div>
+                <div style="height:100%; background:linear-gradient(90deg, #ffd700, #ff0055); width:100%; transition:width 0.5s;" id="energyBar"></div>
             </div>
-            <p style="font-size: 0.8rem; color: #666; margin-top: 15px;">
-                Costo: 10⚡ | Recompensa: <span id="tapPowerVal">0.1</span>
-            </p>
-        </div>
-    </div>
-
-    <div id="screen-shop" class="screen">
-        <h2 style="color: var(--neon-gold);">MERCADO NEGRO</h2>
-        
-        <div class="shop-item">
-            <div class="shop-info">
-                <h4>Guantes de Poder</h4>
-                <p>+0.1 ganancia por tap</p>
-            </div>
-            <button class="buy-btn" onclick="buyUpgrade('multitap', 50)">50 pts</button>
-        </div>
-
-        <div class="shop-item">
-            <div class="shop-info">
-                <h4>Batería Nuclear</h4>
-                <p>+500 Energía Máxima</p>
-            </div>
-            <button class="buy-btn" onclick="buyUpgrade('maxenergy', 100)">100 pts</button>
-        </div>
-
-        <div class="shop-item">
-            <div class="shop-info">
-                <h4>Recarga de Emergencia</h4>
-                <p>Recuperar 100% Energía</p>
-            </div>
-            <button class="buy-btn" onclick="buyUpgrade('refill', 20)">20 pts</button>
+            <p style="color:#666; font-size:0.8rem; margin-top:10px;">Gasto: 10⚡ | Gana: <span id="tapPowerVal">0.1</span></p>
         </div>
     </div>
 
     <div id="screen-arena" class="screen">
-        <h2 style="color: var(--neon-red);">ARENA DE SUPERVIVENCIA</h2>
-        <p style="font-size: 0.8rem; color: #888;">Arrastra para moverte. Disparo automático.</p>
+        <h2 style="color: var(--neon-red);">DEFENSA FINANCIERA</h2>
+        <p style="font-size: 0.8rem; color: #888;">Arrastra para mover al Duende. Dispara a las deudas.</p>
         
-        <div style="position: relative;">
-            <canvas id="gameCanvas" width="320" height="400"></canvas>
+        <div class="arena-container">
+            <canvas id="gameCanvas"></canvas>
             
             <div id="arenaOverlay" class="arena-overlay">
-                <h2 id="arenaTitle" style="color:white;">GAME OVER</h2>
-                <p>Recompensa: <span id="arenaReward" style="color:var(--neon-green);">0</span> pts</p>
-                <button class="buy-btn" onclick="startArena()">JUGAR OTRA VEZ (Costo: 50⚡)</button>
+                <h2 id="arenaTitle" style="color:white; margin-bottom:10px;">ZONA DE RIESGO</h2>
+                <p style="color:#ccc; margin-bottom:20px;">Sobrevive y gana $ELDUENDE</p>
+                <button class="btn-start" onclick="startArena()">INICIAR (50⚡)</button>
+                <p id="arenaReward" style="color:var(--neon-green); margin-top:15px; display:none;">Ganado: 0</p>
             </div>
+        </div>
+    </div>
+
+    <div id="screen-shop" class="screen">
+        <h2 style="color: var(--neon-gold);">MERCADO</h2>
+        <div class="shop-item">
+            <div><h4>Guantes Pro</h4><p style="color:#888; font-size:0.8rem;">+0.1 por clic</p></div>
+            <button class="buy-btn" onclick="buyUpgrade('multitap', 50)">50 pts</button>
+        </div>
+        <div class="shop-item">
+            <div><h4>Batería Extra</h4><p style="color:#888; font-size:0.8rem;">+500 Energía</p></div>
+            <button class="buy-btn" onclick="buyUpgrade('maxenergy', 100)">100 pts</button>
+        </div>
+        <div class="shop-item">
+            <div><h4>Recarga Total</h4><p style="color:#888; font-size:0.8rem;">Llenar energía</p></div>
+            <button class="buy-btn" onclick="buyUpgrade('refill', 20)">20 pts</button>
         </div>
     </div>
 
     <div id="screen-home" class="screen">
         <h2>COMUNIDAD</h2>
         <div class="shop-item" onclick="window.open('https://t.me/elduende420peru')" style="cursor:pointer;">
-            <div class="shop-info"><h4>📢 Canal Telegram</h4></div>
-            <div>➡️</div>
-        </div>
-        <div class="shop-item" onclick="window.open('https://wa.me/51900877863')" style="cursor:pointer;">
-            <div class="shop-info"><h4>💬 WhatsApp</h4></div>
-            <div>➡️</div>
+            <h4>📢 Canal Telegram</h4><div>➡️</div>
         </div>
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('tap', this)">
-            <span class="nav-icon">⛏️</span> Minar
-        </div>
-        <div class="nav-item" onclick="switchTab('shop', this)">
-            <span class="nav-icon">🛒</span> Tienda
-        </div>
-        <div class="nav-item" onclick="switchTab('arena', this)">
-            <span class="nav-icon">⚔️</span> Arena
-        </div>
-        <div class="nav-item" onclick="switchTab('home', this)">
-            <span class="nav-icon">🏠</span> Inicio
-        </div>
+        <div class="nav-item active" onclick="switchTab('tap', this)"><span class="nav-icon">⛏️</span>Minar</div>
+        <div class="nav-item" onclick="switchTab('shop', this)"><span class="nav-icon">🛒</span>Tienda</div>
+        <div class="nav-item" onclick="switchTab('arena', this)"><span class="nav-icon">⚔️</span>Arena</div>
+        <div class="nav-item" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span>Inicio</div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- ESTADO DEL JUGADOR ---
-        let state = {
-            score: 0.0,
-            energy: 500,
-            maxEnergy: 500,
-            tapPower: 0.1,    // 0.1 puntos por clic
-            tapCost: 10       // 10 energía por clic
-        };
+        // --- IMÁGENES (SPRITES) ---
+        const imgPlayer = new Image(); imgPlayer.src = 'https://cdn-icons-png.flaticon.com/512/4712/4712035.png'; // Duende
+        const imgEnemy = new Image(); imgEnemy.src = 'https://cdn-icons-png.flaticon.com/512/2331/2331952.png'; // Calavera Roja
+        const imgBullet = new Image(); imgBullet.src = 'https://cdn-icons-png.flaticon.com/512/763/763699.png'; // Fuego
 
-        // --- SISTEMA DE PESTAÑAS ---
-        function switchTab(tabName, el) {
+        // --- ESTADO ---
+        let state = { score: 0.0, energy: 500, maxEnergy: 500, tapPower: 0.1, tapCost: 10 };
+
+        // --- UI & TABS ---
+        function switchTab(name, el) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('screen-'+tabName).classList.add('active');
+            document.getElementById('screen-'+name).classList.add('active');
             el.classList.add('active');
-            
-            // Pausar Arena si salimos
-            if(tabName !== 'arena') stopArena();
+            if(name !== 'arena') stopArena();
         }
 
-        // --- TON CONNECT ---
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: window.location.origin + '/static/tonconnect-manifest.json',
             buttonRootId: 'ton-connect'
         });
 
-        // --- LÓGICA MINERO (TAP) ---
-        const clickBtn = document.getElementById('clickBtn');
-        
-        clickBtn.addEventListener('click', (e) => {
+        // --- LOGICA TAP ---
+        document.getElementById('clickBtn').addEventListener('click', (e) => {
             if (state.energy >= state.tapCost) {
-                // Matemáticas del juego
                 state.score += state.tapPower;
                 state.energy -= state.tapCost;
-                
                 updateUI();
-                
-                // Efectos visuales
                 if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-                showFloater(e.clientX, e.clientY, `+${state.tapPower.toFixed(1)}`);
+                
+                // Floater
+                let el = document.createElement('div');
+                el.className = 'floating-text';
+                el.innerText = '+' + state.tapPower.toFixed(1);
+                el.style.left = e.clientX + 'px';
+                el.style.top = e.clientY + 'px';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 1000);
             } else {
                 if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
             }
         });
 
-        // Regeneración sostenible: 1 Energía cada 28 segundos (aprox 4 horas para 500)
-        setInterval(() => {
-            if (state.energy < state.maxEnergy) {
-                state.energy += 1;
-                updateUI();
-            }
-        }, 28000); // 28 segundos
-
-        // --- LÓGICA TIENDA ---
-        function buyUpgrade(type, cost) {
-            if (state.score >= cost) {
-                state.score -= cost;
-                
-                if (type === 'multitap') {
-                    state.tapPower += 0.1;
-                    alert("¡Guantes equipados! Ahora ganas " + state.tapPower.toFixed(1) + " por clic.");
-                } else if (type === 'maxenergy') {
-                    state.maxEnergy += 500;
-                    state.energy += 500; // Rellenar lo comprado
-                    alert("¡Batería ampliada! Máximo: " + state.maxEnergy);
-                } else if (type === 'refill') {
-                    state.energy = state.maxEnergy;
-                    alert("¡Energía al 100%!");
-                }
-                updateUI();
-            } else {
-                alert("Fondos insuficientes. Necesitas minar más.");
-            }
-        }
-
-        function showFloater(x, y, text) {
-            let el = document.createElement('div');
-            el.className = 'floating-text';
-            el.innerText = text;
-            el.style.left = (x || window.innerWidth/2) + 'px';
-            el.style.top = (y || window.innerHeight/2) + 'px';
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 1000);
-        }
+        // Regeneración
+        setInterval(() => { if(state.energy < state.maxEnergy){ state.energy++; updateUI(); } }, 28000);
 
         function updateUI() {
-            // Manejo de decimales con toFixed(1)
             document.getElementById('displayScore').innerText = state.score.toFixed(1);
             document.getElementById('energyVal').innerText = Math.floor(state.energy);
             document.getElementById('maxEnergyVal').innerText = state.maxEnergy;
             document.getElementById('tapPowerVal').innerText = state.tapPower.toFixed(1);
-            
-            let pct = (state.energy / state.maxEnergy) * 100;
-            document.getElementById('energyBar').style.width = pct + '%';
+            document.getElementById('energyBar').style.width = (state.energy/state.maxEnergy*100) + '%';
         }
 
-        // --- MOTOR DEL JUEGO SURVIVOR (ARENA) ---
+        function buyUpgrade(type, cost) {
+            if(state.score >= cost) {
+                state.score -= cost;
+                if(type === 'multitap') state.tapPower += 0.1;
+                if(type === 'maxenergy') { state.maxEnergy += 500; state.energy += 500; }
+                if(type === 'refill') state.energy = state.maxEnergy;
+                updateUI();
+                alert("¡Compra exitosa!");
+            } else alert("Faltan puntos");
+        }
+
+        // --- MOTOR GRAFICO ARENA (SPRITES) ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let gameLoopId;
         let arenaActive = false;
-        
-        // Entidades
-        let player = { x: 160, y: 200, r: 10, speed: 3 };
-        let enemies = [];
-        let bullets = [];
+        let player = { x: 150, y: 200, size: 40, speed: 4 };
+        let enemies = [], bullets = [];
         let arenaScore = 0;
         let frame = 0;
-
-        // Input táctil
         let touchX = null, touchY = null;
+
+        // Ajustar Canvas al tamaño real
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+
+        // Controles Táctiles (Seguir dedo)
         canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault(); // Evitar scroll
+            e.preventDefault();
             let rect = canvas.getBoundingClientRect();
             touchX = e.touches[0].clientX - rect.left;
             touchY = e.touches[0].clientY - rect.top;
-        }, {passive: false});
-        
+        }, {passive:false});
         canvas.addEventListener('touchend', () => { touchX = null; touchY = null; });
-
-        // Input Mouse (para PC)
+        // Mouse (PC)
         canvas.addEventListener('mousemove', (e) => {
             if(e.buttons === 1) {
                 let rect = canvas.getBoundingClientRect();
@@ -337,18 +293,15 @@
         canvas.addEventListener('mouseup', () => { touchX = null; touchY = null; });
 
         function startArena() {
-            if (state.energy < 50) {
-                alert("Necesitas 50 de energía para entrar a la Arena.");
-                return;
-            }
-            state.energy -= 50;
-            updateUI();
-
+            if (state.energy < 50) { alert("Necesitas 50 Energia"); return; }
+            state.energy -= 50; updateUI();
+            
             document.getElementById('arenaOverlay').style.display = 'none';
-            player = { x: canvas.width/2, y: canvas.height/2, r: 8, speed: 3 };
-            enemies = [];
-            bullets = [];
-            arenaScore = 0;
+            resizeCanvas();
+            
+            player.x = canvas.width/2; 
+            player.y = canvas.height/2;
+            enemies = []; bullets = []; arenaScore = 0;
             arenaActive = true;
             loop();
         }
@@ -360,114 +313,97 @@
 
         function gameOver() {
             stopArena();
-            state.score += arenaScore; // Sumar premio
-            updateUI();
-            
-            document.getElementById('arenaTitle').innerText = "¡SOBREVIVISTE!";
-            document.getElementById('arenaReward').innerText = arenaScore.toFixed(1);
-            document.getElementById('arenaOverlay').style.display = 'block';
+            state.score += arenaScore; updateUI();
+            document.getElementById('arenaTitle').innerText = "¡FIN DE JUEGO!";
+            document.getElementById('arenaReward').innerText = "Ganaste: " + arenaScore.toFixed(1);
+            document.getElementById('arenaReward').style.display = 'block';
+            document.getElementById('arenaOverlay').style.display = 'flex';
         }
 
         function loop() {
             if (!arenaActive) return;
             
-            ctx.fillStyle = '#111';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
+            // Limpiar Canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
             // 1. Mover Jugador
-            if (touchX !== null && touchY !== null) {
+            if (touchX !== null) {
                 let dx = touchX - player.x;
                 let dy = touchY - player.y;
                 let dist = Math.hypot(dx, dy);
                 if (dist > 5) {
-                    player.x += (dx / dist) * player.speed;
-                    player.y += (dy / dist) * player.speed;
+                    player.x += (dx/dist) * player.speed;
+                    player.y += (dy/dist) * player.speed;
                 }
             }
 
-            // 2. Spawn Enemigos
-            if (frame % 60 === 0) { // Cada segundo aprox
-                enemies.push({
-                    x: Math.random() < 0.5 ? 0 : canvas.width,
-                    y: Math.random() * canvas.height,
-                    speed: 1 + Math.random(),
-                    hp: 1
+            // 2. Dibujar JUGADOR (Sprite Duende)
+            ctx.drawImage(imgPlayer, player.x - 20, player.y - 20, 40, 40);
+
+            // 3. Lógica Enemigos
+            if (frame % 50 === 0) {
+                enemies.push({ 
+                    x: Math.random() < 0.5 ? -30 : canvas.width + 30, 
+                    y: Math.random() * canvas.height, 
+                    speed: 1 + Math.random(), 
+                    size: 35 
                 });
             }
 
-            // 3. Disparo Automático (al más cercano)
-            if (frame % 30 === 0 && enemies.length > 0) {
-                let nearest = enemies[0]; // Simplificado
-                let dx = nearest.x - player.x;
-                let dy = nearest.y - player.y;
+            // 4. Disparo Automático
+            if (frame % 25 === 0 && enemies.length > 0) {
+                let target = enemies[0];
+                let dx = target.x - player.x;
+                let dy = target.y - player.y;
                 let dist = Math.hypot(dx, dy);
-                
-                bullets.push({
-                    x: player.x, y: player.y,
-                    vx: (dx/dist) * 5, vy: (dy/dist) * 5
-                });
+                bullets.push({ x: player.x, y: player.y, vx: (dx/dist)*7, vy: (dy/dist)*7 });
             }
 
-            // 4. Actualizar Balas
-            ctx.fillStyle = '#ffd700';
+            // 5. Dibujar y Mover Balas (Fuego)
             for (let i = bullets.length - 1; i >= 0; i--) {
                 let b = bullets[i];
                 b.x += b.vx; b.y += b.vy;
-                ctx.beginPath(); ctx.arc(b.x, b.y, 3, 0, Math.PI*2); ctx.fill();
-                
-                // Limpiar balas fuera
-                if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) bullets.splice(i, 1);
+                ctx.drawImage(imgBullet, b.x - 10, b.y - 10, 20, 20);
+                if(b.x < -50 || b.x > canvas.width+50) bullets.splice(i, 1);
             }
 
-            // 5. Actualizar Enemigos
-            ctx.fillStyle = '#ff0055';
+            // 6. Dibujar y Mover Enemigos (Calaveras)
             for (let i = enemies.length - 1; i >= 0; i--) {
                 let e = enemies[i];
                 let dx = player.x - e.x;
                 let dy = player.y - e.y;
                 let dist = Math.hypot(dx, dy);
                 
-                // Mover hacia jugador
                 e.x += (dx/dist) * e.speed;
                 e.y += (dy/dist) * e.speed;
-                
-                // Dibujar
-                ctx.beginPath(); ctx.arc(e.x, e.y, 8, 0, Math.PI*2); ctx.fill();
 
-                // Colisión con jugador (Game Over)
-                if (dist < 15) {
-                    document.getElementById('arenaTitle').innerText = "MUERTO EN COMBATE";
-                    gameOver();
-                    return;
-                }
+                ctx.drawImage(imgEnemy, e.x - 17, e.y - 17, 35, 35);
 
-                // Colisión con balas
+                // Colisión Jugador
+                if (dist < 25) { gameOver(); return; }
+
+                // Colisión Bala
                 for (let j = bullets.length - 1; j >= 0; j--) {
                     let b = bullets[j];
-                    let distB = Math.hypot(e.x - b.x, e.y - b.y);
-                    if (distB < 10) {
+                    if (Math.hypot(e.x - b.x, e.y - b.y) < 25) {
                         enemies.splice(i, 1);
                         bullets.splice(j, 1);
-                        arenaScore += 0.5; // Ganancia por kill
+                        arenaScore += 0.5;
                         break;
                     }
                 }
             }
 
-            // Dibujar Jugador
-            ctx.fillStyle = '#39ff14';
-            ctx.beginPath(); ctx.arc(player.x, player.y, player.r, 0, Math.PI*2); ctx.fill();
-
             // HUD
-            ctx.fillStyle = 'white';
-            ctx.font = '16px Arial';
-            ctx.fillText("Score: " + arenaScore.toFixed(1), 10, 20);
+            ctx.fillStyle = "white";
+            ctx.font = "bold 16px Arial";
+            ctx.fillText("Score: " + arenaScore.toFixed(1), 10, 25);
 
             frame++;
             gameLoopId = requestAnimationFrame(loop);
         }
 
-        updateUI(); // Iniciar UI
+        updateUI();
     </script>
 </body>
 </html>
