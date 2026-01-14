@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Luxor Super App</title>
+    <title>El Duende App</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
@@ -13,8 +13,8 @@
             --neon-green: #39ff14;
             --neon-gold: #ffd700;
             --neon-red: #ff0055;
-            --dark-bg: #0a0a0a;
-            --card-bg: #1a1a1a;
+            --dark-bg: #050505;
+            --card-bg: #111;
         }
 
         body {
@@ -27,157 +27,168 @@
             user-select: none; overflow: hidden;
         }
 
-        /* --- PANTALLAS --- */
-        .screen {
-            display: none; flex-grow: 1; flex-direction: column;
-            align-items: center; padding: 20px; overflow-y: auto;
-            padding-bottom: 90px;
+        /* Top Bar */
+        .top-bar {
+            width: 100%; display: flex; justify-content: space-between;
+            align-items: center; padding: 10px 20px;
+            background: rgba(0,0,0,0.8); border-bottom: 1px solid #333; z-index:10;
         }
+        .user-balance { font-size: 1.1rem; color: var(--neon-green); font-weight: bold; }
+
+        /* Screens */
+        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 90px; }
         .screen.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
-        /* --- HEADER --- */
-        .top-bar {
-            width: 100%; display: flex; justify-content: space-between;
-            align-items: center; padding: 10px 20px; box-sizing: border-box;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
-        }
-        .user-balance { font-size: 1.2rem; color: var(--neon-green); font-weight: bold; }
-
-        /* --- ESTILOS TAP --- */
+        /* Tap Button */
         .main-button {
-            width: 180px; height: 180px;
-            background: radial-gradient(circle, #222 0%, #000 100%);
-            border-radius: 50%; border: 3px solid var(--neon-green);
-            box-shadow: 0 0 25px rgba(57, 255, 20, 0.2);
+            width: 220px; height: 220px;
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+            border-radius: 50%; border: 4px solid var(--neon-green);
+            box-shadow: 0 0 40px rgba(57, 255, 20, 0.2);
             display: flex; justify-content: center; align-items: center;
             margin: 30px 0; cursor: pointer; position: relative;
         }
         .main-button:active { transform: scale(0.95); }
-        .button-icon { font-size: 5rem; }
-        
-        /* --- ESTILOS ARENA (CANVAS) --- */
+
+        /* Arena */
         .arena-container {
-            position: relative;
-            width: 100%;
-            max-width: 340px;
-            height: 450px;
-            margin-top: 10px;
-            border: 2px solid #333;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #111;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 20px 20px; /* Efecto Grid */
+            position: relative; width: 100%; max-width: 360px; height: 500px;
+            margin-top: 10px; border: 2px solid #333; border-radius: 15px;
+            overflow: hidden; background: #050505;
+            background-image: linear-gradient(rgba(0, 255, 0, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 0, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
-
         canvas { display: block; width: 100%; height: 100%; }
-
         .arena-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            display: flex; /* Flex para centrar contenido */
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
+            background: rgba(0,0,0,0.9); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10;
         }
-
         .btn-start {
-            background: linear-gradient(45deg, var(--neon-green), #228b22);
-            color: #000; border: none; padding: 15px 30px;
-            font-size: 1.2rem; font-weight: bold; border-radius: 30px;
-            cursor: pointer; box-shadow: 0 0 20px var(--neon-green);
-            animation: pulse 1.5s infinite;
+            background: linear-gradient(90deg, var(--neon-green), #006400);
+            color: #fff; border: none; padding: 15px 40px; font-size: 1.2rem;
+            font-weight: bold; border-radius: 30px; cursor: pointer;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
         }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* --- TIENDA --- */
-        .shop-item {
-            background: var(--card-bg); width: 100%; max-width: 320px;
-            padding: 15px; margin-bottom: 10px; border-radius: 12px;
-            border: 1px solid #333; display: flex; justify-content: space-between; align-items: center;
+        /* Shop */
+        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 360px; }
+        .shop-card {
+            background: var(--card-bg); border: 1px solid #333; border-radius: 10px;
+            padding: 15px 10px; text-align: center; display: flex; flex-direction: column; align-items: center;
         }
-        .buy-btn { background: var(--neon-green); border:none; padding:8px 12px; border-radius:5px; font-weight:bold; }
+        .shop-img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        .buy-btn {
+            background: var(--neon-gold); color: #000; border: none;
+            padding: 8px 15px; border-radius: 5px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 5px;
+        }
 
-        /* --- NAV --- */
+        /* Nav */
         .bottom-nav {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 350px; height: 65px;
-            background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px);
-            border-radius: 35px; border: 1px solid #444;
-            display: flex; justify-content: space-around; align-items: center;
-            z-index: 1000;
+            width: 90%; max-width: 350px; height: 70px;
+            background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(10px);
+            border-radius: 20px; border: 1px solid #333;
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
         }
-        .nav-item { color: #666; font-size: 0.7rem; text-align: center; }
-        .nav-icon { font-size: 1.5rem; display: block; margin-bottom: 3px; }
+        .nav-item { color: #666; font-size: 0.7rem; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .nav-icon { font-size: 1.5rem; margin-bottom: 4px; }
         .nav-item.active { color: var(--neon-green); transform: translateY(-3px); }
 
-        .floating-text { position: absolute; color: var(--neon-gold); font-weight: bold; pointer-events: none; animation: float 1s forwards; }
-        @keyframes float { to { transform: translateY(-50px); opacity: 0; } }
+        .floating-text { position: absolute; color: var(--neon-gold); font-weight: bold; pointer-events: none; animation: float 0.8s forwards; font-size: 1.5rem; z-index: 50; }
+        @keyframes float { to { transform: translateY(-80px); opacity: 0; } }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
         <div id="ton-connect"></div>
-        <div class="user-balance">$ <span id="displayScore">0.0</span></div>
+        <div class="user-balance">$ELDUENDE: <span id="displayScore">0</span></div>
     </div>
 
     <div id="screen-tap" class="screen active">
-        <h2 style="color: #888; font-weight: normal;">MINERO CENTRAL</h2>
+        <h2 style="color: #888; letter-spacing: 2px;">MINERO CENTRAL</h2>
         <div class="main-button" id="clickBtn">
-            <div class="button-icon">👹</div>
+            <img id="mainTapImage" src="/static/logo.png" style="width: 80%; height: 80%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 0 15px var(--neon-green));">
         </div>
-        <div style="width: 80%; text-align: center;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                <span>⚡ Energía</span>
-                <span><span id="energyVal">500</span>/<span id="maxEnergyVal">500</span></span>
+        <div style="width: 85%; text-align: center;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size: 0.9rem;">
+                <span>⚡ Energía</span><span><span id="energyVal">500</span>/500</span>
             </div>
-            <div style="background:#333; height:10px; border-radius:5px;">
-                <div style="height:100%; background:linear-gradient(90deg, #ffd700, #ff0055); width:100%; transition:width 0.5s;" id="energyBar"></div>
+            <div style="background:#222; height:15px; border-radius:8px; overflow: hidden; border: 1px solid #444;">
+                <div style="height:100%; background:linear-gradient(90deg, #ffd700, #ff0055); width:100%; transition:width 0.3s;" id="energyBar"></div>
             </div>
-            <p style="color:#666; font-size:0.8rem; margin-top:10px;">Gasto: 10⚡ | Gana: <span id="tapPowerVal">0.1</span></p>
         </div>
     </div>
 
     <div id="screen-arena" class="screen">
-        <h2 style="color: var(--neon-red);">DEFENSA FINANCIERA</h2>
-        <p style="font-size: 0.8rem; color: #888;">Arrastra para mover al Duende. Dispara a las deudas.</p>
-        
+        <h2 style="color: var(--neon-red);">ZONA DE GUERRA</h2>
         <div class="arena-container">
             <canvas id="gameCanvas"></canvas>
-            
             <div id="arenaOverlay" class="arena-overlay">
-                <h2 id="arenaTitle" style="color:white; margin-bottom:10px;">ZONA DE RIESGO</h2>
-                <p style="color:#ccc; margin-bottom:20px;">Sobrevive y gana $ELDUENDE</p>
+                <h2 style="color:white; margin-bottom:10px;">DEFENSA FINANCIERA</h2>
+                <p style="color:#ccc;">Sobrevive a los Osos y Scammers</p><br>
                 <button class="btn-start" onclick="startArena()">INICIAR (50⚡)</button>
-                <p id="arenaReward" style="color:var(--neon-green); margin-top:15px; display:none;">Ganado: 0</p>
+                <p id="arenaReward" style="color:var(--neon-green); margin-top:20px; font-weight:bold; display:none;">Ganado: 0</p>
             </div>
         </div>
     </div>
 
     <div id="screen-shop" class="screen">
-        <h2 style="color: var(--neon-gold);">MERCADO</h2>
-        <div class="shop-item">
-            <div><h4>Guantes Pro</h4><p style="color:#888; font-size:0.8rem;">+0.1 por clic</p></div>
-            <button class="buy-btn" onclick="buyUpgrade('multitap', 50)">50 pts</button>
-        </div>
-        <div class="shop-item">
-            <div><h4>Batería Extra</h4><p style="color:#888; font-size:0.8rem;">+500 Energía</p></div>
-            <button class="buy-btn" onclick="buyUpgrade('maxenergy', 100)">100 pts</button>
-        </div>
-        <div class="shop-item">
-            <div><h4>Recarga Total</h4><p style="color:#888; font-size:0.8rem;">Llenar energía</p></div>
-            <button class="buy-btn" onclick="buyUpgrade('refill', 20)">20 pts</button>
+        <h2 style="color: var(--neon-gold);">MERCADO NEGRO</h2>
+        <div class="shop-grid">
+            <div class="shop-card">
+                <img src="/static/skin_DUENDE_HACKER.png" class="shop-img">
+                <div style="font-weight:bold;">HACKER</div>
+                <div style="font-size:0.7rem; color:#888;">Velocidad x2</div>
+                <button class="buy-btn" onclick="buySkin('hacker', 5000)">5,000 Pts</button>
+            </div>
+            <div class="shop-card">
+                <img src="/static/skin_DUENDE_BOX.png" class="shop-img">
+                <div style="font-weight:bold;">BOXER</div>
+                <div style="font-size:0.7rem; color:#888;">Daño Crítico</div>
+                <button class="buy-btn" onclick="buySkin('boxer', 8000)">8,000 Pts</button>
+            </div>
+            <div class="shop-card">
+                <img src="/static/skin_REY_DUENDE.png" class="shop-img">
+                <div style="font-weight:bold;">EL REY</div>
+                <div style="font-size:0.7rem; color:#888;">Ganancia x2</div>
+                <button class="buy-btn" onclick="buySkin('king', 15000)">15,000 Pts</button>
+            </div>
+            <div class="shop-card">
+                <img src="/static/skin_DUENDE_MAESTRO.png" class="shop-img">
+                <div style="font-weight:bold;">MAESTRO</div>
+                <div style="font-size:0.7rem; color:#888;">Poder Legendario</div>
+                <button class="buy-btn" onclick="buySkin('maestro', 30000)">30,000 Pts</button>
+            </div>
+            
+            <div class="shop-card">
+                <img src="/static/booster_RAYOTON.png" class="shop-img">
+                <div style="font-weight:bold;">RECARGA</div>
+                <div style="font-size:0.7rem; color:#888;">Energía Full</div>
+                <button class="buy-btn" onclick="buyBooster('refill', 500)">500 Pts</button>
+            </div>
+            <div class="shop-card">
+                <img src="/static/booster_INVENCIBLE_90S.png" class="shop-img">
+                <div style="font-weight:bold;">ESCUDO</div>
+                <div style="font-size:0.7rem; color:#888;">Invencible 10s</div>
+                <button class="buy-btn" onclick="buyBooster('shield', 1000)">1,000 Pts</button>
+            </div>
+            <div class="shop-card">
+                <img src="/static/booster_x100_ENERGIA.png" class="shop-img">
+                <div style="font-weight:bold;">MAX ENERGY</div>
+                <div style="font-size:0.7rem; color:#888;">+100 Capacidad</div>
+                <button class="buy-btn" onclick="buyBooster('maxcap', 2000)">2,000 Pts</button>
+            </div>
         </div>
     </div>
 
     <div id="screen-home" class="screen">
         <h2>COMUNIDAD</h2>
-        <div class="shop-item" onclick="window.open('https://t.me/elduende420peru')" style="cursor:pointer;">
-            <h4>📢 Canal Telegram</h4><div>➡️</div>
+        <div style="background:var(--card-bg); width:100%; padding:20px; border-radius:10px; margin-top:20px; text-align:center; border:1px solid #333; cursor:pointer;" onclick="window.open('https://t.me/elduende420peru')">
+            <div style="font-size:3rem; margin-bottom: 10px;">📢</div>
+            <h4>Canal Oficial</h4>
         </div>
     </div>
 
@@ -192,16 +203,93 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- IMÁGENES (SPRITES) ---
-        const imgPlayer = new Image(); imgPlayer.src = 'https://cdn-icons-png.flaticon.com/512/4712/4712035.png'; // Duende
-        const imgEnemy = new Image(); imgEnemy.src = 'https://cdn-icons-png.flaticon.com/512/2331/2331952.png'; // Calavera Roja
-        const imgBullet = new Image(); imgBullet.src = 'https://cdn-icons-png.flaticon.com/512/763/763699.png'; // Fuego
+        // --- CARGA DE ASSETS CONFIRMADOS ---
+        const sprites = {
+            player: new Image(),
+            hacker: new Image(),
+            boxer: new Image(), // Nombre corregido
+            king: new Image(),
+            maestro: new Image(),
+            enemyBear: new Image(),
+            enemyRug: new Image(),
+            enemyWhale: new Image(),
+            bullet: new Image()
+        };
+        
+        // Rutas exactas
+        sprites.player.src = '/static/logo.png';
+        sprites.hacker.src = '/static/skin_DUENDE_HACKER.png';
+        sprites.boxer.src = '/static/skin_DUENDE_BOX.png'; 
+        sprites.king.src = '/static/skin_REY_DUENDE.png';
+        sprites.maestro.src = '/static/skin_DUENDE_MAESTRO.png';
+        sprites.enemyBear.src = '/static/enemy_BEAR_MARKET.png';
+        sprites.enemyRug.src = '/static/enemy_RUG_PULL.png';
+        sprites.enemyWhale.src = '/static/enemy_WHALE.png';
+        sprites.bullet.src = '/static/loot_COIN.png';
 
-        // --- ESTADO ---
-        let state = { score: 0.0, energy: 500, maxEnergy: 500, tapPower: 0.1, tapCost: 10 };
+        let state = { score: 0, energy: 500, maxEnergy: 500, currentSkin: 'default', tapPower: 1, arenaMulti: 1 };
+        let invincible = false;
 
-        // --- UI & TABS ---
-        function switchTab(name, el) {
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: window.location.origin + '/static/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect'
+        });
+
+        // --- TIENDA SKINS ---
+        function buySkin(name, cost) {
+            if(state.score >= cost) {
+                state.score -= cost;
+                activateSkin(name);
+                updateUI();
+                alert("¡Skin equipada!");
+            } else alert("Faltan puntos.");
+        }
+
+        // --- TIENDA BOOSTERS ---
+        function buyBooster(type, cost) {
+            if(state.score >= cost) {
+                state.score -= cost;
+                if(type === 'refill') { state.energy = state.maxEnergy; alert("Energía Recargada"); }
+                if(type === 'maxcap') { state.maxEnergy += 100; state.energy = state.maxEnergy; alert("Capacidad Aumentada"); }
+                if(type === 'shield') { invincible = true; setTimeout(()=>{ invincible=false; alert("Escudo Agotado"); }, 10000); alert("¡Invencible por 10s!"); }
+                updateUI();
+            } else alert("Faltan puntos.");
+        }
+
+        function activateSkin(name) {
+            state.currentSkin = name;
+            let img = document.getElementById('mainTapImage');
+            if(name === 'hacker') { img.src = sprites.hacker.src; state.tapPower = 2; }
+            if(name === 'boxer') { img.src = sprites.boxer.src; state.tapPower = 1; }
+            if(name === 'king') { img.src = sprites.king.src; state.arenaMulti = 2; }
+            if(name === 'maestro') { img.src = sprites.maestro.src; state.tapPower = 5; }
+        }
+
+        // --- TAP ---
+        document.getElementById('clickBtn').addEventListener('click', (e) => {
+            if (state.energy >= 1) {
+                state.score += state.tapPower;
+                state.energy -= 1;
+                updateUI();
+                if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+                let el = document.createElement('div');
+                el.className = 'floating-text';
+                el.innerText = '+' + state.tapPower;
+                el.style.left = e.clientX + 'px';
+                el.style.top = e.clientY + 'px';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 800);
+            }
+        });
+        setInterval(() => { if(state.energy < state.maxEnergy) { state.energy++; updateUI(); } }, 2000);
+
+        function updateUI() {
+            document.getElementById('displayScore').innerText = state.score.toLocaleString();
+            document.getElementById('energyVal').innerText = state.energy;
+            document.getElementById('energyBar').style.width = (state.energy/state.maxEnergy*100) + '%';
+        }
+
+        window.switchTab = function(name, el) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('screen-'+name).classList.add('active');
@@ -209,72 +297,17 @@
             if(name !== 'arena') stopArena();
         }
 
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: window.location.origin + '/static/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect'
-        });
-
-        // --- LOGICA TAP ---
-        document.getElementById('clickBtn').addEventListener('click', (e) => {
-            if (state.energy >= state.tapCost) {
-                state.score += state.tapPower;
-                state.energy -= state.tapCost;
-                updateUI();
-                if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-                
-                // Floater
-                let el = document.createElement('div');
-                el.className = 'floating-text';
-                el.innerText = '+' + state.tapPower.toFixed(1);
-                el.style.left = e.clientX + 'px';
-                el.style.top = e.clientY + 'px';
-                document.body.appendChild(el);
-                setTimeout(() => el.remove(), 1000);
-            } else {
-                if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
-            }
-        });
-
-        // Regeneración
-        setInterval(() => { if(state.energy < state.maxEnergy){ state.energy++; updateUI(); } }, 28000);
-
-        function updateUI() {
-            document.getElementById('displayScore').innerText = state.score.toFixed(1);
-            document.getElementById('energyVal').innerText = Math.floor(state.energy);
-            document.getElementById('maxEnergyVal').innerText = state.maxEnergy;
-            document.getElementById('tapPowerVal').innerText = state.tapPower.toFixed(1);
-            document.getElementById('energyBar').style.width = (state.energy/state.maxEnergy*100) + '%';
-        }
-
-        function buyUpgrade(type, cost) {
-            if(state.score >= cost) {
-                state.score -= cost;
-                if(type === 'multitap') state.tapPower += 0.1;
-                if(type === 'maxenergy') { state.maxEnergy += 500; state.energy += 500; }
-                if(type === 'refill') state.energy = state.maxEnergy;
-                updateUI();
-                alert("¡Compra exitosa!");
-            } else alert("Faltan puntos");
-        }
-
-        // --- MOTOR GRAFICO ARENA (SPRITES) ---
+        // --- MOTOR DE ARENA ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        let gameLoopId;
-        let arenaActive = false;
-        let player = { x: 150, y: 200, size: 40, speed: 4 };
+        let gameLoopId, arenaActive = false;
+        let player = { x: 150, y: 200, speed: 4 };
         let enemies = [], bullets = [];
-        let arenaScore = 0;
-        let frame = 0;
+        let arenaScore = 0; let frame = 0;
         let touchX = null, touchY = null;
 
-        // Ajustar Canvas al tamaño real
-        function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-        }
-
-        // Controles Táctiles (Seguir dedo)
+        function resizeCanvas() { canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight; }
+        
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
             let rect = canvas.getBoundingClientRect();
@@ -282,123 +315,103 @@
             touchY = e.touches[0].clientY - rect.top;
         }, {passive:false});
         canvas.addEventListener('touchend', () => { touchX = null; touchY = null; });
-        // Mouse (PC)
-        canvas.addEventListener('mousemove', (e) => {
-            if(e.buttons === 1) {
-                let rect = canvas.getBoundingClientRect();
-                touchX = e.clientX - rect.left;
-                touchY = e.clientY - rect.top;
-            }
-        });
-        canvas.addEventListener('mouseup', () => { touchX = null; touchY = null; });
 
-        function startArena() {
-            if (state.energy < 50) { alert("Necesitas 50 Energia"); return; }
+        window.startArena = function() {
+            if (state.energy < 50) { alert("Necesitas 50 de Energía"); return; }
             state.energy -= 50; updateUI();
-            
             document.getElementById('arenaOverlay').style.display = 'none';
             resizeCanvas();
-            
-            player.x = canvas.width/2; 
-            player.y = canvas.height/2;
+            player.x = canvas.width/2; player.y = canvas.height/2;
             enemies = []; bullets = []; arenaScore = 0;
             arenaActive = true;
             loop();
         }
 
-        function stopArena() {
-            arenaActive = false;
-            cancelAnimationFrame(gameLoopId);
-        }
-
+        function stopArena() { arenaActive = false; cancelAnimationFrame(gameLoopId); }
         function gameOver() {
             stopArena();
-            state.score += arenaScore; updateUI();
-            document.getElementById('arenaTitle').innerText = "¡FIN DE JUEGO!";
-            document.getElementById('arenaReward').innerText = "Ganaste: " + arenaScore.toFixed(1);
+            state.score += Math.floor(arenaScore * state.arenaMulti); updateUI();
+            document.getElementById('arenaReward').innerText = "Ganaste: " + Math.floor(arenaScore * state.arenaMulti);
             document.getElementById('arenaReward').style.display = 'block';
             document.getElementById('arenaOverlay').style.display = 'flex';
         }
 
         function loop() {
             if (!arenaActive) return;
-            
-            // Limpiar Canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Mover Jugador
+            // 1. Player
+            let currentSprite = sprites.player;
+            if(state.currentSkin === 'hacker') currentSprite = sprites.hacker;
+            if(state.currentSkin === 'boxer') currentSprite = sprites.boxer;
+            if(state.currentSkin === 'king') currentSprite = sprites.king;
+            if(state.currentSkin === 'maestro') currentSprite = sprites.maestro;
+
             if (touchX !== null) {
-                let dx = touchX - player.x;
-                let dy = touchY - player.y;
+                let dx = touchX - player.x; let dy = touchY - player.y;
                 let dist = Math.hypot(dx, dy);
-                if (dist > 5) {
-                    player.x += (dx/dist) * player.speed;
-                    player.y += (dy/dist) * player.speed;
-                }
+                if (dist > 5) { player.x += (dx/dist) * player.speed; player.y += (dy/dist) * player.speed; }
+            }
+            
+            // Efecto escudo invencible
+            if(invincible) {
+                 ctx.beginPath(); ctx.arc(player.x, player.y, 30, 0, Math.PI*2); 
+                 ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 3; ctx.stroke();
+            }
+            ctx.drawImage(currentSprite, player.x - 25, player.y - 25, 50, 50);
+
+            // 2. Enemigos
+            if (frame % 60 === 0) {
+                let r = Math.random();
+                let eImg = sprites.enemyBear; let speed = 1.5; let hp = 1;
+                if(r > 0.7) { eImg = sprites.enemyRug; speed = 3; } 
+                if(r > 0.95) { eImg = sprites.enemyWhale; speed = 0.5; hp = 5; }
+                enemies.push({ x: Math.random()<0.5?-40:canvas.width+40, y: Math.random()*canvas.height, img: eImg, speed: speed, hp: hp });
             }
 
-            // 2. Dibujar JUGADOR (Sprite Duende)
-            ctx.drawImage(imgPlayer, player.x - 20, player.y - 20, 40, 40);
-
-            // 3. Lógica Enemigos
-            if (frame % 50 === 0) {
-                enemies.push({ 
-                    x: Math.random() < 0.5 ? -30 : canvas.width + 30, 
-                    y: Math.random() * canvas.height, 
-                    speed: 1 + Math.random(), 
-                    size: 35 
-                });
-            }
-
-            // 4. Disparo Automático
-            if (frame % 25 === 0 && enemies.length > 0) {
-                let target = enemies[0];
-                let dx = target.x - player.x;
-                let dy = target.y - player.y;
+            // 3. Auto-Fire
+            let fireRate = state.currentSkin === 'hacker' ? 15 : 30;
+            if (frame % fireRate === 0 && enemies.length > 0) {
+                let nearest = enemies[0];
+                let dx = nearest.x - player.x; let dy = nearest.y - player.y;
                 let dist = Math.hypot(dx, dy);
-                bullets.push({ x: player.x, y: player.y, vx: (dx/dist)*7, vy: (dy/dist)*7 });
+                bullets.push({ x: player.x, y: player.y, vx: (dx/dist)*8, vy: (dy/dist)*8 });
             }
 
-            // 5. Dibujar y Mover Balas (Fuego)
+            // 4. Balas (Coins)
             for (let i = bullets.length - 1; i >= 0; i--) {
                 let b = bullets[i];
                 b.x += b.vx; b.y += b.vy;
-                ctx.drawImage(imgBullet, b.x - 10, b.y - 10, 20, 20);
+                ctx.drawImage(sprites.bullet, b.x - 10, b.y - 10, 20, 20);
                 if(b.x < -50 || b.x > canvas.width+50) bullets.splice(i, 1);
             }
 
-            // 6. Dibujar y Mover Enemigos (Calaveras)
+            // 5. Colisiones
             for (let i = enemies.length - 1; i >= 0; i--) {
                 let e = enemies[i];
-                let dx = player.x - e.x;
-                let dy = player.y - e.y;
-                let dist = Math.hypot(dx, dy);
-                
-                e.x += (dx/dist) * e.speed;
-                e.y += (dy/dist) * e.speed;
+                let dx = player.x - e.x; let dy = player.y - e.y; let dist = Math.hypot(dx, dy);
+                e.x += (dx/dist) * e.speed; e.y += (dy/dist) * e.speed;
+                ctx.drawImage(e.img, e.x - 20, e.y - 20, 40, 40);
 
-                ctx.drawImage(imgEnemy, e.x - 17, e.y - 17, 35, 35);
+                if (dist < 30 && !invincible) { gameOver(); return; } // Muerte
 
-                // Colisión Jugador
-                if (dist < 25) { gameOver(); return; }
-
-                // Colisión Bala
                 for (let j = bullets.length - 1; j >= 0; j--) {
                     let b = bullets[j];
                     if (Math.hypot(e.x - b.x, e.y - b.y) < 25) {
-                        enemies.splice(i, 1);
                         bullets.splice(j, 1);
-                        arenaScore += 0.5;
+                        e.hp--;
+                        if(e.hp <= 0) {
+                            enemies.splice(i, 1);
+                            let pts = 10; if(e.img === sprites.enemyWhale) pts = 100;
+                            arenaScore += pts;
+                        }
                         break;
                     }
                 }
             }
-
-            // HUD
-            ctx.fillStyle = "white";
-            ctx.font = "bold 16px Arial";
-            ctx.fillText("Score: " + arenaScore.toFixed(1), 10, 25);
-
+            
+            ctx.fillStyle = "white"; ctx.font = "bold 18px Arial";
+            ctx.fillText("Score: " + Math.floor(arenaScore * state.arenaMulti), 10, 30);
             frame++;
             gameLoopId = requestAnimationFrame(loop);
         }
