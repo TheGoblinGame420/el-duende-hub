@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>El Duende App</title>
+    <title>El Duende Survivor</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -12,197 +12,179 @@
     <style>
         :root {
             --primary: #39ff14; --gold: #ffd700; --danger: #ff0055; --blue: #0098EA;
-            --bg-dark: #1c1f24; --card: #272a2f; --nav: #16181b;
+            --bg-dark: #121418; --card: #1e2228; --nav: #0e1013;
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         
         body {
             margin: 0; padding: 0;
-            background-color: #000;
-            background-image: radial-gradient(circle at 50% 0%, #2b3038 0%, #000 100%);
+            background: radial-gradient(circle at top, #1a202c 0%, #000 100%);
             color: #fff; font-family: 'Rajdhani', sans-serif;
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden; user-select: none;
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
         }
 
         /* --- LOADER --- */
-        #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; transition: opacity 0.5s;
-        }
-        .spinner {
-            width: 50px; height: 50px; border: 5px solid #333;
-            border-top: 5px solid var(--primary); border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
+        .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* --- HEADER --- */
         .header {
             padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 10;
+            background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 10; flex-shrink: 0;
         }
-        .balance-box { text-align: right; }
-        .balance-label { font-size: 0.75rem; color: #888; letter-spacing: 1px; }
-        .balance-val { font-size: 1.5rem; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 5px; justify-content: flex-end; }
-        .coin-icon { width: 24px; height: 24px; background: var(--gold); border-radius: 50%; display: inline-block; box-shadow: 0 0 10px var(--gold); }
+        .balance-val { font-size: 1.5rem; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .coin-icon { width: 22px; height: 22px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 10px var(--gold); }
 
         /* --- SCREENS --- */
-        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; width: 100%; overflow-y: auto; padding-bottom: 100px; }
-        .screen.active { display: flex; animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; width: 100%; overflow-y: auto; padding-bottom: 90px; }
+        .screen.active { display: flex; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- TAP ZONE --- */
+        /* --- HOME (TAP) --- */
+        .social-bar {
+            display: flex; gap: 15px; margin-top: 15px;
+        }
+        .social-icon { font-size: 1.8rem; color: #ccc; transition: 0.2s; }
+        .social-icon:hover { color: var(--primary); transform: scale(1.1); }
+
         .tap-area {
-            position: relative; margin-top: 40px; width: 300px; height: 300px;
+            position: relative; margin-top: 30px; width: 280px; height: 280px;
             display: flex; justify-content: center; align-items: center;
         }
-        /* Glow Effect behind character */
         .glow-bg {
-            position: absolute; width: 250px; height: 250px;
-            background: radial-gradient(circle, rgba(57,255,20,0.2) 0%, transparent 70%);
-            border-radius: 50%; z-index: 1; animation: pulseGlow 3s infinite;
+            position: absolute; width: 220px; height: 220px; background: radial-gradient(circle, rgba(57,255,20,0.15) 0%, transparent 70%);
+            border-radius: 50%; z-index: 1; animation: pulseGlow 4s infinite;
         }
-        @keyframes pulseGlow { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 0.8; } }
+        @keyframes pulseGlow { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.3); opacity: 0.6; } }
 
+        /* ANIMACIÓN DE RESPIRACIÓN EN MENÚ */
         .main-character {
-            width: 260px; height: 260px; z-index: 2; object-fit: contain;
-            cursor: pointer; transition: transform 0.05s;
-            /* Truco para limpiar bordes blancos leves */
-            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); 
+            width: 240px; height: 240px; z-index: 2; object-fit: contain;
+            cursor: pointer; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+            animation: breathe 3s ease-in-out infinite;
         }
-        .main-character:active { transform: scale(0.95); }
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03) translateY(-5px); } }
+        .main-character:active { animation: none; transform: scale(0.95) rotate(3deg); transition: 0.05s; }
 
         .energy-status {
-            width: 90%; max-width: 350px; margin-top: 30px;
+            width: 90%; max-width: 350px; margin-top: 25px;
             background: var(--card); padding: 15px; border-radius: 15px;
-            display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        .energy-text { font-weight: bold; color: #aaa; font-size: 0.9rem; }
-        .energy-num { font-weight: 900; color: #fff; font-size: 1.1rem; }
-        .energy-bar { height: 8px; width: 100%; background: #111; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+        .energy-bar { height: 10px; width: 100%; background: #111; border-radius: 5px; margin-top: 10px; overflow: hidden; }
         .energy-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--gold), var(--primary)); transition: width 0.3s; }
 
-        /* --- ARENA --- */
-        #screen-arena { padding: 0; }
-        .arena-container { width: 100%; height: 100%; position: relative; background: #000; }
-        canvas { display: block; width: 100%; height: 100%; }
+        /* --- ARENA (IMPORTANTE: touch-action: none) --- */
+        #screen-arena { padding: 0; overflow: hidden; }
+        .arena-container { width: 100%; height: 100%; position: relative; background: #080808; }
+        canvas { display: block; width: 100%; height: 100%; touch-action: none; } /* CRÍTICO PARA MOVIMIENTO */
+        
         .arena-overlay {
             position: absolute; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
             display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20;
         }
         .arena-btn {
-            background: linear-gradient(135deg, #ff3b3b, #990000);
-            border: none; color: white; padding: 20px 50px; border-radius: 16px;
-            font-size: 1.5rem; font-weight: 900; letter-spacing: 1px;
-            box-shadow: 0 10px 25px rgba(255, 59, 59, 0.4);
-            cursor: pointer; text-transform: uppercase;
+            background: linear-gradient(135deg, var(--danger), #990000);
+            border: none; color: white; padding: 18px 40px; border-radius: 12px;
+            font-size: 1.4rem; font-weight: 900; letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(255, 59, 59, 0.4); cursor: pointer;
+            animation: pulseBtn 2s infinite;
         }
+        @keyframes pulseBtn { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* --- SHOP & RANK --- */
-        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 92%; margin-top: 20px; }
+        /* --- SHOP --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; width: 94%; margin-top: 15px; }
         .card {
-            background: var(--card); border-radius: 16px; padding: 15px;
+            background: var(--card); border-radius: 14px; padding: 12px;
             display: flex; flex-direction: column; align-items: center; text-align: center;
-            border: 1px solid rgba(255,255,255,0.05); transition: transform 0.2s;
+            border: 1px solid rgba(255,255,255,0.03);
         }
-        .card:active { transform: scale(0.98); background: #333; }
-        .card img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px; }
-        .card h4 { margin: 0; font-size: 1rem; color: #fff; }
-        .card p { margin: 5px 0 10px 0; font-size: 0.7rem; color: #888; }
+        .card img { width: 65px; height: 65px; object-fit: contain; margin-bottom: 8px; }
         .btn-price {
-            background: #333; color: #fff; padding: 8px 16px; border-radius: 8px;
-            font-size: 0.85rem; font-weight: bold; width: 100%; border: none;
+            background: #333; color: #fff; padding: 10px; border-radius: 8px; margin-top: auto;
+            font-size: 0.8rem; font-weight: bold; width: 100%; border: none; cursor: pointer;
         }
-        .btn-ton { background: var(--blue); }
-        .btn-gold { background: var(--gold); color: #000; }
+        .btn-ton { background: var(--blue); } .btn-gold { background: var(--gold); color: #000; }
 
         /* --- NAV --- */
         .nav {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 85px;
-            background: var(--nav); border-top: 1px solid rgba(255,255,255,0.05);
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
+            background: rgba(14, 16, 19, 0.95); backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.05);
             display: flex; justify-content: space-around; align-items: center;
-            padding-bottom: 15px; z-index: 100;
+            padding-bottom: 10px; z-index: 100;
         }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; color: #555;
-            font-size: 0.7rem; font-weight: bold; width: 25%; cursor: pointer;
-        }
-        .nav-item i { font-size: 1.6rem; margin-bottom: 5px; transition: 0.2s; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 0.7rem; font-weight: bold; width: 25%; }
+        .nav-item i { font-size: 1.5rem; margin-bottom: 5px; transition: 0.2s; }
         .nav-item.active { color: #fff; }
-        .nav-item.active i { color: var(--primary); transform: translateY(-3px); text-shadow: 0 0 10px var(--primary); }
+        .nav-item.active i { color: var(--primary); transform: translateY(-4px); text-shadow: 0 0 12px var(--primary); }
 
-        /* --- FLOATING TEXT --- */
-        .float-num { position: absolute; font-weight: 900; font-size: 2rem; color: var(--gold); pointer-events: none; animation: floatUp 0.8s forwards; z-index: 200; text-shadow: 0 2px 0 #000; }
-        @keyframes floatUp { to { transform: translateY(-100px); opacity: 0; } }
+        .float-num { position: absolute; font-weight: 900; font-size: 1.8rem; color: var(--gold); pointer-events: none; animation: floatUp 0.6s forwards; z-index: 200; text-shadow: 0 2px 0 #000; }
+        @keyframes floatUp { to { transform: translateY(-80px); opacity: 0; } }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="spinner"></div>
-        <p style="margin-top:20px; font-weight:bold; letter-spacing:1px; color:#888;">INICIANDO...</p>
+        <p style="margin-top:20px; font-weight:bold; color:#666;">CARGANDO RECURSOS...</p>
     </div>
 
     <div class="header">
         <div id="ton-connect"></div>
-        <div class="balance-box">
-            <div class="balance-label">PROFIT PER TAP</div>
+        <div style="text-align:right;">
+            <div style="font-size:0.7rem; color:#888;">BALANCE TOTAL</div>
             <div class="balance-val"><span class="coin-icon"></span> <span id="scoreDisplay">0</span></div>
         </div>
     </div>
 
     <div id="tab-tap" class="screen active">
+        <div class="social-bar">
+            <a href="https://t.me/elduende420peru" target="_blank" class="social-icon"><i class="fab fa-telegram"></i></a>
+            <a href="https://wa.me/51900877863" target="_blank" class="social-icon"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://www.facebook.com/profile.php?id=61586213196155" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>
+            <a href="https://x.com/elduendesolana" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
+        </div>
+
         <div class="tap-area" id="tapZone">
             <div class="glow-bg"></div>
             <img id="charImg" src="" class="main-character">
         </div>
 
         <div class="energy-status">
-            <div>
-                <div class="energy-text">ENERGÍA</div>
-                <div class="energy-num"><span id="energyVal">500</span> / 500</div>
+            <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                <span>⚡ ENERGÍA</span>
+                <span><span id="energyVal">500</span> / <span id="maxEnergyVal">500</span></span>
             </div>
-            <div style="text-align:right;">
-                <div class="energy-text">BOOST</div>
-                <div id="invincibleTag" style="color:var(--blue); font-weight:900; display:none;">ESCUDO</div>
-            </div>
-        </div>
-        <div style="width:90%; margin-top:5px;"><div class="energy-bar"><div class="energy-fill" id="energyFill"></div></div></div>
-
-        <div class="grid-container" style="margin-top:30px;">
-            <div class="card" onclick="window.open('https://t.me/elduende420peru')">
-                <i class="fab fa-telegram" style="font-size:2rem; color:#229ED9;"></i>
-                <h4 style="margin-top:10px;">Telegram</h4>
-            </div>
-            <div class="card" onclick="window.open('https://wa.me/51900877863')">
-                <i class="fab fa-whatsapp" style="font-size:2rem; color:#25D366;"></i>
-                <h4 style="margin-top:10px;">WhatsApp</h4>
-            </div>
+            <div class="energy-bar"><div class="energy-fill" id="energyFill"></div></div>
+            <div id="invincibleTag" style="color:var(--blue); font-weight:900; text-align:center; margin-top:5px; display:none;">🛡️ ESCUDO ACTIVO</div>
         </div>
     </div>
 
     <div id="tab-arena" class="screen">
         <div class="arena-container">
             <canvas id="gameCanvas"></canvas>
-            <div style="position:absolute; top:20px; left:20px; font-size:1.5rem; font-weight:900; z-index:10; pointer-events:none;">
-                💀 <span id="killsTxt">0</span>
+            
+            <div style="position:absolute; top:20px; left:20px; z-index:10; pointer-events:none;">
+                <div style="font-size:1.2rem; font-weight:900; color:#fff;">💀 <span id="killsTxt">0</span></div>
+                <div style="font-size:1rem; font-weight:bold; color:var(--danger);">HP: <span id="hpTxt">100</span>%</div>
+                <div style="font-size:0.8rem; color:#888; margin-top:5px;">Dificultad: <span id="diffTxt">1</span>x</div>
             </div>
 
             <div id="arenaStart" class="arena-overlay">
-                <h1 style="font-size:3rem; color:var(--danger); margin:0; text-shadow:0 0 20px red;">SURVIVOR</h1>
-                <p style="color:#aaa; margin-bottom:30px;">Sobrevive a la caída</p>
+                <h1 style="font-size:3rem; color:var(--danger); margin:0; text-shadow:0 0 20px red; font-style:italic;">SURVIVOR</h1>
+                <p style="color:#aaa; margin-bottom:30px;">Resiste la oleada bajista</p>
                 <button class="arena-btn" onclick="startArena()">JUGAR</button>
-                <p style="margin-top:10px; color:#666; font-size:0.8rem;">Costo: 50⚡ o 150 monedas</p>
+                <p style="margin-top:15px; color:#666; font-size:0.9rem;">Costo: 50⚡ o 150 monedas</p>
             </div>
 
             <div id="arenaEnd" class="arena-overlay" style="display:none;">
-                <h1 style="color:var(--primary); font-size:2.5rem;">VICTORIA</h1>
-                <p id="rewardTxt" style="font-size:1.5rem; font-weight:bold; margin-bottom:20px;">+0</p>
-                <button class="arena-btn" style="background:#333; font-size:1rem;" onclick="closeArena()">SALIR</button>
+                <h1 id="endTitle" style="color:var(--primary); font-size:2.5rem;">VICTORIA</h1>
+                <p id="rewardTxt" style="font-size:1.8rem; font-weight:900; margin-bottom:20px; color:var(--gold);">+0</p>
+                <button class="arena-btn" style="background:#333; font-size:1rem; padding:15px 30px; box-shadow:none; animation:none;" onclick="closeArena()">SALIR</button>
             </div>
         </div>
     </div>
@@ -210,275 +192,245 @@
     <div id="tab-shop" class="screen">
         <h2 style="margin-top:20px; color:var(--gold);">MERCADO NEGRO</h2>
         
-        <div style="width:92%; text-align:left; margin-top:10px; color:#666; font-size:0.8rem; font-weight:bold;">SKINS PREMIUM (TON)</div>
+        <div style="width:94%; text-align:left; margin-top:15px; color:#888; font-size:0.8rem; font-weight:bold;">SKINS PREMIUM (TON)</div>
         <div class="grid-container">
             <div class="card">
                 <img src="/static/skin_DUENDE_HACKER.png">
-                <h4>HACKER</h4>
-                <p>Velocidad x2</p>
+                <div style="font-weight:bold;">HACKER</div>
+                <div style="font-size:0.7rem; color:#888;">Velocidad x2</div>
                 <button class="btn-price btn-ton" onclick="payTon('hacker', 0.2)">0.2 TON</button>
             </div>
             <div class="card">
                 <img src="/static/skin_DUENDE_BOX.png">
-                <h4>BOXER</h4>
-                <p>Daño Crítico</p>
+                <div style="font-weight:bold;">BOXER</div>
+                <div style="font-size:0.7rem; color:#888;">Daño Crítico</div>
                 <button class="btn-price btn-ton" onclick="payTon('boxer', 0.5)">0.5 TON</button>
             </div>
             <div class="card">
                 <img src="/static/skin_REY_DUENDE.png">
-                <h4>EL REY</h4>
-                <p>Ganancia x2</p>
+                <div style="font-weight:bold;">EL REY</div>
+                <div style="font-size:0.7rem; color:#888;">Ganancia x2</div>
                 <button class="btn-price btn-ton" onclick="payTon('king', 1.0)">1.0 TON</button>
             </div>
             <div class="card">
                 <img src="/static/skin_DUENDE_MAESTRO.png">
-                <h4>MAESTRO</h4>
-                <p>Legendario</p>
+                <div style="font-weight:bold;">MAESTRO</div>
+                <div style="font-size:0.7rem; color:#888;">Legendario</div>
                 <button class="btn-price btn-ton" onclick="payTon('maestro', 2.0)">2.0 TON</button>
             </div>
         </div>
 
-        <div style="width:92%; text-align:left; margin-top:20px; color:#666; font-size:0.8rem; font-weight:bold;">ITEMS (MONEDAS)</div>
+        <div style="width:94%; text-align:left; margin-top:25px; color:#888; font-size:0.8rem; font-weight:bold;">POTENCIADORES (MONEDAS)</div>
         <div class="grid-container">
             <div class="card">
                 <img src="/static/booster_RAYOTON.png">
-                <h4>RECARGA</h4>
+                <div style="font-weight:bold;">RECARGA</div>
+                <div style="font-size:0.7rem; color:#888;">Energía 100%</div>
                 <button class="btn-price btn-gold" onclick="buyItem('refill', 500)">500</button>
             </div>
             <div class="card">
                 <img src="/static/booster_INVENCIBLE_90S.png">
-                <h4>ESCUDO</h4>
+                <div style="font-weight:bold;">ESCUDO</div>
+                <div style="font-size:0.7rem; color:#888;">Invencible 90s</div>
                 <button class="btn-price btn-gold" onclick="buyItem('shield', 2000)">2k</button>
+            </div>
+            <div class="card">
+                <img src="/static/booster_x100_ENERGIA.png">
+                <div style="font-weight:bold;">MAX +100</div>
+                <div style="font-size:0.7rem; color:#888;">Capacidad</div>
+                <button class="btn-price btn-gold" onclick="buyItem('max', 5000)">5k</button>
+            </div>
+             <div class="card">
+                <img src="/static/loot_COIN.png"> 
+                <div style="font-weight:bold;">DAÑO +</div>
+                <div style="font-size:0.7rem; color:#888;">Poder Temporal</div>
+                <button class="btn-price btn-gold" onclick="buyItem('dmg', 3000)">3k</button>
             </div>
         </div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" onclick="nav('tap', this)">
-            <i class="fas fa-hammer"></i>
-            <span>Minar</span>
-        </div>
-        <div class="nav-item" onclick="nav('arena', this)">
-            <i class="fas fa-skull"></i>
-            <span>Arena</span>
-        </div>
-        <div class="nav-item" onclick="nav('shop', this)">
-            <i class="fas fa-shopping-cart"></i>
-            <span>Tienda</span>
-        </div>
+        <div class="nav-item active" onclick="nav('tap', this)"><i class="fas fa-hammer"></i><span>Minar</span></div>
+        <div class="nav-item" onclick="nav('arena', this)"><i class="fas fa-skull"></i><span>Arena</span></div>
+        <div class="nav-item" onclick="nav('shop', this)"><i class="fas fa-shopping-cart"></i><span>Tienda</span></div>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp; tg.expand(); tg.setHeaderColor('#1c1f24');
+        const tg = window.Telegram.WebApp; tg.expand(); tg.setHeaderColor('#1a202c');
         const MY_WALLET = "UQAm2w4HcJ1tW8RBNj7BZQh0Q-ckpzlxzD-r8p2JduHkpQnc";
 
-        // ASSETS CONFIG
         const assets = {
             common: '/static/skin_duende_comunparatodos.png',
-            hacker: '/static/skin_DUENDE_HACKER.png',
-            boxer: '/static/skin_DUENDE_BOX.png',
-            king: '/static/skin_REY_DUENDE.png',
-            maestro: '/static/skin_DUENDE_MAESTRO.png',
-            bear: '/static/enemy_BEAR_MARKET.png',
-            rug: '/static/enemy_RUG_PULL.png',
-            whale: '/static/enemy_WHALE.png',
-            bullet: '/static/loot_COIN.png'
+            hacker: '/static/skin_DUENDE_HACKER.png', boxer: '/static/skin_DUENDE_BOX.png', king: '/static/skin_REY_DUENDE.png', maestro: '/static/skin_DUENDE_MAESTRO.png',
+            bear: '/static/enemy_BEAR_MARKET.png', rug: '/static/enemy_RUG_PULL.png', whale: '/static/enemy_WHALE.png',
+            bullet: '/static/loot_COIN.png',
+            booster_shield: '/static/booster_INVENCIBLE_90S.png' // Usado para drop de escudo
         };
-        const imgs = {};
-        let loadedCount = 0;
+        const imgs = {}; let loadedCount = 0;
 
         // SISTEMA DE CARGA ANTI-BLOQUEO
-        function startLoading() {
-            const total = Object.keys(assets).length;
-            // Temporizador de seguridad: Si en 3 seg no carga, inicia igual
-            setTimeout(() => {
-                if(document.getElementById('loader').style.display !== 'none') {
-                    console.warn("Forzando inicio por tiempo de espera...");
-                    initApp();
-                }
-            }, 3000);
-
-            Object.keys(assets).forEach(key => {
-                imgs[key] = new Image();
-                imgs[key].src = assets[key];
-                imgs[key].onload = () => { loadedCount++; if(loadedCount===total) initApp(); };
-                imgs[key].onerror = () => { console.log("Error cargando: " + key); loadedCount++; if(loadedCount===total) initApp(); };
-            });
-        }
+        setTimeout(() => { if(document.getElementById('loader').style.display!=='none') initApp(); }, 3000);
+        Object.keys(assets).forEach(k => { imgs[k]=new Image(); imgs[k].src=assets[k]; imgs[k].onload=()=>{loadedCount++;if(loadedCount===Object.keys(assets).length)initApp();}; imgs[k].onerror=()=>{loadedCount++;if(loadedCount===Object.keys(assets).length)initApp();}; });
 
         function initApp() {
-            document.getElementById('loader').style.opacity = '0';
-            setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
-            document.getElementById('charImg').src = imgs.common.src;
-            updateUI();
+            document.getElementById('loader').style.opacity = '0'; setTimeout(()=>document.getElementById('loader').style.display='none',500);
+            document.getElementById('charImg').src = imgs.common.src; updateUI();
         }
 
-        // ESTADO
-        let state = { score: 0, energy: 500, maxEnergy: 500, skin: 'common', power: 1 };
+        let state = { score: 1000, energy: 500, maxEnergy: 500, skin: 'common', power: 1, dmgBoost: 1 };
         let invincible = false;
 
         const tonUi = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: window.location.origin + '/static/tonconnect-manifest.json', buttonRootId: 'ton-connect', uiPreferences: {theme: TON_CONNECT_UI.THEME.DARK} });
 
-        // --- CORE LOGIC ---
         function updateUI() {
             document.getElementById('scoreDisplay').innerText = Math.floor(state.score).toLocaleString();
             document.getElementById('energyVal').innerText = Math.floor(state.energy);
+            document.getElementById('maxEnergyVal').innerText = state.maxEnergy;
             document.getElementById('energyFill').style.width = (state.energy/state.maxEnergy*100) + '%';
         }
-
         function nav(tab, btn) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('tab-'+tab).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            if(tab !== 'arena') stopArena();
+            document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('tab-'+tab).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+            if(tab!=='arena') stopArena();
         }
 
-        // TAP
+        // TAP & SHOP
         document.getElementById('tapZone').addEventListener('click', (e) => {
-            if(state.energy < 1) return;
+            if(state.energy<1) return;
             state.energy--; state.score += state.power; updateUI();
-            
-            // Animación CSS
-            const img = document.getElementById('charImg');
-            img.style.transform = "scale(0.95) rotate(5deg)";
-            setTimeout(() => img.style.transform = "scale(1) rotate(0deg)", 100);
-
-            // Floating Text
-            const float = document.createElement('div');
-            float.className = 'float-num';
-            float.innerText = "+" + state.power;
-            float.style.left = e.clientX + 'px'; float.style.top = e.clientY + 'px';
-            document.body.appendChild(float);
-            setTimeout(()=>float.remove(), 800);
-
-            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            const float = document.createElement('div'); float.className='float-num'; float.innerText="+"+state.power; float.style.left=e.clientX+'px'; float.style.top=e.clientY+'px'; document.body.appendChild(float); setTimeout(()=>float.remove(),600);
+            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         });
-        setInterval(() => { if(state.energy < state.maxEnergy) { state.energy++; updateUI(); } }, 1000);
+        setInterval(()=>{if(state.energy<state.maxEnergy){state.energy++;updateUI();}},1000);
 
-        // TIENDA
         async function payTon(skin, price) {
             if(!tonUi.connected) return alert("Conecta Wallet");
-            try {
-                await tonUi.sendTransaction({validUntil: Math.floor(Date.now()/1000)+3600, messages:[{address:MY_WALLET, amount:Math.floor(price*1000000000).toString()}]});
-                state.skin = skin; updateSkin(); alert("Comprado!");
-            } catch(e) { alert("Cancelado"); }
+            try { await tonUi.sendTransaction({validUntil:Math.floor(Date.now()/1000)+3600, messages:[{address:MY_WALLET, amount:Math.floor(price*1000000000).toString()}]}); state.skin=skin; updateSkin(); alert("Comprado!"); } catch(e){alert("Error pago");}
         }
         function buyItem(type, cost) {
-            if(state.score < cost) return alert("Falta Saldo");
-            state.score -= cost;
-            if(type==='refill') state.energy = state.maxEnergy;
-            if(type==='shield') { invincible=true; document.getElementById('invincibleTag').style.display='block'; setTimeout(()=>{invincible=false;document.getElementById('invincibleTag').style.display='none';}, 90000); }
+            if(state.score<cost) return alert("Faltan monedas");
+            state.score-=cost;
+            if(type==='refill') state.energy=state.maxEnergy;
+            if(type==='max') state.maxEnergy+=100;
+            if(type==='dmg') { state.dmgBoost=2; setTimeout(()=>state.dmgBoost=1, 60000); alert("Daño x2 por 60s"); }
+            if(type==='shield') { invincible=true; document.getElementById('invincibleTag').style.display='block'; setTimeout(()=>{invincible=false;document.getElementById('invincibleTag').style.display='none';},90000); }
             updateUI();
         }
         function updateSkin() {
-            let src = imgs.common.src; state.power=1;
-            if(state.skin==='hacker') { src=imgs.hacker.src; state.power=2; }
-            if(state.skin==='boxer') { src=imgs.boxer.src; state.power=3; }
-            if(state.skin==='king') { src=imgs.king.src; state.power=2; } // Multiplicador en Arena
-            if(state.skin==='maestro') { src=imgs.maestro.src; state.power=5; }
-            document.getElementById('charImg').src = src;
+            let src=imgs.common.src; state.power=1;
+            if(state.skin==='hacker'){src=imgs.hacker.src;state.power=2;} if(state.skin==='boxer'){src=imgs.boxer.src;state.power=3;}
+            if(state.skin==='king'){src=imgs.king.src;state.power=2;} if(state.skin==='maestro'){src=imgs.maestro.src;state.power=5;}
+            document.getElementById('charImg').src=src;
         }
 
-        // --- ARENA ENGINE ---
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        let gameActive = false, loopId;
-        let player={x:0,y:0}, enemies=[], bullets=[], particles=[], kills=0;
+        // --- ARENA ENGINE TOTAL (MOVIMIENTO + ANIMACIÓN + DROPS) ---
+        const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
+        let gameActive=false, loopId;
+        let player={x:0,y:0,hp:100}, enemies=[], bullets=[], drops=[], kills=0;
         let stick={active:false, sx:0, sy:0, nx:0, ny:0};
-        let frame=0;
+        let frame=0, difficulty=1, gameTime=0;
 
         function startArena() {
-            if(state.energy >= 50) state.energy-=50;
-            else if(state.score >= 150) state.score-=150;
-            else return alert("Falta 50⚡ o 150 monedas");
-            
-            updateUI();
-            document.getElementById('arenaStart').style.display='none';
-            document.getElementById('arenaEnd').style.display='none';
-            resize(); player={x:0, y:0}; enemies=[]; bullets=[]; kills=0;
+            if(state.energy>=50) state.energy-=50; else if(state.score>=150) state.score-=150; else return alert("Falta Energía o Monedas");
+            updateUI(); document.getElementById('arenaStart').style.display='none'; document.getElementById('arenaEnd').style.display='none';
+            resize(); player={x:0,y:0,hp:100,maxHp:100}; enemies=[]; bullets=[]; drops=[]; kills=0; difficulty=1; gameTime=0;
             gameActive=true; loop();
         }
-        
         function stopArena() { gameActive=false; cancelAnimationFrame(loopId); }
         function closeArena() { document.getElementById('arenaStart').style.display='flex'; document.getElementById('arenaEnd').style.display='none'; }
-        
-        function resize() {
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = canvas.parentElement.clientWidth * dpr;
-            canvas.height = canvas.parentElement.clientHeight * dpr;
-            ctx.scale(dpr, dpr);
-        }
+        function resize() { const dpr=window.devicePixelRatio||1; canvas.width=canvas.parentElement.clientWidth*dpr; canvas.height=canvas.parentElement.clientHeight*dpr; ctx.scale(dpr,dpr); }
 
-        // Joystick Logic
-        canvas.addEventListener('touchstart', e=>{ stick.active=true; stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; stick.nx=stick.sx; stick.ny=stick.sy; });
-        canvas.addEventListener('touchmove', e=>{ if(stick.active){ e.preventDefault(); stick.nx=e.touches[0].clientX; stick.ny=e.touches[0].clientY; } });
-        canvas.addEventListener('touchend', ()=>{ stick.active=false; });
+        // JOYSTICK TÁCTIL MEJORADO
+        canvas.addEventListener('touchstart', e=>{ e.preventDefault(); stick.active=true; stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; stick.nx=stick.sx; stick.ny=stick.sy; });
+        canvas.addEventListener('touchmove', e=>{ e.preventDefault(); if(stick.active){ stick.nx=e.touches[0].clientX; stick.ny=e.touches[0].clientY; } });
+        canvas.addEventListener('touchend', e=>{ e.preventDefault(); stick.active=false; });
 
         function loop() {
             if(!gameActive) return;
-            const W = canvas.width/window.devicePixelRatio; const H = canvas.height/window.devicePixelRatio;
-            
-            // Player Move
-            if(stick.active) {
-                const dx = stick.nx-stick.sx; const dy = stick.ny-stick.sy;
-                const dist = Math.hypot(dx,dy);
-                if(dist>10) {
-                    const ang = Math.atan2(dy,dx);
-                    player.x += Math.cos(ang)*5; player.y += Math.sin(ang)*5;
-                }
-            }
+            const W=canvas.width/(window.devicePixelRatio||1); const H=canvas.height/(window.devicePixelRatio||1);
+            gameTime++; if(gameTime % 1800 === 0) { difficulty += 0.5; document.getElementById('diffTxt').innerText = difficulty + "x"; } // Sube dificultad cada 30s
 
-            // Camera
-            const camX = player.x - W/2; const camY = player.y - H/2;
+            // Movimiento Jugador
+            if(stick.active) {
+                const dx=stick.nx-stick.sx; const dy=stick.ny-stick.sy; const dist=Math.hypot(dx,dy);
+                if(dist>5) { const ang=Math.atan2(dy,dx); player.x+=Math.cos(ang)*5; player.y+=Math.sin(ang)*5; }
+            }
+            const camX=player.x-W/2; const camY=player.y-H/2;
 
             // Render
-            ctx.fillStyle = '#111'; ctx.fillRect(0,0,W,H);
-            ctx.strokeStyle = '#222'; ctx.lineWidth=2;
-            const grid=80;
+            ctx.fillStyle='#080808'; ctx.fillRect(0,0,W,H);
+            ctx.strokeStyle='#1a1a1a'; ctx.lineWidth=3; const grid=100;
             const ox=Math.floor(camX/grid)*grid; const oy=Math.floor(camY/grid)*grid;
-            for(let x=ox; x<camX+W+grid; x+=grid) for(let y=oy; y<camY+H+grid; y+=grid) ctx.strokeRect(x-camX, y-camY, grid, grid);
+            for(let x=ox; x<camX+W+grid; x+=grid) for(let y=oy; y<camY+H+grid; y+=grid) ctx.strokeRect(x-camX,y-camY,grid,grid);
 
-            // Draw Player
+            // DROPS (Items en el suelo)
+            drops.forEach((d, i) => {
+                const dx = d.x-camX; const dy = d.y-camY;
+                ctx.save(); ctx.translate(dx, dy + Math.sin(gameTime/20)*5); // Flotar
+                if(d.type==='health') { ctx.fillStyle='red'; ctx.beginPath(); ctx.arc(0,0,10,0,6.28); ctx.fill(); ctx.fillStyle='#fff'; ctx.font='bold 12px Arial'; ctx.fillText("HP",-8,4); }
+                if(d.type==='shield') { ctx.drawImage(imgs.booster_shield, -15, -15, 30, 30); }
+                ctx.restore();
+                
+                if(Math.hypot(player.x-d.x, player.y-d.y) < 30) {
+                    drops.splice(i,1);
+                    if(d.type==='health') { player.hp = Math.min(player.hp+20, player.maxHp); document.getElementById('hpTxt').innerText=player.hp; }
+                    if(d.type==='shield') { invincible=true; setTimeout(()=>invincible=false, 5000); }
+                    if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+                }
+            });
+
+            // DIBUJAR JUGADOR CON ANIMACIÓN
+            const px=W/2; const py=H/2;
             const pImg = state.skin==='common' ? imgs.common : imgs[state.skin];
-            const px = W/2; const py = H/2;
-            if(invincible) { ctx.beginPath(); ctx.arc(px,py,40,0,7); ctx.strokeStyle='#0ff'; ctx.stroke(); }
-            ctx.drawImage(pImg, px-30, py-30, 60, 60);
+            ctx.save(); ctx.translate(px, py);
+            if(stick.active) ctx.rotate(Math.sin(gameTime/10)*0.1); // Tambaleo al caminar
+            if(invincible) { ctx.beginPath(); ctx.arc(0,0,40,0,6.28); ctx.strokeStyle='#0ff'; ctx.lineWidth=3; ctx.stroke(); }
+            ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.beginPath(); ctx.ellipse(0,25,20,8,0,0,6.28); ctx.fill(); // Sombra
+            ctx.drawImage(pImg, -30, -30, 60, 60);
+            ctx.restore();
 
-            // Logic Enemies
-            if(frame%50===0) {
-                const ang = Math.random()*6.28; const dist = W/2+100;
-                let type='bear', hp=3, spd=2;
-                if(Math.random()>0.8) { type='rug'; spd=4; hp=2; }
-                if(Math.random()>0.95) { type='whale'; spd=1; hp=15; }
-                enemies.push({x:player.x+Math.cos(ang)*dist, y:player.y+Math.sin(ang)*dist, type:type, hp:hp, spd:spd});
+            // Enemigos (Más pequeños y lentos al inicio)
+            if(frame%(Math.max(20, 60-difficulty*5))===0) {
+                const ang=Math.random()*6.28; const dist=W/2+150;
+                let type='bear', hp=3, spd=1.5;
+                if(Math.random()>0.8) { type='rug'; spd=2.5; hp=2; }
+                if(Math.random()>0.97) { type='whale'; spd=0.8; hp=15; }
+                enemies.push({x:player.x+Math.cos(ang)*dist, y:player.y+Math.sin(ang)*dist, type:type, hp:hp*difficulty, spd:spd*(1+difficulty/10)});
             }
 
-            // Auto Shoot
+            // Disparo
             if(frame%20===0 && enemies.length>0) {
                 const target = enemies.reduce((a,b)=>Math.hypot(a.x-player.x, a.y-player.y)<Math.hypot(b.x-player.x, b.y-player.y)?a:b);
                 const ang = Math.atan2(target.y-player.y, target.x-player.x);
                 bullets.push({x:player.x, y:player.y, vx:Math.cos(ang)*12, vy:Math.sin(ang)*12, life:60});
             }
 
-            // Update Entities
+            // Actualizar Entidades
             bullets.forEach((b,i) => {
-                b.x+=b.vx; b.y+=b.vy; b.life--;
-                ctx.drawImage(imgs.bullet, b.x-camX-10, b.y-camY-10, 20, 20);
-                if(b.life<=0) bullets.splice(i,1);
+                b.x+=b.vx; b.y+=b.vy; b.life--; ctx.drawImage(imgs.bullet, b.x-camX-10, b.y-camY-10, 20, 20); if(b.life<=0) bullets.splice(i,1);
             });
 
             enemies.forEach((e,i) => {
-                const ang = Math.atan2(player.y-e.y, player.x-e.x);
-                e.x += Math.cos(ang)*e.spd; e.y += Math.sin(ang)*e.spd;
-                ctx.drawImage(imgs[e.type], e.x-camX-25, e.y-camY-25, 50, 50);
+                const ang = Math.atan2(player.y-e.y, player.x-e.x); e.x+=Math.cos(ang)*e.spd; e.y+=Math.sin(ang)*e.spd;
+                const ex=e.x-camX; const ey=e.y-camY;
+                ctx.drawImage(imgs[e.type], ex-20, ey-20, 40, 40); // Enemigos más pequeños
 
-                if(Math.hypot(player.x-e.x, player.y-e.y)<30 && !invincible) { gameActive=false; endGame(); }
+                if(Math.hypot(player.x-e.x, player.y-e.y)<25 && !invincible) {
+                    player.hp -= 10; document.getElementById('hpTxt').innerText=player.hp;
+                    if(player.hp<=0) { gameActive=false; endGame(false); } else { invincible=true; setTimeout(()=>invincible=false, 1000); }
+                }
 
                 bullets.forEach((b,bi) => {
                     if(Math.hypot(b.x-e.x, b.y-e.y)<30) {
-                        bullets.splice(bi,1); e.hp--;
-                        if(e.hp<=0) { enemies.splice(i,1); kills++; document.getElementById('killsTxt').innerText=kills; }
+                        bullets.splice(bi,1); e.hp -= state.dmgBoost;
+                        if(e.hp<=0) {
+                            enemies.splice(i,1); kills++; document.getElementById('killsTxt').innerText=kills;
+                            // DROP CHANCE (15%)
+                            if(Math.random() < 0.15) {
+                                let dropType = Math.random() > 0.7 ? 'shield' : 'health';
+                                drops.push({x:e.x, y:e.y, type:dropType});
+                            }
+                        }
                     }
                 });
             });
@@ -486,15 +438,14 @@
             frame++; loopId = requestAnimationFrame(loop);
         }
 
-        function endGame() {
+        function endGame(win) {
             const reward = kills*10; state.score+=reward;
+            document.getElementById('endTitle').innerText = win ? "VICTORIA" : "DERROTADO";
+            document.getElementById('endTitle').style.color = win ? "var(--primary)" : "var(--danger)";
             document.getElementById('rewardTxt').innerText = `+${reward}`;
             document.getElementById('arenaEnd').style.display='flex';
             updateUI();
         }
-
-        // INICIAR
-        startLoading();
     </script>
 </body>
 </html>
