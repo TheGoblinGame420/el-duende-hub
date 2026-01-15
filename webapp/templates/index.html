@@ -13,8 +13,9 @@
             --neon-green: #39ff14;
             --neon-gold: #ffd700;
             --neon-red: #ff0055;
+            --ton-blue: #0098EA;
             --dark-bg: #050505;
-            --card-bg: #111;
+            --card-bg: #141414;
         }
 
         body {
@@ -27,17 +28,17 @@
             user-select: none; overflow: hidden;
         }
 
-        /* --- UI ELEMENTS --- */
+        /* --- UI GENERAL --- */
         .top-bar {
             width: 100%; display: flex; justify-content: space-between;
             align-items: center; padding: 10px 20px;
-            background: rgba(0,0,0,0.8); border-bottom: 1px solid #333; z-index: 100;
+            background: rgba(0,0,0,0.9); border-bottom: 1px solid #333; z-index: 100;
         }
-        .user-balance { font-size: 1.1rem; color: var(--neon-green); font-weight: bold; }
+        .user-balance { font-size: 1.1rem; color: var(--neon-green); font-weight: bold; text-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }
 
         .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 90px; }
         .screen.active { display: flex; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
 
         /* Loader */
         #loader {
@@ -46,21 +47,21 @@
             justify-content: center; align-items: center;
         }
         .loader-spinner {
-            border: 4px solid #333; border-top: 4px solid var(--neon-green);
-            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
+            border: 4px solid #222; border-top: 4px solid var(--neon-green);
+            border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Tap Button */
         .main-button {
-            width: 220px; height: 220px;
+            width: 240px; height: 240px;
             background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
             border-radius: 50%; border: 4px solid var(--neon-green);
-            box-shadow: 0 0 40px rgba(57, 255, 20, 0.2);
+            box-shadow: 0 0 50px rgba(57, 255, 20, 0.15);
             display: flex; justify-content: center; align-items: center;
             margin: 30px 0; cursor: pointer; position: relative; transition: transform 0.1s;
         }
-        .main-button:active { transform: scale(0.95); }
+        .main-button:active { transform: scale(0.96); }
 
         /* Arena */
         .arena-container {
@@ -73,55 +74,57 @@
         canvas { display: block; width: 100%; height: 100%; }
         .arena-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 10;
+            background: rgba(0,0,0,0.85); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10; backdrop-filter: blur(2px);
         }
         .btn-start {
             background: linear-gradient(90deg, var(--neon-green), #006400);
             color: #fff; border: none; padding: 15px 40px; font-size: 1.2rem;
             font-weight: bold; border-radius: 30px; cursor: pointer;
             box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+            text-transform: uppercase; letter-spacing: 1px;
         }
 
-        /* Shop Cards */
-        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 360px; }
+        /* Shop Grid */
+        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 360px; margin-bottom: 20px; }
         .shop-card {
-            background: var(--card-bg); border: 1px solid #333; border-radius: 10px;
-            padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            background: var(--card-bg); border: 1px solid #333; border-radius: 12px;
+            padding: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            transition: transform 0.2s;
         }
-        .shop-img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 5px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        .shop-card:active { transform: scale(0.98); }
+        .shop-img { width: 65px; height: 65px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.1)); }
         
         .buy-btn {
-            background: var(--neon-gold); color: #000; border: none;
-            padding: 8px 15px; border-radius: 5px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 5px;
+            border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 8px; font-size: 0.9rem;
         }
-        /* Botón especial para pagar con TON */
-        .buy-btn.ton-pay {
-            background: #0088cc; color: white;
-            box-shadow: 0 0 10px rgba(0, 136, 204, 0.4);
-        }
+        /* Botón Puntos (Dorado) */
+        .btn-points { background: var(--neon-gold); color: #000; box-shadow: 0 4px 10px rgba(255, 215, 0, 0.2); }
+        /* Botón TON (Azul) */
+        .btn-ton { background: var(--ton-blue); color: white; box-shadow: 0 4px 15px rgba(0, 152, 234, 0.3); }
 
         /* Nav */
         .bottom-nav {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 350px; height: 70px;
-            background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(10px);
-            border-radius: 20px; border: 1px solid #333;
+            width: 92%; max-width: 380px; height: 75px;
+            background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(15px);
+            border-radius: 25px; border: 1px solid #333;
             display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .nav-item { color: #666; font-size: 0.7rem; text-align: center; display: flex; flex-direction: column; align-items: center; }
-        .nav-icon { font-size: 1.5rem; margin-bottom: 4px; }
-        .nav-item.active { color: var(--neon-green); transform: translateY(-3px); }
+        .nav-item { color: #666; font-size: 0.75rem; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.2s; }
+        .nav-icon { font-size: 1.6rem; margin-bottom: 4px; }
+        .nav-item.active { color: var(--neon-green); transform: translateY(-3px); text-shadow: 0 0 10px rgba(57, 255, 20, 0.4); }
 
-        .floating-text { position: absolute; color: var(--neon-gold); font-weight: bold; pointer-events: none; animation: float 0.8s forwards; font-size: 1.5rem; z-index: 50; }
-        @keyframes float { to { transform: translateY(-80px); opacity: 0; } }
+        .floating-text { position: absolute; color: var(--neon-gold); font-weight: bold; pointer-events: none; animation: float 0.8s forwards; font-size: 1.8rem; z-index: 50; text-shadow: 0 0 5px black; }
+        @keyframes float { to { transform: translateY(-100px); opacity: 0; } }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="loader-spinner"></div>
-        <p style="margin-top:20px; color:#888;">Conectando al Blockchain...</p>
+        <p style="margin-top:20px; color:#888; font-size: 0.9rem; letter-spacing: 1px;">CARGANDO ASSETS...</p>
     </div>
 
     <div class="top-bar">
@@ -130,95 +133,104 @@
     </div>
 
     <div id="screen-tap" class="screen">
-        <h2 style="color: #888; letter-spacing: 2px;">MINERO CENTRAL</h2>
+        <h2 style="color: #888; letter-spacing: 3px; font-size: 1rem; margin-top: 10px;">MINERO CENTRAL</h2>
+        
         <div class="main-button" id="clickBtn">
-            <img id="mainTapImage" src="" style="width: 80%; height: 80%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 0 15px var(--neon-green));">
+            <img id="mainTapImage" src="" style="width: 85%; height: 85%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 0 20px var(--neon-green));">
         </div>
         
-        <div style="width: 85%; text-align: center;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size: 0.9rem;">
-                <span>⚡ Energía</span><span><span id="energyVal">500</span>/<span id="maxEnergyVal">500</span></span>
+        <div style="width: 85%; max-width: 300px; text-align: center;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size: 0.9rem; color: #ccc;">
+                <span>⚡ Energía</span>
+                <span><span id="energyVal">500</span>/<span id="maxEnergyVal">500</span></span>
             </div>
-            <div style="background:#222; height:15px; border-radius:8px; overflow: hidden; border: 1px solid #444;">
+            <div style="background:#222; height:12px; border-radius:6px; overflow: hidden; border: 1px solid #444;">
                 <div style="height:100%; background:linear-gradient(90deg, #ffd700, #ff0055); width:100%; transition:width 0.3s;" id="energyBar"></div>
             </div>
-            <p id="invincibleText" style="color: #00ffff; display: none; margin-top: 5px;">🛡️ ESCUDO ACTIVO</p>
+            <p id="invincibleText" style="color: #00ffff; display: none; margin-top: 10px; font-weight: bold; animation: pulse 1s infinite;">🛡️ ESCUDO ACTIVO</p>
         </div>
     </div>
 
     <div id="screen-arena" class="screen">
-        <h2 style="color: var(--neon-red);">ZONA DE GUERRA</h2>
+        <h2 style="color: var(--neon-red); letter-spacing: 2px;">ZONA DE GUERRA</h2>
         <div class="arena-container">
             <canvas id="gameCanvas"></canvas>
             <div id="arenaOverlay" class="arena-overlay">
                 <h2 style="color:white; margin-bottom:10px;">DEFENSA FINANCIERA</h2>
-                <p style="color:#ccc;">Destruye el FUD y las Ballenas</p><br>
+                <p style="color:#ccc; font-size: 0.9rem;">Esquiva Osos. Destruye Ballenas.</p><br>
                 <button class="btn-start" onclick="startArena()">INICIAR (50⚡)</button>
-                <p id="arenaReward" style="color:var(--neon-green); margin-top:20px; font-weight:bold; display:none;">Ganado: 0</p>
+                <p id="arenaReward" style="color:var(--neon-green); margin-top:20px; font-weight:bold; display:none; font-size: 1.2rem;">Ganado: 0</p>
             </div>
         </div>
     </div>
 
     <div id="screen-shop" class="screen">
-        <h2 style="color: var(--neon-gold);">MERCADO NEGRO</h2>
+        <h2 style="color: var(--neon-gold); letter-spacing: 2px;">MERCADO NEGRO</h2>
         
-        <h3 style="color:#888; font-size: 1rem; width:100%; text-align:left; padding-left:20px; margin-bottom:5px;">PREMIUM SKINS (TON)</h3>
+        <h3 style="color:#0098EA; font-size: 0.9rem; width:100%; text-align:left; margin: 15px 0 10px 0; border-bottom: 1px solid #333; padding-bottom: 5px;">💎 PREMIUM (TON)</h3>
         <div class="shop-grid">
             <div class="shop-card">
                 <img src="/static/skin_DUENDE_HACKER.png" class="shop-img">
                 <div style="font-weight:bold;">HACKER</div>
-                <div style="font-size:0.7rem; color:#888;">Velocidad x2</div>
-                <button class="buy-btn ton-pay" onclick="payWithTon('hacker', 0.2)">0.2 TON</button>
+                <div style="font-size:0.65rem; color:#888;">Velocidad x2</div>
+                <button class="buy-btn btn-ton" onclick="payWithTon('hacker', 0.2)">0.2 TON</button>
             </div>
             <div class="shop-card">
                 <img src="/static/skin_DUENDE_BOX.png" class="shop-img">
                 <div style="font-weight:bold;">BOXER</div>
-                <div style="font-size:0.7rem; color:#888;">Daño Crítico</div>
-                <button class="buy-btn ton-pay" onclick="payWithTon('boxer', 0.5)">0.5 TON</button>
+                <div style="font-size:0.65rem; color:#888;">Daño Crítico</div>
+                <button class="buy-btn btn-ton" onclick="payWithTon('boxer', 0.5)">0.5 TON</button>
             </div>
             <div class="shop-card">
                 <img src="/static/skin_REY_DUENDE.png" class="shop-img">
                 <div style="font-weight:bold;">EL REY</div>
-                <div style="font-size:0.7rem; color:#888;">Ganancia x2</div>
-                <button class="buy-btn ton-pay" onclick="payWithTon('king', 1.0)">1.0 TON</button>
+                <div style="font-size:0.65rem; color:#888;">Ganancia x2</div>
+                <button class="buy-btn btn-ton" onclick="payWithTon('king', 1.0)">1.0 TON</button>
             </div>
             <div class="shop-card">
                 <img src="/static/skin_DUENDE_MAESTRO.png" class="shop-img">
                 <div style="font-weight:bold;">MAESTRO</div>
-                <div style="font-size:0.7rem; color:#888;">Legendario</div>
-                <button class="buy-btn ton-pay" onclick="payWithTon('maestro', 2.0)">2.0 TON</button>
+                <div style="font-size:0.65rem; color:#888;">Legendario</div>
+                <button class="buy-btn btn-ton" onclick="payWithTon('maestro', 2.0)">2.0 TON</button>
             </div>
         </div>
 
-        <h3 style="color:#888; font-size: 1rem; width:100%; text-align:left; padding-left:20px; margin-top:20px; margin-bottom:5px;">POTENCIADORES (PUNTOS)</h3>
+        <h3 style="color:var(--neon-gold); font-size: 0.9rem; width:100%; text-align:left; margin: 15px 0 10px 0; border-bottom: 1px solid #333; padding-bottom: 5px;">⚡ POTENCIADORES (PUNTOS)</h3>
         <div class="shop-grid">
             <div class="shop-card">
                 <img src="/static/booster_RAYOTON.png" class="shop-img">
                 <div style="font-weight:bold;">RAYO TON</div>
-                <div style="font-size:0.7rem; color:#888;">Recarga 100%</div>
-                <button class="buy-btn" onclick="buyBooster('refill', 500)">500 Pts</button>
+                <div style="font-size:0.65rem; color:#888;">Recarga 100%</div>
+                <button class="buy-btn btn-points" onclick="buyBooster('refill', 500)">500 Pts</button>
             </div>
             <div class="shop-card">
                 <img src="/static/booster_INVENCIBLE_90S.png" class="shop-img">
-                <div style="font-weight:bold;">INVENCIBLE</div>
-                <div style="font-size:0.7rem; color:#888;">Escudo 90s</div>
-                <button class="buy-btn" onclick="buyBooster('shield90', 2000)">2k Pts</button>
+                <div style="font-weight:bold;">ESCUDO</div>
+                <div style="font-size:0.65rem; color:#888;">Invencible 90s</div>
+                <button class="buy-btn btn-points" onclick="buyBooster('shield90', 2000)">2k Pts</button>
             </div>
             <div class="shop-card">
                 <img src="/static/booster_x100_ENERGIA.png" class="shop-img">
                 <div style="font-weight:bold;">MAX POWER</div>
-                <div style="font-size:0.7rem; color:#888;">+100 Capacidad</div>
-                <button class="buy-btn" onclick="buyBooster('maxcap', 5000)">5k Pts</button>
+                <div style="font-size:0.65rem; color:#888;">+100 Capacidad</div>
+                <button class="buy-btn btn-points" onclick="buyBooster('maxcap', 5000)">5k Pts</button>
             </div>
         </div>
     </div>
 
     <div id="screen-home" class="screen">
-        <h2>COMUNIDAD</h2>
-        <div style="background:var(--card-bg); width:100%; padding:20px; border-radius:10px; margin-top:20px; text-align:center; border:1px solid #333; cursor:pointer;" onclick="window.open('https://t.me/elduende420peru')">
+        <h2 style="color:white; margin-bottom: 30px;">COMUNIDAD</h2>
+        
+        <div style="background:var(--card-bg); width:100%; padding:20px; border-radius:15px; margin-bottom:15px; text-align:center; border:1px solid #333; cursor:pointer; transition: 0.2s;" onclick="window.open('https://t.me/elduende420peru')">
             <div style="font-size:3rem; margin-bottom: 10px;">📢</div>
-            <h4>Canal Oficial</h4>
-            <p style="color:#666; font-size:0.8rem;">Noticias y Airdrops</p>
+            <h4 style="margin:0; color:white;">Canal Oficial</h4>
+            <p style="color:#888; font-size:0.8rem; margin-top:5px;">Noticias, Airdrops y Señales</p>
+        </div>
+
+        <div style="background:var(--card-bg); width:100%; padding:20px; border-radius:15px; margin-bottom:15px; text-align:center; border:1px solid #333; cursor:pointer; transition: 0.2s;" onclick="window.open('https://t.me/elduendepnp')">
+            <div style="font-size:3rem; margin-bottom: 10px;">👨‍💻</div>
+            <h4 style="margin:0; color:white;">Soporte Dev</h4>
+            <p style="color:#888; font-size:0.8rem; margin-top:5px;">Reportar Bugs</p>
         </div>
     </div>
 
@@ -233,7 +245,7 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- CONFIGURACIÓN DE PAGO ---
+        // ⚠️ TU WALLET REAL (Donde llegarán los TON)
         const MY_WALLET = "UQAm2w4HcJ1tW8RBNj7BZQh0Q-ckpzlxzD-r8p2JduHkpQnc";
 
         // --- SISTEMA DE CARGA (Preloader) ---
@@ -261,7 +273,11 @@
                     assetsLoaded++;
                     if (assetsLoaded === totalAssets) startGame();
                 };
-                images[key].onerror = () => { assetsLoaded++; if (assetsLoaded === totalAssets) startGame(); };
+                images[key].onerror = () => { 
+                    console.log("Error cargando " + key);
+                    assetsLoaded++; 
+                    if (assetsLoaded === totalAssets) startGame(); 
+                };
             }
         }
 
@@ -281,59 +297,80 @@
             buttonRootId: 'ton-connect'
         });
 
-        // --- PAGOS REALES CON TON ---
+        // --- LÓGICA DE PAGOS (TON) ---
         async function payWithTon(skinName, amountTon) {
+            // 1. Verificar conexión
             if (!tonConnectUI.connected) {
-                return alert("⚠️ Conecta tu Wallet arriba a la derecha primero.");
+                return alert("⚠️ Por favor conecta tu Wallet (Botón Azul Arriba) para comprar.");
             }
 
+            // 2. Convertir a NanoTONs (1 TON = 1,000,000,000)
+            const nanoTons = (amountTon * 1000000000).toString();
+
             const transaction = {
-                validUntil: Math.floor(Date.now() / 1000) + 300, // 5 min para pagar
+                validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutos de validez
                 messages: [
                     {
-                        address: MY_WALLET, // Tu Billetera
-                        amount: (amountTon * 1000000000).toString() // Conversión a Nanotons
+                        address: MY_WALLET,
+                        amount: nanoTons
                     }
                 ]
             };
 
             try {
-                // Enviar transacción real
+                // 3. Enviar transacción
                 await tonConnectUI.sendTransaction(transaction);
                 
-                // Si el usuario firma y envía:
-                alert("¡Pago Enviado! Procesando skin...");
+                // 4. Si tiene éxito (El usuario firmó)
+                alert("✅ ¡Pago Confirmado! Skin " + skinName.toUpperCase() + " activada.");
                 activateSkin(skinName);
                 
             } catch (e) {
                 console.error(e);
-                alert("Pago cancelado o fallido.");
+                // Si el usuario cancela o hay error
+                if (e.message.includes('User rejected')) {
+                    alert("❌ Cancelaste la transacción.");
+                } else {
+                    alert("❌ Error en el pago. Inténtalo de nuevo.");
+                }
             }
         }
 
-        // --- TIENDA (BOOSTERS POR PUNTOS) ---
+        // --- LÓGICA DE BOOSTERS (PUNTOS) ---
         function buyBooster(type, cost) {
             if(state.score >= cost) {
                 state.score -= cost;
-                if(type === 'refill') { state.energy = state.maxEnergy; alert("¡Energía al 100%!"); }
-                if(type === 'maxcap') { state.maxEnergy += 100; state.energy = state.maxEnergy; alert("¡Capacidad aumentada!"); }
-                if(type === 'shield90') { 
+                
+                if(type === 'refill') { 
+                    state.energy = state.maxEnergy; 
+                    alert("⚡ Energía Recargada al 100%"); 
+                }
+                else if(type === 'maxcap') { 
+                    state.maxEnergy += 100; 
+                    state.energy = state.maxEnergy; 
+                    alert("🔋 Capacidad aumentada (+100)"); 
+                }
+                else if(type === 'shield90') { 
                     invincible = true; 
                     document.getElementById('invincibleText').style.display = 'block';
                     setTimeout(()=>{ 
                         invincible=false; 
                         document.getElementById('invincibleText').style.display = 'none';
+                        alert("🛡️ Escudo Desactivado");
                     }, 90000); 
-                    alert("¡INVENCIBLE POR 90s!"); 
+                    alert("🛡️ ¡ERES INVENCIBLE POR 90 SEGUNDOS!"); 
                 }
                 updateUI();
-            } else alert("Faltan puntos.");
+            } else {
+                alert("❌ No tienes suficientes puntos ($ELDUENDE). ¡Mina más!");
+            }
         }
 
         function activateSkin(name) {
             state.currentSkin = name;
             let img = document.getElementById('mainTapImage');
             
+            // Aplicar poderes de la Skin
             if(name === 'hacker') { img.src = images.hacker.src; state.tapPower = 2; }
             else if(name === 'boxer') { img.src = images.boxer.src; state.tapPower = 3; }
             else if(name === 'king') { img.src = images.king.src; state.arenaMulti = 2; }
@@ -341,31 +378,46 @@
             else { img.src = images.player.src; }
         }
 
-        // --- TAP ---
+        // --- TAP SYSTEM ---
         document.getElementById('clickBtn').addEventListener('click', (e) => {
             if (state.energy >= 1) {
                 state.score += state.tapPower;
                 state.energy -= 1;
                 updateUI();
                 if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+                
+                // Efecto flotante
                 let el = document.createElement('div');
                 el.className = 'floating-text';
                 el.innerText = '+' + state.tapPower;
-                el.style.left = e.clientX + 'px';
-                el.style.top = e.clientY + 'px';
+                
+                // Posición (Mouse o Toque)
+                let x = e.clientX || (window.innerWidth/2);
+                let y = e.clientY || (window.innerHeight/2);
+                
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
                 document.body.appendChild(el);
                 setTimeout(() => el.remove(), 800);
             }
         });
-        setInterval(() => { if(state.energy < state.maxEnergy) { state.energy++; updateUI(); } }, 2000);
+        
+        // Regeneración de Energía
+        setInterval(() => { 
+            if(state.energy < state.maxEnergy) { 
+                state.energy++; 
+                updateUI(); 
+            } 
+        }, 1500); // Un poco más rápido que antes
 
         function updateUI() {
-            document.getElementById('displayScore').innerText = state.score.toLocaleString();
+            document.getElementById('displayScore').innerText = Math.floor(state.score).toLocaleString();
             document.getElementById('energyVal').innerText = state.energy;
             document.getElementById('maxEnergyVal').innerText = state.maxEnergy;
             document.getElementById('energyBar').style.width = (state.energy/state.maxEnergy*100) + '%';
         }
 
+        // --- NAVEGACIÓN ---
         window.switchTab = function(name, el) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -374,7 +426,7 @@
             if(name !== 'arena') stopArena();
         }
 
-        // --- ARENA ---
+        // --- ARENA GAME ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let gameLoopId, arenaActive = false;
@@ -390,11 +442,17 @@
             ctx.scale(dpr, dpr); canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px';
         }
 
-        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); let rect = canvas.getBoundingClientRect(); touchX = e.touches[0].clientX - rect.left; touchY = e.touches[0].clientY - rect.top; }, {passive:false});
+        canvas.addEventListener('touchmove', (e) => { 
+            e.preventDefault(); 
+            let rect = canvas.getBoundingClientRect(); 
+            touchX = e.touches[0].clientX - rect.left; 
+            touchY = e.touches[0].clientY - rect.top; 
+        }, {passive:false});
+        
         canvas.addEventListener('touchend', () => { touchX = null; touchY = null; });
 
         window.startArena = function() {
-            if (state.energy < 50) { alert("Necesitas 50 de Energía"); return; }
+            if (state.energy < 50) { alert("⚠️ Necesitas 50 de Energía para entrar."); return; }
             state.energy -= 50; updateUI();
             document.getElementById('arenaOverlay').style.display = 'none';
             resizeCanvas();
@@ -418,6 +476,7 @@
             const rect = canvas.getBoundingClientRect();
             ctx.clearRect(0, 0, rect.width, rect.height);
 
+            // Dibujar Jugador
             let currentSprite = images.player;
             if(state.currentSkin === 'hacker') currentSprite = images.hacker;
             if(state.currentSkin === 'boxer') currentSprite = images.boxer;
@@ -428,15 +487,17 @@
                 let dx = touchX - player.x; let dy = touchY - player.y; let dist = Math.hypot(dx, dy);
                 if (dist > 5) { player.x += (dx/dist) * player.speed; player.y += (dy/dist) * player.speed; }
             }
-            if(invincible) { ctx.beginPath(); ctx.arc(player.x, player.y, 35, 0, Math.PI*2); ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 2; ctx.stroke(); }
+            if(invincible) { ctx.beginPath(); ctx.arc(player.x, player.y, 35, 0, Math.PI*2); ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 3; ctx.stroke(); }
             ctx.drawImage(currentSprite, player.x - 25, player.y - 25, 50, 50);
 
+            // Generar Enemigos
             if (frame % 60 === 0) {
                 let r = Math.random(); let eImg = images.bear; let speed = 1.5; let hp = 1;
                 if(r > 0.7) { eImg = images.rug; speed = 3; } if(r > 0.95) { eImg = images.whale; speed = 0.5; hp = 5; }
                 enemies.push({ x: Math.random()<0.5?-40:rect.width+40, y: Math.random()*rect.height, img: eImg, speed: speed, hp: hp });
             }
 
+            // Disparo Automático
             let fireRate = state.currentSkin === 'hacker' ? 15 : 30;
             if (frame % fireRate === 0 && enemies.length > 0) {
                 let nearest = enemies.reduce((prev, curr) => {
@@ -446,11 +507,13 @@
                 bullets.push({ x: player.x, y: player.y, vx: (dx/dist)*8, vy: (dy/dist)*8 });
             }
 
+            // Mover Balas
             for (let i = bullets.length - 1; i >= 0; i--) {
                 let b = bullets[i]; b.x += b.vx; b.y += b.vy; ctx.drawImage(images.bullet, b.x - 10, b.y - 10, 20, 20);
                 if(b.x < -50 || b.x > rect.width+50 || b.y < -50 || b.y > rect.height+50) bullets.splice(i, 1);
             }
 
+            // Mover Enemigos y Colisiones
             for (let i = enemies.length - 1; i >= 0; i--) {
                 let e = enemies[i];
                 let dx = player.x - e.x; let dy = player.y - e.y; let dist = Math.hypot(dx, dy);
@@ -470,6 +533,7 @@
             frame++; gameLoopId = requestAnimationFrame(loop);
         }
 
+        // Iniciar carga de assets
         loadAssets();
     </script>
 </body>
