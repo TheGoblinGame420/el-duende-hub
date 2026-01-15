@@ -39,7 +39,7 @@
         .screen.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
-        /* Loader Screen */
+        /* Loader */
         #loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 2000; display: flex; flex-direction: column;
@@ -90,9 +90,15 @@
             padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
         }
         .shop-img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 5px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        
         .buy-btn {
             background: var(--neon-gold); color: #000; border: none;
             padding: 8px 15px; border-radius: 5px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 5px;
+        }
+        /* Botón especial para pagar con TON */
+        .buy-btn.ton-pay {
+            background: #0088cc; color: white;
+            box-shadow: 0 0 10px rgba(0, 136, 204, 0.4);
         }
 
         /* Nav */
@@ -115,7 +121,7 @@
 
     <div id="loader">
         <div class="loader-spinner"></div>
-        <p style="margin-top:20px; color:#888;">Cargando Assets...</p>
+        <p style="margin-top:20px; color:#888;">Conectando al Blockchain...</p>
     </div>
 
     <div class="top-bar">
@@ -155,32 +161,37 @@
 
     <div id="screen-shop" class="screen">
         <h2 style="color: var(--neon-gold);">MERCADO NEGRO</h2>
+        
+        <h3 style="color:#888; font-size: 1rem; width:100%; text-align:left; padding-left:20px; margin-bottom:5px;">PREMIUM SKINS (TON)</h3>
         <div class="shop-grid">
             <div class="shop-card">
                 <img src="/static/skin_DUENDE_HACKER.png" class="shop-img">
                 <div style="font-weight:bold;">HACKER</div>
                 <div style="font-size:0.7rem; color:#888;">Velocidad x2</div>
-                <button class="buy-btn" onclick="buySkin('hacker', 5000)">5k Pts</button>
+                <button class="buy-btn ton-pay" onclick="payWithTon('hacker', 0.2)">0.2 TON</button>
             </div>
             <div class="shop-card">
                 <img src="/static/skin_DUENDE_BOX.png" class="shop-img">
                 <div style="font-weight:bold;">BOXER</div>
                 <div style="font-size:0.7rem; color:#888;">Daño Crítico</div>
-                <button class="buy-btn" onclick="buySkin('boxer', 8000)">8k Pts</button>
+                <button class="buy-btn ton-pay" onclick="payWithTon('boxer', 0.5)">0.5 TON</button>
             </div>
             <div class="shop-card">
                 <img src="/static/skin_REY_DUENDE.png" class="shop-img">
                 <div style="font-weight:bold;">EL REY</div>
                 <div style="font-size:0.7rem; color:#888;">Ganancia x2</div>
-                <button class="buy-btn" onclick="buySkin('king', 15000)">15k Pts</button>
+                <button class="buy-btn ton-pay" onclick="payWithTon('king', 1.0)">1.0 TON</button>
             </div>
             <div class="shop-card">
                 <img src="/static/skin_DUENDE_MAESTRO.png" class="shop-img">
                 <div style="font-weight:bold;">MAESTRO</div>
-                <div style="font-size:0.7rem; color:#888;">Skin Legendaria</div>
-                <button class="buy-btn" onclick="buySkin('maestro', 30000)">30k Pts</button>
+                <div style="font-size:0.7rem; color:#888;">Legendario</div>
+                <button class="buy-btn ton-pay" onclick="payWithTon('maestro', 2.0)">2.0 TON</button>
             </div>
-            
+        </div>
+
+        <h3 style="color:#888; font-size: 1rem; width:100%; text-align:left; padding-left:20px; margin-top:20px; margin-bottom:5px;">POTENCIADORES (PUNTOS)</h3>
+        <div class="shop-grid">
             <div class="shop-card">
                 <img src="/static/booster_RAYOTON.png" class="shop-img">
                 <div style="font-weight:bold;">RAYO TON</div>
@@ -222,11 +233,14 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // 1. SISTEMA DE CARGA DE ASSETS (PRELOADER)
+        // --- CONFIGURACIÓN DE PAGO ---
+        const MY_WALLET = "UQAm2w4HcJ1tW8RBNj7BZQh0Q-ckpzlxzD-r8p2JduHkpQnc";
+
+        // --- SISTEMA DE CARGA (Preloader) ---
         const assets = {
             player: '/static/logo.png',
             hacker: '/static/skin_DUENDE_HACKER.png',
-            boxer: '/static/skin_DUENDE_BOX.png',  // <-- NOMBRE CORREGIDO
+            boxer: '/static/skin_DUENDE_BOX.png',
             king: '/static/skin_REY_DUENDE.png',
             maestro: '/static/skin_DUENDE_MAESTRO.png',
             bear: '/static/enemy_BEAR_MARKET.png',
@@ -245,16 +259,9 @@
                 images[key].src = assets[key];
                 images[key].onload = () => {
                     assetsLoaded++;
-                    if (assetsLoaded === totalAssets) {
-                        startGame(); // Arrancar juego solo cuando todo cargó
-                    }
-                };
-                images[key].onerror = () => {
-                    console.error("Error cargando: " + assets[key]);
-                    // Intentar seguir aunque falle una
-                    assetsLoaded++;
                     if (assetsLoaded === totalAssets) startGame();
                 };
+                images[key].onerror = () => { assetsLoaded++; if (assetsLoaded === totalAssets) startGame(); };
             }
         }
 
@@ -262,12 +269,10 @@
             document.getElementById('loader').style.display = 'none';
             document.getElementById('screen-tap').classList.add('active');
             updateUI();
-            
-            // Poner imagen inicial
             document.getElementById('mainTapImage').src = images.player.src;
         }
 
-        // --- ESTADO DEL JUEGO ---
+        // --- ESTADO ---
         let state = { score: 0, energy: 500, maxEnergy: 500, currentSkin: 'default', tapPower: 1, arenaMulti: 1 };
         let invincible = false;
 
@@ -276,30 +281,50 @@
             buttonRootId: 'ton-connect'
         });
 
-        // --- TIENDA ---
-        function buySkin(name, cost) {
-            if(state.score >= cost) {
-                state.score -= cost;
-                activateSkin(name);
-                updateUI();
-                alert("¡Skin equipada!");
-            } else alert("Faltan puntos.");
+        // --- PAGOS REALES CON TON ---
+        async function payWithTon(skinName, amountTon) {
+            if (!tonConnectUI.connected) {
+                return alert("⚠️ Conecta tu Wallet arriba a la derecha primero.");
+            }
+
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 300, // 5 min para pagar
+                messages: [
+                    {
+                        address: MY_WALLET, // Tu Billetera
+                        amount: (amountTon * 1000000000).toString() // Conversión a Nanotons
+                    }
+                ]
+            };
+
+            try {
+                // Enviar transacción real
+                await tonConnectUI.sendTransaction(transaction);
+                
+                // Si el usuario firma y envía:
+                alert("¡Pago Enviado! Procesando skin...");
+                activateSkin(skinName);
+                
+            } catch (e) {
+                console.error(e);
+                alert("Pago cancelado o fallido.");
+            }
         }
 
+        // --- TIENDA (BOOSTERS POR PUNTOS) ---
         function buyBooster(type, cost) {
             if(state.score >= cost) {
                 state.score -= cost;
                 if(type === 'refill') { state.energy = state.maxEnergy; alert("¡Energía al 100%!"); }
-                if(type === 'maxcap') { state.maxEnergy += 100; state.energy = state.maxEnergy; alert("¡Capacidad aumentada a " + state.maxEnergy + "!"); }
+                if(type === 'maxcap') { state.maxEnergy += 100; state.energy = state.maxEnergy; alert("¡Capacidad aumentada!"); }
                 if(type === 'shield90') { 
                     invincible = true; 
                     document.getElementById('invincibleText').style.display = 'block';
                     setTimeout(()=>{ 
                         invincible=false; 
                         document.getElementById('invincibleText').style.display = 'none';
-                        alert("Escudo Agotado"); 
-                    }, 90000); // 90 segundos
-                    alert("¡INVENCIBLE POR 90 SEGUNDOS!"); 
+                    }, 90000); 
+                    alert("¡INVENCIBLE POR 90s!"); 
                 }
                 updateUI();
             } else alert("Faltan puntos.");
@@ -316,10 +341,6 @@
             else { img.src = images.player.src; }
         }
 
-        function refillEnergy() {
-            if(state.score >= 500) { state.score -= 500; state.energy = state.maxEnergy; updateUI(); }
-        }
-
         // --- TAP ---
         document.getElementById('clickBtn').addEventListener('click', (e) => {
             if (state.energy >= 1) {
@@ -327,7 +348,6 @@
                 state.energy -= 1;
                 updateUI();
                 if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-                
                 let el = document.createElement('div');
                 el.className = 'floating-text';
                 el.innerText = '+' + state.tapPower;
@@ -364,22 +384,13 @@
         let touchX = null, touchY = null;
 
         function resizeCanvas() { 
-            // Fix DPI para móviles (Retina Display)
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.parentElement.getBoundingClientRect();
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-            canvas.style.width = rect.width + 'px';
-            canvas.style.height = rect.height + 'px';
+            canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr); canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px';
         }
 
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            let rect = canvas.getBoundingClientRect();
-            touchX = e.touches[0].clientX - rect.left;
-            touchY = e.touches[0].clientY - rect.top;
-        }, {passive:false});
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); let rect = canvas.getBoundingClientRect(); touchX = e.touches[0].clientX - rect.left; touchY = e.touches[0].clientY - rect.top; }, {passive:false});
         canvas.addEventListener('touchend', () => { touchX = null; touchY = null; });
 
         window.startArena = function() {
@@ -387,14 +398,9 @@
             state.energy -= 50; updateUI();
             document.getElementById('arenaOverlay').style.display = 'none';
             resizeCanvas();
-            
-            // Centrar jugador
             const rect = canvas.getBoundingClientRect();
             player.x = rect.width/2; player.y = rect.height/2;
-            
-            enemies = []; bullets = []; arenaScore = 0;
-            arenaActive = true;
-            loop();
+            enemies = []; bullets = []; arenaScore = 0; arenaActive = true; loop();
         }
 
         function stopArena() { arenaActive = false; cancelAnimationFrame(gameLoopId); }
@@ -409,10 +415,9 @@
 
         function loop() {
             if (!arenaActive) return;
-            const rect = canvas.getBoundingClientRect(); // Usar tamaño visual
+            const rect = canvas.getBoundingClientRect();
             ctx.clearRect(0, 0, rect.width, rect.height);
 
-            // 1. Dibujar Jugador
             let currentSprite = images.player;
             if(state.currentSkin === 'hacker') currentSprite = images.hacker;
             if(state.currentSkin === 'boxer') currentSprite = images.boxer;
@@ -420,85 +425,52 @@
             if(state.currentSkin === 'maestro') currentSprite = images.maestro;
 
             if (touchX !== null) {
-                let dx = touchX - player.x; let dy = touchY - player.y;
-                let dist = Math.hypot(dx, dy);
+                let dx = touchX - player.x; let dy = touchY - player.y; let dist = Math.hypot(dx, dy);
                 if (dist > 5) { player.x += (dx/dist) * player.speed; player.y += (dy/dist) * player.speed; }
             }
-
-            // Escudo visual
-            if(invincible) {
-                ctx.beginPath(); ctx.arc(player.x, player.y, 35, 0, Math.PI*2);
-                ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 2; ctx.stroke();
-            }
-            
-            // Dibujar Sprite centrado
+            if(invincible) { ctx.beginPath(); ctx.arc(player.x, player.y, 35, 0, Math.PI*2); ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 2; ctx.stroke(); }
             ctx.drawImage(currentSprite, player.x - 25, player.y - 25, 50, 50);
 
-            // 2. Enemigos
             if (frame % 60 === 0) {
-                let r = Math.random();
-                let eImg = images.bear; let speed = 1.5; let hp = 1;
-                if(r > 0.7) { eImg = images.rug; speed = 3; } 
-                if(r > 0.95) { eImg = images.whale; speed = 0.5; hp = 5; }
+                let r = Math.random(); let eImg = images.bear; let speed = 1.5; let hp = 1;
+                if(r > 0.7) { eImg = images.rug; speed = 3; } if(r > 0.95) { eImg = images.whale; speed = 0.5; hp = 5; }
                 enemies.push({ x: Math.random()<0.5?-40:rect.width+40, y: Math.random()*rect.height, img: eImg, speed: speed, hp: hp });
             }
 
-            // 3. Disparos
             let fireRate = state.currentSkin === 'hacker' ? 15 : 30;
             if (frame % fireRate === 0 && enemies.length > 0) {
-                // Disparar al más cercano
                 let nearest = enemies.reduce((prev, curr) => {
-                    let dPrev = Math.hypot(prev.x - player.x, prev.y - player.y);
-                    let dCurr = Math.hypot(curr.x - player.x, curr.y - player.y);
-                    return dPrev < dCurr ? prev : curr;
+                    let dPrev = Math.hypot(prev.x - player.x, prev.y - player.y); let dCurr = Math.hypot(curr.x - player.x, curr.y - player.y); return dPrev < dCurr ? prev : curr;
                 });
-                let dx = nearest.x - player.x; let dy = nearest.y - player.y;
-                let dist = Math.hypot(dx, dy);
+                let dx = nearest.x - player.x; let dy = nearest.y - player.y; let dist = Math.hypot(dx, dy);
                 bullets.push({ x: player.x, y: player.y, vx: (dx/dist)*8, vy: (dy/dist)*8 });
             }
 
-            // 4. Balas
             for (let i = bullets.length - 1; i >= 0; i--) {
-                let b = bullets[i];
-                b.x += b.vx; b.y += b.vy;
-                ctx.drawImage(images.bullet, b.x - 10, b.y - 10, 20, 20);
+                let b = bullets[i]; b.x += b.vx; b.y += b.vy; ctx.drawImage(images.bullet, b.x - 10, b.y - 10, 20, 20);
                 if(b.x < -50 || b.x > rect.width+50 || b.y < -50 || b.y > rect.height+50) bullets.splice(i, 1);
             }
 
-            // 5. Colisiones
             for (let i = enemies.length - 1; i >= 0; i--) {
                 let e = enemies[i];
                 let dx = player.x - e.x; let dy = player.y - e.y; let dist = Math.hypot(dx, dy);
                 e.x += (dx/dist) * e.speed; e.y += (dy/dist) * e.speed;
                 ctx.drawImage(e.img, e.x - 20, e.y - 20, 40, 40);
-
-                // Colisión Jugador
                 if (dist < 30 && !invincible) { gameOver(); return; }
-
-                // Colisión Balas
                 for (let j = bullets.length - 1; j >= 0; j--) {
                     let b = bullets[j];
                     if (Math.hypot(e.x - b.x, e.y - b.y) < 25) {
-                        bullets.splice(j, 1);
-                        e.hp--;
-                        if(e.hp <= 0) {
-                            enemies.splice(i, 1);
-                            let pts = 10; if(e.img === images.whale) pts = 100;
-                            arenaScore += pts;
-                        }
+                        bullets.splice(j, 1); e.hp--;
+                        if(e.hp <= 0) { enemies.splice(i, 1); let pts = 10; if(e.img === images.whale) pts = 100; arenaScore += pts; }
                         break;
                     }
                 }
             }
-            
-            ctx.fillStyle = "white"; ctx.font = "bold 18px Arial";
-            ctx.fillText("Score: " + Math.floor(arenaScore * state.arenaMulti), 10, 30);
-            frame++;
-            gameLoopId = requestAnimationFrame(loop);
+            ctx.fillStyle = "white"; ctx.font = "bold 18px Arial"; ctx.fillText("Score: " + Math.floor(arenaScore * state.arenaMulti), 10, 30);
+            frame++; gameLoopId = requestAnimationFrame(loop);
         }
 
-        // --- INICIAR ---
-        loadAssets(); // Iniciar carga
+        loadAssets();
     </script>
 </body>
 </html>
