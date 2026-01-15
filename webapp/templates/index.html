@@ -18,26 +18,27 @@
             --card-bg: #161616;
         }
 
+        * { box-sizing: border-box; }
+
         body {
             margin: 0; padding: 0; background-color: var(--dark-bg); color: #ffffff;
             font-family: 'Rajdhani', sans-serif; display: flex; flex-direction: column;
             height: 100vh; user-select: none; overflow: hidden;
         }
 
-        /* TOP BAR */
+        /* --- UI GENERAL --- */
         .top-bar {
-            flex-shrink: 0;
-            width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;
-            background: rgba(0,0,0,0.9); border-bottom: 1px solid #333; z-index: 100;
+            flex-shrink: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;
+            background: rgba(0,0,0,0.95); border-bottom: 2px solid #222; z-index: 100;
         }
-        .user-balance { font-size: 1.2rem; color: var(--neon-green); font-weight: 900; text-shadow: 0 0 10px rgba(57, 255, 20, 0.6); }
+        .currency-label { color: var(--neon-green); font-weight: 900; letter-spacing: 1px; }
+        .user-balance { font-size: 1.3rem; color: #fff; font-weight: 900; text-shadow: 0 0 15px rgba(57, 255, 20, 0.5); }
 
-        /* SCREENS */
-        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; overflow-y: auto; padding-bottom: 90px; width: 100%; }
+        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; overflow-y: auto; padding-bottom: 100px; width: 100%; }
         .screen.active { display: flex; animation: fadeIn 0.3s ease; }
-        .screen-padded { padding: 20px; } /* Padding solo para pantallas que no son Arena */
+        .screen-content { width: 100%; max-width: 400px; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes fadeIn { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
 
         /* LOADER */
         #loader {
@@ -46,186 +47,125 @@
             justify-content: center; align-items: center;
         }
         .loader-spinner {
-            border: 4px solid #222; border-top: 4px solid var(--neon-green);
-            border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;
+            border: 5px solid #222; border-top: 5px solid var(--neon-green);
+            border-radius: 50%; width: 60px; height: 60px; animation: spin 0.8s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- TAP TO EARN --- */
+        /* --- TAP SCREEN --- */
         .main-button {
-            width: 260px; height: 260px;
-            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
-            border-radius: 50%; border: 5px solid var(--neon-green);
-            box-shadow: 0 0 60px rgba(57, 255, 20, 0.2);
+            width: 280px; height: 280px;
+            background: radial-gradient(circleAt center, #222 0%, #000 70%);
+            border-radius: 50%; border: 4px solid rgba(57, 255, 20, 0.3);
+            box-shadow: 0 0 50px rgba(57, 255, 20, 0.1), inset 0 0 30px rgba(0,0,0,0.8);
             display: flex; justify-content: center; align-items: center;
-            margin: 40px 0; cursor: pointer; position: relative; 
-            transition: all 0.1s ease; /* Para la animación de golpe */
+            margin: 30px 0; cursor: pointer; position: relative; 
+            transition: all 0.1s ease;
         }
-        /* Efecto de Golpe */
-        .main-button:active { transform: scale(0.9) rotate(5deg); border-color: #fff; }
-        
-        .floating-text { position: absolute; color: var(--neon-gold); font-weight: 900; pointer-events: none; animation: float 0.6s forwards; font-size: 2.5rem; z-index: 200; text-shadow: 2px 2px 0 #000; }
-        @keyframes float { to { transform: translateY(-150px) scale(1.5); opacity: 0; } }
+        .main-button:active { transform: scale(0.95); border-color: var(--neon-green); }
+        /* MEJORA GRÁFICA: Drop shadow intenso para integrar el sprite y mejorar bordes */
+        #mainTapImage { filter: drop-shadow(0 0 20px rgba(57, 255, 20, 0.7)); transition: filter 0.3s; }
 
-        /* --- ARENA (SURVIVOR MODE) --- */
-        #screen-arena { padding: 0; overflow: hidden; position: relative; } /* Fullscreen */
-        
-        .arena-container {
-            width: 100%; height: 100%; background: #000; position: relative;
-        }
+        /* Animaciones Tap */
+        .floating-text { position: absolute; color: var(--neon-gold); font-weight: 900; pointer-events: none; animation: floatUp 0.8s forwards; font-size: 2.5rem; z-index: 200; text-shadow: 3px 3px 0 #000; }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(1); opacity:1; } 100% { transform: translateY(-100px) scale(1.2); opacity: 0; } }
+
+        .jumping-coin { position: absolute; width: 40px; height: 40px; pointer-events: none; z-index: 190; animation: jumpCoin 0.8s forwards ease-out; filter: drop-shadow(0 0 10px var(--neon-gold)); }
+        @keyframes jumpCoin { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 20% { opacity: 1; transform: translate(-50%, -120px) scale(1.2) rotate(180deg); } 100% { transform: translate(-50%, -40px) scale(0.8) rotate(360deg); opacity: 0; } }
+
+        /* --- ARENA SCREEN --- */
+        #screen-arena { padding: 0; overflow: hidden; }
+        .arena-container { width: 100%; height: 100%; background: #000; position: relative; }
         canvas { display: block; width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
-        
-        .arena-hud {
-            position: absolute; top: 10px; left: 10px; z-index: 10;
-            background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 20px;
-            border: 1px solid var(--neon-green); color: var(--neon-green); font-weight: 900; font-size: 1.2rem;
-        }
+        .arena-hud { position: absolute; top: 15px; left: 15px; z-index: 10; background: rgba(0,0,0,0.7); padding: 8px 20px; border-radius: 30px; border: 2px solid var(--neon-red); color: var(--neon-red); font-weight: 900; font-size: 1.3rem; box-shadow: 0 0 15px rgba(255,0,85,0.3); }
+        .arena-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; backdrop-filter: blur(10px); }
+        .btn-start { background: linear-gradient(180deg, #ff0055, #990033); color: #fff; border: none; padding: 18px 50px; font-size: 1.4rem; font-weight: 900; border-radius: 12px; cursor: pointer; box-shadow: 0 10px 30px rgba(255, 0, 85, 0.4); text-transform: uppercase; letter-spacing: 1px; animation: pulseRed 2s infinite; width: 80%; max-width: 300px; }
+        @keyframes pulseRed { 0% { box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); } 50% { box-shadow: 0 0 40px rgba(255, 0, 85, 0.8); } 100% { box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); } }
 
-        .arena-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 20; backdrop-filter: blur(8px);
-        }
-        .btn-start {
-            background: linear-gradient(180deg, var(--neon-red), #500);
-            color: #fff; border: 2px solid #ff5555; padding: 15px 60px; font-size: 1.5rem;
-            font-weight: 900; border-radius: 10px; cursor: pointer;
-            box-shadow: 0 0 30px rgba(255, 0, 85, 0.4);
-            text-transform: uppercase; letter-spacing: 2px;
-            animation: pulseBtn 2s infinite;
-        }
-        @keyframes pulseBtn { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        /* --- RANKING & SHOP UI --- */
+        .rank-list, .shop-grid { width: 100%; }
+        .rank-item { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 15px 20px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #222; box-shadow: 0 5px 10px rgba(0,0,0,0.2); }
+        .rank-pos { font-size: 1.3rem; font-weight: 900; width: 40px; }
+        .rank-1 { color: var(--neon-gold); } .rank-2 { color: #c0c0c0; } .rank-3 { color: #cd7f32; }
+        .rank-user { border: 2px solid var(--neon-green); background: rgba(57, 255, 20, 0.05); }
 
-        /* --- RANKING --- */
-        .rank-list { width: 100%; max-width: 400px; margin-top: 10px; }
-        .rank-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--card-bg); padding: 15px; margin-bottom: 8px; border-radius: 10px;
-            border: 1px solid #333;
-        }
-        .rank-pos { font-size: 1.2rem; font-weight: 900; color: #888; width: 30px; }
-        .rank-1 { color: var(--neon-gold); text-shadow: 0 0 10px var(--neon-gold); }
-        .rank-2 { color: #c0c0c0; }
-        .rank-3 { color: #cd7f32; }
-        
-        .rank-user { border: 1px solid var(--neon-green); background: rgba(57, 255, 20, 0.1); }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+        .shop-card { background: var(--card-bg); border: 1px solid #222; border-radius: 15px; padding: 15px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .shop-img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); }
+        .buy-btn { width: 100%; padding: 12px; border-radius: 8px; border:none; font-weight:900; cursor:pointer; margin-top:auto; font-size: 0.9rem; text-transform: uppercase; }
+        .btn-ton { background: linear-gradient(135deg, #0098EA, #0077b6); color: white; box-shadow: 0 5px 15px rgba(0, 152, 234, 0.3); }
+        .btn-pts { background: linear-gradient(135deg, var(--neon-gold), #e6c200); color: black; box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3); }
 
-        /* --- TIENDA & NAV --- */
-        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 400px; }
-        .shop-card { background: var(--card-bg); border: 1px solid #333; border-radius: 10px; padding: 10px; text-align: center; }
-        .shop-img { width: 60px; height: 60px; object-fit: contain; }
-        .buy-btn { width: 100%; padding: 8px; border-radius: 5px; border:none; font-weight:bold; cursor:pointer; margin-top:5px;}
-        .btn-ton { background: #0098EA; color: white; }
-        .btn-pts { background: var(--neon-gold); color: black; }
-
-        .bottom-nav {
-            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
-            width: 95%; max-width: 420px; height: 70px;
-            background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(10px);
-            border-radius: 20px; border: 1px solid #333;
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-        }
-        .nav-item { color: #666; font-size: 0.7rem; text-align: center; display: flex; flex-direction: column; align-items: center; }
-        .nav-icon { font-size: 1.5rem; margin-bottom: 2px; }
-        .nav-item.active { color: var(--neon-green); transform: translateY(-2px); }
+        /* NAVBAR */
+        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 400px; height: 75px; background: rgba(15, 15, 15, 0.98); backdrop-filter: blur(20px); border-radius: 25px; border: 2px solid #222; display: flex; justify-content: space-around; align-items: center; z-index: 1000; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
+        .nav-item { color: #777; font-size: 0.75rem; text-align: center; display: flex; flex-direction: column; align-items: center; transition: 0.3s; font-weight: 700; }
+        .nav-icon { font-size: 1.7rem; margin-bottom: 4px; }
+        .nav-item.active { color: var(--neon-green); transform: translateY(-4px) scale(1.1); text-shadow: 0 0 15px rgba(57, 255, 20, 0.6); }
     </style>
 </head>
 <body>
 
-    <div id="loader"><div class="loader-spinner"></div><p style="margin-top:20px; color:#888;">INICIANDO SISTEMA...</p></div>
+    <div id="loader"><div class="loader-spinner"></div><p style="margin-top:20px; color:#888; font-weight:900; letter-spacing:1px;">CARGANDO $DUENDE...</p></div>
 
     <div class="top-bar">
         <div id="ton-connect"></div>
-        <div class="user-balance">$ <span id="displayScore">0</span></div>
+        <div><span class="currency-label">$DUENDE:</span> <span class="user-balance" id="displayScore">0</span></div>
     </div>
 
-    <div id="screen-tap" class="screen screen-padded active">
-        <h2 style="color: #888; letter-spacing: 4px; font-size: 0.9rem;">MINADO ACTIVO</h2>
-        
-        <div class="main-button" id="clickBtn">
-            <img id="mainTapImage" src="" style="width: 80%; height: 80%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 0 15px var(--neon-green));">
-        </div>
-        
-        <div style="width: 100%; max-width: 350px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px; color:#ccc; font-weight:bold;">
-                <span>⚡ ENERGÍA</span><span><span id="energyVal">500</span>/<span id="maxEnergyVal">500</span></span>
+    <div id="screen-tap" class="screen active">
+        <div class="screen-content">
+            <h2 style="color: #888; letter-spacing: 4px; font-size: 1rem; margin-bottom: 10px;">MINADO CENTRAL</h2>
+            
+            <div class="main-button" id="clickBtn">
+                <img id="mainTapImage" src="" style="width: 85%; height: 85%; object-fit: contain; pointer-events: none;">
             </div>
-            <div style="background:#222; height:18px; border-radius:10px; overflow:hidden; border:1px solid #444;">
-                <div style="height:100%; background:linear-gradient(90deg, #ffd700, #ff0055); width:100%; transition:width 0.2s;" id="energyBar"></div>
+            
+            <div style="width: 100%;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#ccc; font-weight:900; font-size: 0.9rem;">
+                    <span>⚡ ENERGÍA</span><span><span id="energyVal">500</span> / <span id="maxEnergyVal">500</span></span>
+                </div>
+                <div style="background:#111; height:20px; border-radius:12px; overflow:hidden; border:2px solid #333; box-shadow: inset 0 5px 10px rgba(0,0,0,0.5);">
+                    <div style="height:100%; background:linear-gradient(90deg, #ffd700, #ff0055); width:100%; transition:width 0.2s;" id="energyBar"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="screen-arena" class="screen">
         <div class="arena-container">
-            <div class="arena-hud">KILLS: <span id="killCount">0</span></div>
+            <div class="arena-hud">💀 KILLS: <span id="killCount">0</span></div>
             <canvas id="gameCanvas"></canvas>
             
             <div id="arenaOverlay" class="arena-overlay">
-                <h1 style="color:var(--neon-red); font-size:3rem; margin:0; text-shadow:0 0 20px red;">SURVIVOR</h1>
-                <p style="color:#ccc; margin-bottom:30px;">Resiste la oleada bajista</p>
-                <button class="btn-start" onclick="startArena()">BATALLA (50⚡)</button>
-                <div id="arenaReward" style="margin-top:20px; color:var(--neon-green); font-size:1.5rem; font-weight:bold; display:none;"></div>
+                <h1 style="color:var(--neon-red); font-size:3.5rem; margin:0; text-shadow:0 0 30px var(--neon-red); font-weight:900; font-style:italic;">SURVIVOR</h1>
+                <p style="color:#ccc; margin-bottom:40px; font-size: 1.1rem;">Resiste la oleada bajista</p>
+                <button class="btn-start" onclick="startArena()">BATALLA<br><span style="font-size:0.9rem;">(50⚡ O 150 $DUENDE)</span></button>
+                <div id="arenaReward" style="margin-top:30px; padding: 15px 30px; background: rgba(57,255,20,0.1); border: 2px solid var(--neon-green); border-radius: 15px; color:var(--neon-green); font-size:1.5rem; font-weight:900; display:none; text-shadow: 0 0 10px var(--neon-green);"></div>
             </div>
         </div>
     </div>
 
-    <div id="screen-rank" class="screen screen-padded">
-        <h2 style="color:var(--neon-blue); letter-spacing:2px;">TOP TRADERS</h2>
-        <div class="rank-list">
-            <div class="rank-item">
-                <div class="rank-pos rank-1">1</div>
-                <div style="flex-grow:1; margin-left:10px;">CryptoWhale</div>
-                <div style="color:var(--neon-gold); font-weight:bold;">9,450,200</div>
-            </div>
-            <div class="rank-item">
-                <div class="rank-pos rank-2">2</div>
-                <div style="flex-grow:1; margin-left:10px;">ElonDoge</div>
-                <div style="color:#fff; font-weight:bold;">8,200,100</div>
-            </div>
-            <div class="rank-item">
-                <div class="rank-pos rank-3">3</div>
-                <div style="flex-grow:1; margin-left:10px;">Satoshi_Peru</div>
-                <div style="color:#fff; font-weight:bold;">7,500,000</div>
-            </div>
-            
-            <div style="text-align:center; color:#444; margin: 10px;">...</div>
-
-            <div class="rank-item rank-user">
-                <div class="rank-pos" style="color:var(--neon-green);">99+</div>
-                <div style="flex-grow:1; margin-left:10px;">TÚ (El Duende)</div>
-                <div style="color:var(--neon-green); font-weight:bold;" id="rankScoreDisplay">0</div>
+    <div id="screen-rank" class="screen">
+        <div class="screen-content">
+            <h2 style="color:var(--neon-blue); letter-spacing:2px; margin-bottom: 20px;">TOP TRADERS GLOBAL</h2>
+            <div class="rank-list">
+                <div class="rank-item"><div class="rank-pos rank-1">1</div><div style="flex-grow:1; margin-left:15px; font-weight:bold;">CryptoWhale</div><div style="color:var(--neon-gold); font-weight:900;">9.4M</div></div>
+                <div class="rank-item"><div class="rank-pos rank-2">2</div><div style="flex-grow:1; margin-left:15px; font-weight:bold;">ElonDoge</div><div style="color:#eee; font-weight:900;">8.2M</div></div>
+                <div class="rank-item"><div class="rank-pos rank-3">3</div><div style="flex-grow:1; margin-left:15px; font-weight:bold;">Satoshi_Peru</div><div style="color:#eee; font-weight:900;">7.5M</div></div>
+                <div style="text-align:center; color:#444; margin: 15px; font-weight:900; letter-spacing: 3px;">. . .</div>
+                <div class="rank-item rank-user"><div class="rank-pos" style="color:var(--neon-green);">99+</div><div style="flex-grow:1; margin-left:15px; font-weight:bold;">TÚ (El Duende)</div><div style="color:var(--neon-green); font-weight:900;" id="rankScoreDisplay">0</div></div>
             </div>
         </div>
     </div>
 
-    <div id="screen-shop" class="screen screen-padded">
-        <h2 style="color: var(--neon-gold);">MERCADO NEGRO</h2>
-        <div class="shop-grid">
-            <div class="shop-card">
-                <img src="/static/skin_DUENDE_HACKER.png" class="shop-img">
-                <div style="font-weight:bold;">HACKER</div>
-                <div style="font-size:0.7rem; color:#888;">Velocidad x2</div>
-                <button class="buy-btn btn-ton" onclick="payWithTon('hacker', 0.2)">0.2 TON</button>
-            </div>
-            <div class="shop-card">
-                <img src="/static/skin_DUENDE_BOX.png" class="shop-img">
-                <div style="font-weight:bold;">BOXER</div>
-                <div style="font-size:0.7rem; color:#888;">Daño Crítico</div>
-                <button class="buy-btn btn-ton" onclick="payWithTon('boxer', 0.5)">0.5 TON</button>
-            </div>
-            <div class="shop-card">
-                <img src="/static/booster_RAYOTON.png" class="shop-img">
-                <div style="font-weight:bold;">RECARGA</div>
-                <div style="font-size:0.7rem; color:#888;">Energía Full</div>
-                <button class="buy-btn btn-pts" onclick="buyBooster('refill', 500)">500 Pts</button>
-            </div>
-            <div class="shop-card">
-                <img src="/static/booster_INVENCIBLE_90S.png" class="shop-img">
-                <div style="font-weight:bold;">ESCUDO</div>
-                <div style="font-size:0.7rem; color:#888;">Invencible</div>
-                <button class="buy-btn btn-pts" onclick="buyBooster('shield', 2000)">2k Pts</button>
+    <div id="screen-shop" class="screen">
+        <div class="screen-content">
+            <h2 style="color: var(--neon-gold); margin-bottom: 25px;">MERCADO NEGRO</h2>
+            <div class="shop-grid">
+                <div class="shop-card"><img src="/static/skin_DUENDE_HACKER.png" class="shop-img"><div style="font-weight:900;">HACKER</div><div style="font-size:0.75rem; color:#888; margin-bottom:10px;">Velocidad x2</div><button class="buy-btn btn-ton" onclick="payWithTon('hacker', 0.2)">0.2 TON</button></div>
+                <div class="shop-card"><img src="/static/skin_DUENDE_BOX.png" class="shop-img"><div style="font-weight:900;">BOXER</div><div style="font-size:0.75rem; color:#888; margin-bottom:10px;">Daño Crítico</div><button class="buy-btn btn-ton" onclick="payWithTon('boxer', 0.5)">0.5 TON</button></div>
+                <div class="shop-card"><img src="/static/booster_RAYOTON.png" class="shop-img"><div style="font-weight:900;">RECARGA</div><div style="font-size:0.75rem; color:#888; margin-bottom:10px;">Energía Full</div><button class="buy-btn btn-pts" onclick="buyBooster('refill', 500)">500 $D</button></div>
+                <div class="shop-card"><img src="/static/booster_INVENCIBLE_90S.png" class="shop-img"><div style="font-weight:900;">ESCUDO</div><div style="font-size:0.75rem; color:#888; margin-bottom:10px;">Invencible 90s</div><button class="buy-btn btn-pts" onclick="buyBooster('shield', 2000)">2k $D</button></div>
             </div>
         </div>
     </div>
@@ -233,21 +173,17 @@
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('tap', this)"><span class="nav-icon">⛏️</span>Minar</div>
         <div class="nav-item" onclick="switchTab('arena', this)"><span class="nav-icon">⚔️</span>Arena</div>
-        <div class="nav-item" onclick="switchTab('rank', this)"><span class="nav-icon">🏆</span>Ranking</div>
+        <div class="nav-item" onclick="switchTab('rank', this)"><span class="nav-icon">🏆</span>Top</div>
         <div class="nav-item" onclick="switchTab('shop', this)"><span class="nav-icon">🛒</span>Tienda</div>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.setHeaderColor('#000000');
-
+        const tg = window.Telegram.WebApp; tg.expand(); tg.setHeaderColor('#000000');
         const MY_WALLET = "UQAm2w4HcJ1tW8RBNj7BZQh0Q-ckpzlxzD-r8p2JduHkpQnc";
 
-        // --- CARGA DE ASSETS ---
-        // AHORA LA SKIN POR DEFECTO ES LA COMÚN
+        // --- ASSETS ---
         const assets = {
-            common: '/static/skin_duende_comunparatodos.png', // NUEVA
+            common: '/static/skin_duende_comunparatodos.png', // CORREGIDO: Skin por defecto
             hacker: '/static/skin_DUENDE_HACKER.png',
             boxer: '/static/skin_DUENDE_BOX.png',
             king: '/static/skin_REY_DUENDE.png',
@@ -256,23 +192,12 @@
             whale: '/static/enemy_WHALE.png',
             bullet: '/static/loot_COIN.png'
         };
-
-        const images = {};
-        let assetsLoaded = 0;
-        const totalAssets = Object.keys(assets).length;
-
-        function loadAssets() {
-            for (let key in assets) {
-                images[key] = new Image();
-                images[key].src = assets[key];
-                images[key].onload = () => { assetsLoaded++; if(assetsLoaded===totalAssets) startGame(); };
-            }
-        }
-
+        const images = {}; let assetsLoaded = 0; const totalAssets = Object.keys(assets).length;
+        function loadAssets() { for (let key in assets) { images[key] = new Image(); images[key].src = assets[key]; images[key].onload = () => { assetsLoaded++; if(assetsLoaded===totalAssets) startGame(); }; } }
+        
         function startGame() {
             document.getElementById('loader').style.display = 'none';
-            document.getElementById('screen-tap').classList.add('active');
-            // Cargar imagen por defecto (Común)
+            // CORREGIDO: Asignar la imagen común al iniciar
             document.getElementById('mainTapImage').src = images.common.src;
             updateUI();
         }
@@ -280,53 +205,44 @@
         let state = { score: 0, energy: 500, maxEnergy: 500, currentSkin: 'common', tapPower: 1, arenaMulti: 1 };
         let invincible = false;
 
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: window.location.origin + '/static/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect'
-        });
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: window.location.origin + '/static/tonconnect-manifest.json', buttonRootId: 'ton-connect', uiPreferences: { theme: TON_CONNECT_UI.THEME.DARK } });
 
-        // --- PAGOS ---
+        // --- PAYMENTS ---
         async function payWithTon(skinName, price) {
-            if (!tonConnectUI.connected) return alert("Conecta Wallet");
-            const nano = Math.floor(price * 1000000000).toString();
-            try {
-                await tonConnectUI.sendTransaction({
-                    validUntil: Math.floor(Date.now()/1000)+3600,
-                    messages: [{ address: MY_WALLET, amount: nano }]
-                });
-                alert("Pago Recibido");
-                activateSkin(skinName);
-            } catch(e) { alert("Error Pago"); }
+            if (!tonConnectUI.connected) return alert("⚠️ Conecta tu Wallet primero.");
+            try { await tonConnectUI.sendTransaction({ validUntil: Math.floor(Date.now()/1000)+3600, messages: [{ address: MY_WALLET, amount: Math.floor(price * 1000000000).toString() }] }); alert("✅ ¡Pago Confirmado!"); activateSkin(skinName); } catch(e) { alert("❌ Pago cancelado."); }
         }
-
         function buyBooster(type, cost) {
-            if(state.score >= cost) {
-                state.score -= cost;
-                if(type === 'refill') state.energy = state.maxEnergy;
-                if(type === 'shield') { invincible = true; setTimeout(()=>invincible=false, 90000); alert("Escudo 90s"); }
-                updateUI();
-            } else alert("Faltan puntos");
+            if(state.score >= cost) { state.score -= cost; if(type === 'refill') state.energy = state.maxEnergy; if(type === 'shield') { invincible = true; setTimeout(()=>invincible=false, 90000); alert("🛡️ ¡Escudo Activo 90s!"); } updateUI(); } else alert("❌ Faltan $DUENDE.");
         }
-
         function activateSkin(name) {
-            state.currentSkin = name;
-            let img = document.getElementById('mainTapImage');
+            state.currentSkin = name; let img = document.getElementById('mainTapImage'); img.style.filter = "drop-shadow(0 0 25px var(--neon-green))";
             if(name === 'hacker') { img.src = images.hacker.src; state.tapPower = 2; }
             else if(name === 'boxer') { img.src = images.boxer.src; state.tapPower = 3; }
             else if(name === 'king') { img.src = images.king.src; state.arenaMulti = 2; }
-            else { img.src = images.common.src; state.tapPower = 1; } // Default Común
+            else { img.src = images.common.src; state.tapPower = 1; img.style.filter = "drop-shadow(0 0 20px rgba(57, 255, 20, 0.7))"; } // Reset filtro para común
         }
 
-        // --- TAP ---
+        // --- TAP SYSTEM (MEJORADO) ---
         document.getElementById('clickBtn').addEventListener('click', (e) => {
             if (state.energy >= 1) {
                 state.score += state.tapPower; state.energy -= 1; updateUI();
-                if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('heavy'); // Vibración fuerte
+                if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
                 
-                let el = document.createElement('div'); el.className = 'floating-text'; el.innerText = '+' + state.tapPower;
-                let x = e.clientX || window.innerWidth/2; let y = e.clientY || window.innerHeight/2;
-                el.style.left = x + 'px'; el.style.top = y + 'px';
-                document.body.appendChild(el); setTimeout(() => el.remove(), 600);
+                // Obtener centro de la imagen para posicionar efectos
+                const rect = document.getElementById('mainTapImage').getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                // 1. Texto Flotante (Encima del personaje)
+                let textEl = document.createElement('div'); textEl.className = 'floating-text'; textEl.innerText = '+' + state.tapPower;
+                textEl.style.left = centerX + 'px'; textEl.style.top = (rect.top + 50) + 'px'; 
+                document.body.appendChild(textEl); setTimeout(() => textEl.remove(), 800);
+
+                // 2. Moneda Saltarina
+                let coinEl = document.createElement('img'); coinEl.src = images.bullet.src; coinEl.className = 'jumping-coin';
+                coinEl.style.left = centerX + 'px'; coinEl.style.top = centerY + 'px';
+                document.body.appendChild(coinEl); setTimeout(() => coinEl.remove(), 800);
             }
         });
         setInterval(() => { if(state.energy < state.maxEnergy) { state.energy++; updateUI(); } }, 1000);
@@ -346,154 +262,102 @@
             if(name !== 'arena') stopArena();
         }
 
-        // --- SURVIVOR IO ENGINE (MEJORADO) ---
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        let gameLoopId, arenaActive = false;
-        let player = { x: 0, y: 0, speed: 5 };
-        let enemies = [], bullets = [], particles = [];
-        let kills = 0; let frame = 0;
-        let touchX = null, touchY = null;
-        let camX = 0, camY = 0;
+        // --- SURVIVOR ARENA ---
+        const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
+        let gameLoopId, arenaActive = false; let player = { x: 0, y: 0, speed: 5 };
+        let enemies = [], bullets = [], particles = []; let kills = 0; let frame = 0;
+        let touchX = null, touchY = null; let camX = 0, camY = 0;
 
-        function resizeCanvas() { 
-            const dpr = window.devicePixelRatio || 1;
-            const rect = canvas.parentElement.getBoundingClientRect();
-            canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr); canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px';
-        }
-
+        function resizeCanvas() { const dpr = window.devicePixelRatio || 1; const rect = canvas.parentElement.getBoundingClientRect(); canvas.width = rect.width * dpr; canvas.height = rect.height * dpr; ctx.scale(dpr, dpr); canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px'; }
         canvas.addEventListener('touchmove', (e) => { e.preventDefault(); let rect = canvas.getBoundingClientRect(); touchX = e.touches[0].clientX - rect.left; touchY = e.touches[0].clientY - rect.top; }, {passive:false});
         canvas.addEventListener('touchend', () => { touchX = null; touchY = null; });
 
+        // CORREGIDO: Lógica de doble costo (Energía o Monedas)
         window.startArena = function() {
-            if (state.energy < 50) { alert("Necesitas 50 de Energía"); return; }
-            state.energy -= 50; updateUI();
+            if (state.energy >= 50) {
+                state.energy -= 50; // Prioridad: Usar energía
+            } else if (state.score >= 150) {
+                state.score -= 150; // Alternativa: Usar 150 monedas
+            } else {
+                alert("⚠️ Necesitas 50 Energía O 150 $DUENDE para entrar.");
+                return;
+            }
+            updateUI();
             document.getElementById('arenaOverlay').style.display = 'none';
-            resizeCanvas();
-            player.x = 0; player.y = 0;
-            enemies = []; bullets = []; particles = []; kills = 0; arenaActive = true; loop();
+            resizeCanvas(); player.x = 0; player.y = 0; enemies = []; bullets = []; particles = []; kills = 0; arenaActive = true; loop();
         }
 
         function stopArena() { arenaActive = false; cancelAnimationFrame(gameLoopId); }
-        function gameOver() {
-            stopArena();
-            state.score += kills * 10 * state.arenaMulti; updateUI();
-            document.getElementById('arenaReward').innerText = "Ganaste: " + (kills * 10) + " $ELDUENDE";
-            document.getElementById('arenaReward').style.display = 'block';
-            document.getElementById('arenaOverlay').style.display = 'flex';
-        }
-
-        function spawnParticles(x, y, color) {
-            for(let i=0; i<5; i++) particles.push({x:x, y:y, vx:(Math.random()-0.5)*10, vy:(Math.random()-0.5)*10, life:1, color:color});
-        }
+        function gameOver() { stopArena(); state.score += kills * 10 * state.arenaMulti; updateUI(); document.getElementById('arenaReward').innerText = "+ " + (kills * 10) + " $DUENDE"; document.getElementById('arenaReward').style.display = 'block'; document.getElementById('arenaOverlay').style.display = 'flex'; if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error'); }
+        function spawnParticles(x, y, color) { for(let i=0; i<8; i++) particles.push({x:x, y:y, vx:(Math.random()-0.5)*12, vy:(Math.random()-0.5)*12, life:1, color:color}); }
 
         function loop() {
             if (!arenaActive) return;
-            const W = canvas.width / (window.devicePixelRatio||1);
-            const H = canvas.height / (window.devicePixelRatio||1);
+            const W = canvas.width / (window.devicePixelRatio||1); const H = canvas.height / (window.devicePixelRatio||1);
             camX = player.x - W/2; camY = player.y - H/2;
+            
+            // Background & Grid (Darker Theme)
+            ctx.fillStyle = '#050505'; ctx.fillRect(0,0,W,H);
+            ctx.strokeStyle = 'rgba(57, 255, 20, 0.08)'; ctx.lineWidth=2;
+            const gridSize = 100; const startX = Math.floor(camX/gridSize)*gridSize; const startY = Math.floor(camY/gridSize)*gridSize;
+            for(let i=startX; i<camX+W+gridSize; i+=gridSize) { for(let j=startY; j<camY+H+gridSize; j+=gridSize) { ctx.strokeRect(i-camX, j-camY, gridSize, gridSize); } }
 
-            // Background
-            ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,W,H);
-            // Grid
-            ctx.strokeStyle = 'rgba(57, 255, 20, 0.1)'; ctx.lineWidth=2;
-            const gridSize = 80;
-            const startX = Math.floor(camX/gridSize)*gridSize;
-            const startY = Math.floor(camY/gridSize)*gridSize;
-            for(let i=startX; i<camX+W+gridSize; i+=gridSize) {
-                for(let j=startY; j<camY+H+gridSize; j+=gridSize) {
-                    ctx.strokeRect(i-camX, j-camY, gridSize, gridSize);
-                }
-            }
+            if(touchX !== null) { let dx = touchX - W/2; let dy = touchY - H/2; let dist = Math.hypot(dx, dy); if(dist > 10) { player.x += (dx/dist)*player.speed; player.y += (dy/dist)*player.speed; } }
 
-            // Player Move
-            if(touchX !== null) {
-                let dx = touchX - W/2; let dy = touchY - H/2;
-                let dist = Math.hypot(dx, dy);
-                if(dist > 10) { player.x += (dx/dist)*player.speed; player.y += (dy/dist)*player.speed; }
-            }
-
-            // Draw Player (Común por defecto)
             let sprite = images.common;
-            if(state.currentSkin === 'hacker') sprite = images.hacker;
-            if(state.currentSkin === 'boxer') sprite = images.boxer;
-            if(state.currentSkin === 'king') sprite = images.king;
+            if(state.currentSkin === 'hacker') sprite = images.hacker; if(state.currentSkin === 'boxer') sprite = images.boxer; if(state.currentSkin === 'king') sprite = images.king;
             
             let pX = W/2; let pY = H/2;
-            if(invincible) { ctx.beginPath(); ctx.arc(pX, pY, 40, 0, Math.PI*2); ctx.strokeStyle='#00ffff'; ctx.stroke(); }
-            ctx.drawImage(sprite, pX-30, pY-30, 60, 60);
+            // Sombra del jugador
+            ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.beginPath(); ctx.ellipse(pX, pY+25, 25, 10, 0, 0, Math.PI*2); ctx.fill();
+            if(invincible) { ctx.beginPath(); ctx.arc(pX, pY, 45, 0, Math.PI*2); ctx.strokeStyle='#00ffff'; ctx.lineWidth=4; ctx.stroke(); }
+            ctx.drawImage(sprite, pX-35, pY-35, 70, 70);
 
-            // Enemies (Con HP)
             if(frame % 50 === 0) {
-                let r = Math.random(); let eImg = images.bear; let speed = 2; let hp = 3; // OSO = 3 HITS
-                if(r > 0.8) { eImg = images.rug; speed = 3.5; hp = 2; } // RUG = 2 HITS
-                if(r > 0.98) { eImg = images.whale; speed = 1; hp = 15; } // BALLENA = 15 HITS
-                
-                let angle = Math.random() * Math.PI * 2;
-                let dist = W + 100;
-                enemies.push({ x: player.x+Math.cos(angle)*dist, y: player.y+Math.sin(angle)*dist, img: eImg, speed: speed, hp: hp, maxHp: hp });
+                let r = Math.random(); let eImg = images.bear; let speed = 2.2; let hp = 3;
+                if(r > 0.8) { eImg = images.rug; speed = 4; hp = 2; } 
+                if(r > 0.98) { eImg = images.whale; speed = 1.2; hp = 20; }
+                let angle = Math.random() * Math.PI * 2; let dist = W + 150;
+                enemies.push({ x: player.x+Math.cos(angle)*dist, y: player.y+Math.sin(angle)*dist, img: eImg, speed: speed, hp: hp, maxHp: hp, hitFlash: 0 });
             }
 
-            // Auto Fire
-            if(frame % 20 === 0 && enemies.length > 0) {
-                let nearest = enemies[0]; // Simplificado
-                let dx = nearest.x - player.x; let dy = nearest.y - player.y;
-                let dist = Math.hypot(dx, dy);
-                bullets.push({x: player.x, y: player.y, vx: (dx/dist)*10, vy: (dy/dist)*10});
+            if(frame % 18 === 0 && enemies.length > 0) {
+                let nearest = enemies.reduce((prev, curr) => Math.hypot(prev.x-player.x, prev.y-player.y) < Math.hypot(curr.x-player.x, curr.y-player.y) ? prev : curr);
+                let dx = nearest.x - player.x; let dy = nearest.y - player.y; let dist = Math.hypot(dx, dy);
+                bullets.push({x: player.x, y: player.y, vx: (dx/dist)*14, vy: (dy/dist)*14});
+                if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
             }
 
-            // Logic Update
-            for(let i=bullets.length-1; i>=0; i--) {
-                let b = bullets[i]; b.x += b.vx; b.y += b.vy;
-                ctx.drawImage(images.bullet, b.x-camX-10, b.y-camY-10, 20, 20);
-                if(Math.hypot(b.x-player.x, b.y-player.y) > 1000) bullets.splice(i, 1);
-            }
+            for(let i=bullets.length-1; i>=0; i--) { let b = bullets[i]; b.x += b.vx; b.y += b.vy; ctx.drawImage(images.bullet, b.x-camX-12, b.y-camY-12, 24, 24); if(Math.hypot(b.x-player.x, b.y-player.y) > 1200) bullets.splice(i, 1); }
 
             for(let i=enemies.length-1; i>=0; i--) {
-                let e = enemies[i];
-                let dx = player.x - e.x; let dy = player.y - e.y; let dist = Math.hypot(dx, dy);
+                let e = enemies[i]; let dx = player.x - e.x; let dy = player.y - e.y; let dist = Math.hypot(dx, dy);
                 e.x += (dx/dist)*e.speed; e.y += (dy/dist)*e.speed;
                 
-                // Draw Enemy
-                ctx.drawImage(e.img, e.x-camX-25, e.y-camY-25, 50, 50);
-                
-                // HP Bar (Solo si está herido)
-                if(e.hp < e.maxHp) {
-                    ctx.fillStyle = 'red'; ctx.fillRect(e.x-camX-20, e.y-camY-35, 40, 5);
-                    ctx.fillStyle = '#0f0'; ctx.fillRect(e.x-camX-20, e.y-camY-35, 40 * (e.hp/e.maxHp), 5);
-                }
+                let screenEX = e.x-camX; let screenEY = e.y-camY;
+                // Sombra enemigo
+                ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.beginPath(); ctx.ellipse(screenEX, screenEY+20, 20, 8, 0, 0, Math.PI*2); ctx.fill();
 
-                if(dist < 30 && !invincible) { gameOver(); return; }
+                // Flash al golpear
+                if(e.hitFlash > 0) { ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = 0.8; e.hitFlash--; }
+                ctx.drawImage(e.img, screenEX-30, screenEY-30, 60, 60);
+                ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1.0;
 
-                // Collisions
+                if(e.hp < e.maxHp) { ctx.fillStyle = '#330000'; ctx.fillRect(screenEX-25, screenEY-45, 50, 6); ctx.fillStyle = '#ff0055'; ctx.fillRect(screenEX-25, screenEY-45, 50 * (e.hp/e.maxHp), 6); }
+                if(dist < 40 && !invincible) { gameOver(); return; }
+
                 for(let j=bullets.length-1; j>=0; j--) {
                     let b = bullets[j];
-                    if(Math.hypot(e.x-b.x, e.y-b.y) < 35) {
-                        bullets.splice(j,1);
-                        e.hp--; // BAJAR VIDA
-                        spawnParticles(e.x, e.y, '#fff'); // Efecto golpe
-                        if(e.hp <= 0) {
-                            spawnParticles(e.x, e.y, '#ff0000'); // Explosión muerte
-                            enemies.splice(i,1); kills++;
-                            document.getElementById('killCount').innerText = kills;
-                        }
+                    if(Math.hypot(e.x-b.x, e.y-b.y) < 40) {
+                        bullets.splice(j,1); e.hp--; e.hitFlash = 3; spawnParticles(e.x, e.y, '#ffd700');
+                        if(e.hp <= 0) { spawnParticles(e.x, e.y, '#ff0055'); enemies.splice(i,1); kills++; document.getElementById('killCount').innerText = kills; if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium'); }
                         break;
                     }
                 }
             }
-
-            // Particles
-            for(let i=particles.length-1; i>=0; i--) {
-                let p = particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.1;
-                if(p.life <= 0) particles.splice(i,1);
-                ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.fillRect(p.x-camX, p.y-camY, 4, 4);
-            }
-            ctx.globalAlpha = 1.0;
-
+            for(let i=particles.length-1; i>=0; i--) { let p = particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.08; if(p.life <= 0) particles.splice(i,1); ctx.globalAlpha = p.life; ctx.fillStyle = p.color; ctx.fillRect(p.x-camX, p.y-camY, 5, 5); } ctx.globalAlpha = 1.0;
             frame++; gameLoopId = requestAnimationFrame(loop);
         }
-
         loadAssets();
     </script>
 </body>
