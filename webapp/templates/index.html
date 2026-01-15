@@ -27,18 +27,29 @@
             user-select: none; overflow: hidden;
         }
 
-        /* Top Bar */
+        /* --- UI ELEMENTS --- */
         .top-bar {
             width: 100%; display: flex; justify-content: space-between;
             align-items: center; padding: 10px 20px;
-            background: rgba(0,0,0,0.8); border-bottom: 1px solid #333; z-index:10;
+            background: rgba(0,0,0,0.8); border-bottom: 1px solid #333; z-index: 100;
         }
         .user-balance { font-size: 1.1rem; color: var(--neon-green); font-weight: bold; }
 
-        /* Screens */
         .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 90px; }
         .screen.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+        /* Loader Screen */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 2000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+        }
+        .loader-spinner {
+            border: 4px solid #333; border-top: 4px solid var(--neon-green);
+            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Tap Button */
         .main-button {
@@ -47,7 +58,7 @@
             border-radius: 50%; border: 4px solid var(--neon-green);
             box-shadow: 0 0 40px rgba(57, 255, 20, 0.2);
             display: flex; justify-content: center; align-items: center;
-            margin: 30px 0; cursor: pointer; position: relative;
+            margin: 30px 0; cursor: pointer; position: relative; transition: transform 0.1s;
         }
         .main-button:active { transform: scale(0.95); }
 
@@ -72,13 +83,13 @@
             box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
         }
 
-        /* Shop */
+        /* Shop Cards */
         .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 360px; }
         .shop-card {
             background: var(--card-bg); border: 1px solid #333; border-radius: 10px;
-            padding: 15px 10px; text-align: center; display: flex; flex-direction: column; align-items: center;
+            padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
         }
-        .shop-img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        .shop-img { width: 60px; height: 60px; object-fit: contain; margin-bottom: 5px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
         .buy-btn {
             background: var(--neon-gold); color: #000; border: none;
             padding: 8px 15px; border-radius: 5px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 5px;
@@ -102,23 +113,30 @@
 </head>
 <body>
 
+    <div id="loader">
+        <div class="loader-spinner"></div>
+        <p style="margin-top:20px; color:#888;">Cargando Assets...</p>
+    </div>
+
     <div class="top-bar">
         <div id="ton-connect"></div>
         <div class="user-balance">$ELDUENDE: <span id="displayScore">0</span></div>
     </div>
 
-    <div id="screen-tap" class="screen active">
+    <div id="screen-tap" class="screen">
         <h2 style="color: #888; letter-spacing: 2px;">MINERO CENTRAL</h2>
         <div class="main-button" id="clickBtn">
-            <img id="mainTapImage" src="/static/logo.png" style="width: 80%; height: 80%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 0 15px var(--neon-green));">
+            <img id="mainTapImage" src="" style="width: 80%; height: 80%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 0 15px var(--neon-green));">
         </div>
+        
         <div style="width: 85%; text-align: center;">
             <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size: 0.9rem;">
-                <span>⚡ Energía</span><span><span id="energyVal">500</span>/500</span>
+                <span>⚡ Energía</span><span><span id="energyVal">500</span>/<span id="maxEnergyVal">500</span></span>
             </div>
             <div style="background:#222; height:15px; border-radius:8px; overflow: hidden; border: 1px solid #444;">
                 <div style="height:100%; background:linear-gradient(90deg, #ffd700, #ff0055); width:100%; transition:width 0.3s;" id="energyBar"></div>
             </div>
+            <p id="invincibleText" style="color: #00ffff; display: none; margin-top: 5px;">🛡️ ESCUDO ACTIVO</p>
         </div>
     </div>
 
@@ -128,7 +146,7 @@
             <canvas id="gameCanvas"></canvas>
             <div id="arenaOverlay" class="arena-overlay">
                 <h2 style="color:white; margin-bottom:10px;">DEFENSA FINANCIERA</h2>
-                <p style="color:#ccc;">Sobrevive a los Osos y Scammers</p><br>
+                <p style="color:#ccc;">Destruye el FUD y las Ballenas</p><br>
                 <button class="btn-start" onclick="startArena()">INICIAR (50⚡)</button>
                 <p id="arenaReward" style="color:var(--neon-green); margin-top:20px; font-weight:bold; display:none;">Ganado: 0</p>
             </div>
@@ -142,44 +160,44 @@
                 <img src="/static/skin_DUENDE_HACKER.png" class="shop-img">
                 <div style="font-weight:bold;">HACKER</div>
                 <div style="font-size:0.7rem; color:#888;">Velocidad x2</div>
-                <button class="buy-btn" onclick="buySkin('hacker', 5000)">5,000 Pts</button>
+                <button class="buy-btn" onclick="buySkin('hacker', 5000)">5k Pts</button>
             </div>
             <div class="shop-card">
                 <img src="/static/skin_DUENDE_BOX.png" class="shop-img">
                 <div style="font-weight:bold;">BOXER</div>
                 <div style="font-size:0.7rem; color:#888;">Daño Crítico</div>
-                <button class="buy-btn" onclick="buySkin('boxer', 8000)">8,000 Pts</button>
+                <button class="buy-btn" onclick="buySkin('boxer', 8000)">8k Pts</button>
             </div>
             <div class="shop-card">
                 <img src="/static/skin_REY_DUENDE.png" class="shop-img">
                 <div style="font-weight:bold;">EL REY</div>
                 <div style="font-size:0.7rem; color:#888;">Ganancia x2</div>
-                <button class="buy-btn" onclick="buySkin('king', 15000)">15,000 Pts</button>
+                <button class="buy-btn" onclick="buySkin('king', 15000)">15k Pts</button>
             </div>
             <div class="shop-card">
                 <img src="/static/skin_DUENDE_MAESTRO.png" class="shop-img">
                 <div style="font-weight:bold;">MAESTRO</div>
-                <div style="font-size:0.7rem; color:#888;">Poder Legendario</div>
-                <button class="buy-btn" onclick="buySkin('maestro', 30000)">30,000 Pts</button>
+                <div style="font-size:0.7rem; color:#888;">Skin Legendaria</div>
+                <button class="buy-btn" onclick="buySkin('maestro', 30000)">30k Pts</button>
             </div>
             
             <div class="shop-card">
                 <img src="/static/booster_RAYOTON.png" class="shop-img">
-                <div style="font-weight:bold;">RECARGA</div>
-                <div style="font-size:0.7rem; color:#888;">Energía Full</div>
+                <div style="font-weight:bold;">RAYO TON</div>
+                <div style="font-size:0.7rem; color:#888;">Recarga 100%</div>
                 <button class="buy-btn" onclick="buyBooster('refill', 500)">500 Pts</button>
             </div>
             <div class="shop-card">
                 <img src="/static/booster_INVENCIBLE_90S.png" class="shop-img">
-                <div style="font-weight:bold;">ESCUDO</div>
-                <div style="font-size:0.7rem; color:#888;">Invencible 10s</div>
-                <button class="buy-btn" onclick="buyBooster('shield', 1000)">1,000 Pts</button>
+                <div style="font-weight:bold;">INVENCIBLE</div>
+                <div style="font-size:0.7rem; color:#888;">Escudo 90s</div>
+                <button class="buy-btn" onclick="buyBooster('shield90', 2000)">2k Pts</button>
             </div>
             <div class="shop-card">
                 <img src="/static/booster_x100_ENERGIA.png" class="shop-img">
-                <div style="font-weight:bold;">MAX ENERGY</div>
+                <div style="font-weight:bold;">MAX POWER</div>
                 <div style="font-size:0.7rem; color:#888;">+100 Capacidad</div>
-                <button class="buy-btn" onclick="buyBooster('maxcap', 2000)">2,000 Pts</button>
+                <button class="buy-btn" onclick="buyBooster('maxcap', 5000)">5k Pts</button>
             </div>
         </div>
     </div>
@@ -189,6 +207,7 @@
         <div style="background:var(--card-bg); width:100%; padding:20px; border-radius:10px; margin-top:20px; text-align:center; border:1px solid #333; cursor:pointer;" onclick="window.open('https://t.me/elduende420peru')">
             <div style="font-size:3rem; margin-bottom: 10px;">📢</div>
             <h4>Canal Oficial</h4>
+            <p style="color:#666; font-size:0.8rem;">Noticias y Airdrops</p>
         </div>
     </div>
 
@@ -203,30 +222,52 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- CARGA DE ASSETS CONFIRMADOS ---
-        const sprites = {
-            player: new Image(),
-            hacker: new Image(),
-            boxer: new Image(), // Nombre corregido
-            king: new Image(),
-            maestro: new Image(),
-            enemyBear: new Image(),
-            enemyRug: new Image(),
-            enemyWhale: new Image(),
-            bullet: new Image()
+        // 1. SISTEMA DE CARGA DE ASSETS (PRELOADER)
+        const assets = {
+            player: '/static/logo.png',
+            hacker: '/static/skin_DUENDE_HACKER.png',
+            boxer: '/static/skin_DUENDE_BOX.png',  // <-- NOMBRE CORREGIDO
+            king: '/static/skin_REY_DUENDE.png',
+            maestro: '/static/skin_DUENDE_MAESTRO.png',
+            bear: '/static/enemy_BEAR_MARKET.png',
+            rug: '/static/enemy_RUG_PULL.png',
+            whale: '/static/enemy_WHALE.png',
+            bullet: '/static/loot_COIN.png'
         };
-        
-        // Rutas exactas
-        sprites.player.src = '/static/logo.png';
-        sprites.hacker.src = '/static/skin_DUENDE_HACKER.png';
-        sprites.boxer.src = '/static/skin_DUENDE_BOX.png'; 
-        sprites.king.src = '/static/skin_REY_DUENDE.png';
-        sprites.maestro.src = '/static/skin_DUENDE_MAESTRO.png';
-        sprites.enemyBear.src = '/static/enemy_BEAR_MARKET.png';
-        sprites.enemyRug.src = '/static/enemy_RUG_PULL.png';
-        sprites.enemyWhale.src = '/static/enemy_WHALE.png';
-        sprites.bullet.src = '/static/loot_COIN.png';
 
+        const images = {};
+        let assetsLoaded = 0;
+        const totalAssets = Object.keys(assets).length;
+
+        function loadAssets() {
+            for (let key in assets) {
+                images[key] = new Image();
+                images[key].src = assets[key];
+                images[key].onload = () => {
+                    assetsLoaded++;
+                    if (assetsLoaded === totalAssets) {
+                        startGame(); // Arrancar juego solo cuando todo cargó
+                    }
+                };
+                images[key].onerror = () => {
+                    console.error("Error cargando: " + assets[key]);
+                    // Intentar seguir aunque falle una
+                    assetsLoaded++;
+                    if (assetsLoaded === totalAssets) startGame();
+                };
+            }
+        }
+
+        function startGame() {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('screen-tap').classList.add('active');
+            updateUI();
+            
+            // Poner imagen inicial
+            document.getElementById('mainTapImage').src = images.player.src;
+        }
+
+        // --- ESTADO DEL JUEGO ---
         let state = { score: 0, energy: 500, maxEnergy: 500, currentSkin: 'default', tapPower: 1, arenaMulti: 1 };
         let invincible = false;
 
@@ -235,7 +276,7 @@
             buttonRootId: 'ton-connect'
         });
 
-        // --- TIENDA SKINS ---
+        // --- TIENDA ---
         function buySkin(name, cost) {
             if(state.score >= cost) {
                 state.score -= cost;
@@ -245,13 +286,21 @@
             } else alert("Faltan puntos.");
         }
 
-        // --- TIENDA BOOSTERS ---
         function buyBooster(type, cost) {
             if(state.score >= cost) {
                 state.score -= cost;
-                if(type === 'refill') { state.energy = state.maxEnergy; alert("Energía Recargada"); }
-                if(type === 'maxcap') { state.maxEnergy += 100; state.energy = state.maxEnergy; alert("Capacidad Aumentada"); }
-                if(type === 'shield') { invincible = true; setTimeout(()=>{ invincible=false; alert("Escudo Agotado"); }, 10000); alert("¡Invencible por 10s!"); }
+                if(type === 'refill') { state.energy = state.maxEnergy; alert("¡Energía al 100%!"); }
+                if(type === 'maxcap') { state.maxEnergy += 100; state.energy = state.maxEnergy; alert("¡Capacidad aumentada a " + state.maxEnergy + "!"); }
+                if(type === 'shield90') { 
+                    invincible = true; 
+                    document.getElementById('invincibleText').style.display = 'block';
+                    setTimeout(()=>{ 
+                        invincible=false; 
+                        document.getElementById('invincibleText').style.display = 'none';
+                        alert("Escudo Agotado"); 
+                    }, 90000); // 90 segundos
+                    alert("¡INVENCIBLE POR 90 SEGUNDOS!"); 
+                }
                 updateUI();
             } else alert("Faltan puntos.");
         }
@@ -259,10 +308,16 @@
         function activateSkin(name) {
             state.currentSkin = name;
             let img = document.getElementById('mainTapImage');
-            if(name === 'hacker') { img.src = sprites.hacker.src; state.tapPower = 2; }
-            if(name === 'boxer') { img.src = sprites.boxer.src; state.tapPower = 1; }
-            if(name === 'king') { img.src = sprites.king.src; state.arenaMulti = 2; }
-            if(name === 'maestro') { img.src = sprites.maestro.src; state.tapPower = 5; }
+            
+            if(name === 'hacker') { img.src = images.hacker.src; state.tapPower = 2; }
+            else if(name === 'boxer') { img.src = images.boxer.src; state.tapPower = 3; }
+            else if(name === 'king') { img.src = images.king.src; state.arenaMulti = 2; }
+            else if(name === 'maestro') { img.src = images.maestro.src; state.tapPower = 5; }
+            else { img.src = images.player.src; }
+        }
+
+        function refillEnergy() {
+            if(state.score >= 500) { state.score -= 500; state.energy = state.maxEnergy; updateUI(); }
         }
 
         // --- TAP ---
@@ -272,6 +327,7 @@
                 state.energy -= 1;
                 updateUI();
                 if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+                
                 let el = document.createElement('div');
                 el.className = 'floating-text';
                 el.innerText = '+' + state.tapPower;
@@ -286,6 +342,7 @@
         function updateUI() {
             document.getElementById('displayScore').innerText = state.score.toLocaleString();
             document.getElementById('energyVal').innerText = state.energy;
+            document.getElementById('maxEnergyVal').innerText = state.maxEnergy;
             document.getElementById('energyBar').style.width = (state.energy/state.maxEnergy*100) + '%';
         }
 
@@ -297,7 +354,7 @@
             if(name !== 'arena') stopArena();
         }
 
-        // --- MOTOR DE ARENA ---
+        // --- ARENA ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let gameLoopId, arenaActive = false;
@@ -306,8 +363,17 @@
         let arenaScore = 0; let frame = 0;
         let touchX = null, touchY = null;
 
-        function resizeCanvas() { canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight; }
-        
+        function resizeCanvas() { 
+            // Fix DPI para móviles (Retina Display)
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+        }
+
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
             let rect = canvas.getBoundingClientRect();
@@ -321,7 +387,11 @@
             state.energy -= 50; updateUI();
             document.getElementById('arenaOverlay').style.display = 'none';
             resizeCanvas();
-            player.x = canvas.width/2; player.y = canvas.height/2;
+            
+            // Centrar jugador
+            const rect = canvas.getBoundingClientRect();
+            player.x = rect.width/2; player.y = rect.height/2;
+            
             enemies = []; bullets = []; arenaScore = 0;
             arenaActive = true;
             loop();
@@ -330,60 +400,69 @@
         function stopArena() { arenaActive = false; cancelAnimationFrame(gameLoopId); }
         function gameOver() {
             stopArena();
-            state.score += Math.floor(arenaScore * state.arenaMulti); updateUI();
-            document.getElementById('arenaReward').innerText = "Ganaste: " + Math.floor(arenaScore * state.arenaMulti);
+            let totalWin = Math.floor(arenaScore * state.arenaMulti);
+            state.score += totalWin; updateUI();
+            document.getElementById('arenaReward').innerText = "Ganaste: " + totalWin;
             document.getElementById('arenaReward').style.display = 'block';
             document.getElementById('arenaOverlay').style.display = 'flex';
         }
 
         function loop() {
             if (!arenaActive) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const rect = canvas.getBoundingClientRect(); // Usar tamaño visual
+            ctx.clearRect(0, 0, rect.width, rect.height);
 
-            // 1. Player
-            let currentSprite = sprites.player;
-            if(state.currentSkin === 'hacker') currentSprite = sprites.hacker;
-            if(state.currentSkin === 'boxer') currentSprite = sprites.boxer;
-            if(state.currentSkin === 'king') currentSprite = sprites.king;
-            if(state.currentSkin === 'maestro') currentSprite = sprites.maestro;
+            // 1. Dibujar Jugador
+            let currentSprite = images.player;
+            if(state.currentSkin === 'hacker') currentSprite = images.hacker;
+            if(state.currentSkin === 'boxer') currentSprite = images.boxer;
+            if(state.currentSkin === 'king') currentSprite = images.king;
+            if(state.currentSkin === 'maestro') currentSprite = images.maestro;
 
             if (touchX !== null) {
                 let dx = touchX - player.x; let dy = touchY - player.y;
                 let dist = Math.hypot(dx, dy);
                 if (dist > 5) { player.x += (dx/dist) * player.speed; player.y += (dy/dist) * player.speed; }
             }
-            
-            // Efecto escudo invencible
+
+            // Escudo visual
             if(invincible) {
-                 ctx.beginPath(); ctx.arc(player.x, player.y, 30, 0, Math.PI*2); 
-                 ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 3; ctx.stroke();
+                ctx.beginPath(); ctx.arc(player.x, player.y, 35, 0, Math.PI*2);
+                ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 2; ctx.stroke();
             }
+            
+            // Dibujar Sprite centrado
             ctx.drawImage(currentSprite, player.x - 25, player.y - 25, 50, 50);
 
             // 2. Enemigos
             if (frame % 60 === 0) {
                 let r = Math.random();
-                let eImg = sprites.enemyBear; let speed = 1.5; let hp = 1;
-                if(r > 0.7) { eImg = sprites.enemyRug; speed = 3; } 
-                if(r > 0.95) { eImg = sprites.enemyWhale; speed = 0.5; hp = 5; }
-                enemies.push({ x: Math.random()<0.5?-40:canvas.width+40, y: Math.random()*canvas.height, img: eImg, speed: speed, hp: hp });
+                let eImg = images.bear; let speed = 1.5; let hp = 1;
+                if(r > 0.7) { eImg = images.rug; speed = 3; } 
+                if(r > 0.95) { eImg = images.whale; speed = 0.5; hp = 5; }
+                enemies.push({ x: Math.random()<0.5?-40:rect.width+40, y: Math.random()*rect.height, img: eImg, speed: speed, hp: hp });
             }
 
-            // 3. Auto-Fire
+            // 3. Disparos
             let fireRate = state.currentSkin === 'hacker' ? 15 : 30;
             if (frame % fireRate === 0 && enemies.length > 0) {
-                let nearest = enemies[0];
+                // Disparar al más cercano
+                let nearest = enemies.reduce((prev, curr) => {
+                    let dPrev = Math.hypot(prev.x - player.x, prev.y - player.y);
+                    let dCurr = Math.hypot(curr.x - player.x, curr.y - player.y);
+                    return dPrev < dCurr ? prev : curr;
+                });
                 let dx = nearest.x - player.x; let dy = nearest.y - player.y;
                 let dist = Math.hypot(dx, dy);
                 bullets.push({ x: player.x, y: player.y, vx: (dx/dist)*8, vy: (dy/dist)*8 });
             }
 
-            // 4. Balas (Coins)
+            // 4. Balas
             for (let i = bullets.length - 1; i >= 0; i--) {
                 let b = bullets[i];
                 b.x += b.vx; b.y += b.vy;
-                ctx.drawImage(sprites.bullet, b.x - 10, b.y - 10, 20, 20);
-                if(b.x < -50 || b.x > canvas.width+50) bullets.splice(i, 1);
+                ctx.drawImage(images.bullet, b.x - 10, b.y - 10, 20, 20);
+                if(b.x < -50 || b.x > rect.width+50 || b.y < -50 || b.y > rect.height+50) bullets.splice(i, 1);
             }
 
             // 5. Colisiones
@@ -393,8 +472,10 @@
                 e.x += (dx/dist) * e.speed; e.y += (dy/dist) * e.speed;
                 ctx.drawImage(e.img, e.x - 20, e.y - 20, 40, 40);
 
-                if (dist < 30 && !invincible) { gameOver(); return; } // Muerte
+                // Colisión Jugador
+                if (dist < 30 && !invincible) { gameOver(); return; }
 
+                // Colisión Balas
                 for (let j = bullets.length - 1; j >= 0; j--) {
                     let b = bullets[j];
                     if (Math.hypot(e.x - b.x, e.y - b.y) < 25) {
@@ -402,7 +483,7 @@
                         e.hp--;
                         if(e.hp <= 0) {
                             enemies.splice(i, 1);
-                            let pts = 10; if(e.img === sprites.enemyWhale) pts = 100;
+                            let pts = 10; if(e.img === images.whale) pts = 100;
                             arenaScore += pts;
                         }
                         break;
@@ -416,7 +497,8 @@
             gameLoopId = requestAnimationFrame(loop);
         }
 
-        updateUI();
+        // --- INICIAR ---
+        loadAssets(); // Iniciar carga
     </script>
 </body>
 </html>
