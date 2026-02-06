@@ -33,37 +33,35 @@
         .loader-footer { background: rgba(0,0,0,0.85); width: 100%; padding: 40px 20px; text-align: center; backdrop-filter: blur(10px); border-top: 3px solid var(--primary); }
         .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
 
-        /* --- HEADER PROFESIONAL CON TU LOGO --- */
-        .header { 
-            padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; 
-            background: rgba(14, 16, 19, 0.9); backdrop-filter: blur(15px); border-bottom: 2px solid var(--primary); z-index: 10; 
-        }
-        .token-balance-container {
-            display: flex; align-items: center; background: rgba(255,255,255,0.05); 
-            padding: 5px 15px; border-radius: 25px; border: 1px solid var(--gold);
-        }
-        .token-balance-container span { font-size: 1.4rem; font-weight: 900; color: #fff; }
-        .token-logo-header { width: 28px; height: 28px; margin-left: 8px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 10px var(--gold); }
+        /* --- HEADER --- */
+        .header { padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(14, 16, 19, 0.9); border-bottom: 2px solid var(--primary); z-index: 10; }
+        .token-balance-container { display: flex; align-items: center; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 25px; border: 1px solid var(--gold); }
+        .token-logo-header { width: 28px; height: 28px; margin-left: 8px; border-radius: 50%; object-fit: cover; }
 
         .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; width: 100%; overflow-y: auto; padding-bottom: 110px; }
-        .screen.active { display: flex; animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .screen.active { display: flex; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- RETIRO --- */
+        /* --- COMPONENTES --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 94%; margin-top: 15px; }
+        .card { background: var(--card); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .card img { width: 65px; height: 65px; object-fit: contain; margin-bottom: 10px; }
+        .btn-price { background: var(--blue); color: #fff; padding: 10px; border-radius: 10px; font-weight: bold; width: 100%; border: none; cursor: pointer; }
+
         .withdraw-card { background: var(--card); border-radius: 20px; width: 92%; padding: 25px; margin-top: 30px; border: 1px solid var(--blue); text-align: center; }
-        .min-withdraw { font-size: 0.8rem; color: #888; margin-top: 10px; }
-        .withdraw-btn { background: var(--blue); border: none; color: white; padding: 12px 30px; border-radius: 10px; font-weight: bold; margin-top: 20px; width: 100%; cursor: pointer; }
-        .withdraw-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        .withdraw-btn { background: var(--blue); border: none; color: white; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 20px; width: 100%; }
 
         /* --- ARENA --- */
         #arena-container { width: 100%; height: 100%; position: relative; overflow: hidden; }
         canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-        .arena-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; text-align: center; }
-        .arena-btn { background: linear-gradient(135deg, var(--danger), #800000); border: none; color: white; padding: 18px 45px; border-radius: 12px; font-size: 1.4rem; font-weight: 900; cursor: pointer; }
+        .arena-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; }
+        .arena-btn { background: linear-gradient(135deg, var(--danger), #800000); border: none; color: white; padding: 20px 50px; border-radius: 15px; font-size: 1.5rem; font-weight: 900; }
 
-        .nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 85px; background: rgba(14, 16, 19, 0.98); backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.75rem; font-weight: 700; width: 20%; }
+        .nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 85px; background: rgba(14, 16, 19, 0.98); border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.7rem; font-weight: 700; width: 20%; }
         .nav-item.active { color: #fff; } .nav-item.active i { color: var(--primary); }
+
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     </style>
 </head>
 <body>
@@ -72,7 +70,7 @@
         <div class="loader-footer">
             <div class="spinner"></div>
             <h2 style="margin:0; color:var(--primary); letter-spacing:3px;">$DUENDE SURVIVOR</h2>
-            <p style="color:#888;">PREPARANDO ECOSISTEMA...</p>
+            <p style="color:#888;">INICIANDO SISTEMA...</p>
         </div>
     </div>
 
@@ -86,7 +84,7 @@
 
     <div id="tab-tap" class="screen active">
         <div style="margin-top:50px;" id="tapZone">
-            <img id="charImg" src="" style="width: 250px; height: 250px; animation: breathe 3s infinite;">
+            <img id="charImg" src="static/skin_duende_comunparatodos.png" style="width: 250px; height: 250px; animation: breathe 3s infinite; pointer-events: none;">
         </div>
         <div style="width: 90%; margin-top:30px; background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--primary);">
             <div style="display:flex; justify-content:space-between; font-weight:900;">
@@ -104,34 +102,50 @@
             <canvas id="gameCanvas"></canvas>
             <div style="position:absolute; top:20px; left:20px; z-index:10; pointer-events:none; background:rgba(0,0,0,0.6); padding:10px; border-radius:10px; border:1px solid var(--primary);">
                 <div style="font-weight:900; color:var(--gold); display:flex; align-items:center; gap:5px;">
-                    <span id="arenaBalance">0</span> <img src="static/coin.png" style="width:18px; height:18px; border-radius:50%;">
+                    <span id="arenaBalance">0</span> <img src="static/coin.png" style="width:18px; height:18px;">
                 </div>
                 <div style="color:var(--danger); font-weight:bold;">❤️ HP: <span id="hpTxt">100</span>%</div>
                 <div style="font-size:0.8rem;">💀 KILLS: <span id="killsTxt">0</span></div>
             </div>
             <div id="arenaStart" class="arena-overlay">
-                <h1 style="color:var(--danger); font-size: 3rem; text-shadow: 0 0 15px red;">ARENA</h1>
-                <button class="arena-btn" onclick="startArena()">JUGAR (10⚡)</button>
+                <h1 style="color:var(--danger); font-size: 2.5rem;">ARENA SURVIVOR</h1>
+                <button class="arena-btn" onclick="startArena()">INICIAR (10⚡)</button>
             </div>
             <div id="arenaEnd" class="arena-overlay" style="display:none;">
-                <h1 id="endTitle">FINALIZADO</h1>
-                <div style="font-size:2.2rem; font-weight:900; color:var(--gold); margin:20px 0;">
-                    + <span id="rewardNum">0</span> <img src="static/coin.png" style="width:40px; vertical-align:middle; border-radius:50%;">
+                <h1 id="endTitle">FIN DEL JUEGO</h1>
+                <div style="font-size:2rem; font-weight:900; color:var(--gold); margin:20px 0;">
+                    GANASTE <span id="rewardNum">0</span> <img src="static/coin.png" style="width:40px; vertical-align:middle;">
                 </div>
                 <button class="arena-btn" style="background:#333;" onclick="closeArena()">REGRESAR</button>
             </div>
         </div>
     </div>
 
+    <div id="tab-shop" class="screen">
+        <h2 style="color:var(--gold); margin-top:20px;">MERCADO NEGRO</h2>
+        <div class="grid-container">
+            <div class="card"><img src="static/skin_DUENDE_HACKER.png"><b>HACKER</b><button class="btn-price" onclick="alert('Conecta Wallet para comprar')">0.2 TON</button></div>
+            <div class="card"><img src="static/skin_REY_DUENDE.png"><b>EL REY</b><button class="btn-price" onclick="alert('Conecta Wallet para comprar')">1.0 TON</button></div>
+        </div>
+    </div>
+
     <div id="tab-withdraw" class="screen">
         <h2 style="color:var(--blue); margin-top:30px;">RETIRAR FONDOS</h2>
         <div class="withdraw-card">
-            <p style="font-size:0.9rem; color:#ccc;">Tu balance actual es apto para retiro si superas el mínimo.</p>
             <div style="font-size:2.5rem; font-weight:900; margin:15px 0;">
-                <span id="withdrawBalance">0</span> <img src="static/coin.png" style="width:35px; border-radius:50%;">
+                <span id="withdrawBalance">0</span> <img src="static/coin.png" style="width:35px;">
             </div>
-            <button id="btnWithdrawAction" class="withdraw-btn" disabled onclick="requestWithdraw()">RETIRAR A WALLET</button>
-            <p class="min-withdraw">Retiro mínimo: 5,000 $DUENDE</p>
+            <button id="btnWithdrawAction" class="withdraw-btn" disabled onclick="alert('Mínimo 5,000 $DUENDE')">RETIRAR</button>
+            <p style="font-size:0.8rem; color:#888; margin-top:10px;">Mínimo: 5,000 $DUENDE</p>
+        </div>
+    </div>
+
+    <div id="tab-donate" class="screen">
+        <div style="background: var(--card); border: 2px solid var(--blue); border-radius: 20px; width: 92%; padding: 25px; margin-top: 40px; text-align: center;">
+            <i class="fas fa-donate" style="color:var(--blue); font-size:2rem;"></i>
+            <h3>APOYAR AL DEV</h3>
+            <div style="background: #000; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 0.7rem; color: var(--blue); margin: 15px 0;">UQAm2w4HcJ1tW8RBNj7BZQh0Q-ckpzlxzD-r8p2JduHkpQnc</div>
+            <button class="arena-btn" style="padding:10px; font-size:1rem; background:var(--blue);" onclick="copyWallet()">COPIAR WALLET</button>
         </div>
     </div>
 
@@ -139,7 +153,7 @@
         <div class="nav-item active" onclick="nav('tap', this)"><i class="fas fa-hammer"></i><span>MINAR</span></div>
         <div class="nav-item" onclick="nav('arena', this)"><i class="fas fa-skull"></i><span>ARENA</span></div>
         <div class="nav-item" onclick="nav('shop', this)"><i class="fas fa-shopping-cart"></i><span>TIENDA</span></div>
-        <div class="nav-item" onclick="nav('withdraw', this)"><i class="fas fa-wallet"></i><span>RETIRAR</span></div>
+        <div class="nav-item" onclick="nav('withdraw', this)"><i class="fas fa-wallet"></i><span>RETIRO</span></div>
         <div class="nav-item" onclick="nav('donate', this)"><i class="fas fa-donate"></i><span>DONAR</span></div>
     </nav>
 
@@ -152,9 +166,9 @@
             bear: 'static/enemy_BEAR_MARKET.png',
             rug: 'static/enemy_RUG_PULL.png',
             whale: 'static/enemy_WHALE.png',
-            bullet: 'static/loot_COIN.png',
             coin: 'static/coin.png',
             bg: 'static/imagen_portada_home.png',
+            bullet: 'static/loot_COIN.png',
             b_shield: 'static/booster_INVENCIBLE_90S.png',
             s_fire: 'static/skill_fire.png'
         };
@@ -170,37 +184,47 @@
         function initApp() {
             document.getElementById('loader').style.opacity = '0';
             setTimeout(() => document.getElementById('loader').style.display='none', 800);
-            document.getElementById('charImg').src = assets.common;
             updateUI();
         }
 
-        let state = { score: 0, energy: 100, maxEnergy: 100, dmgBoost: 1 };
+        let state = { score: 0, energy: 100, dmgBoost: 1 };
         let invincible = false;
-        let particles = [];
 
         function updateUI() {
-            const val = Math.floor(state.score).toLocaleString();
+            const val = state.score.toLocaleString();
             document.getElementById('scoreDisplay').innerText = val;
             document.getElementById('arenaBalance').innerText = val;
             document.getElementById('withdrawBalance').innerText = val;
             document.getElementById('energyVal').innerText = Math.floor(state.energy);
             document.getElementById('energyFill').style.width = state.energy + '%';
             
-            // Lógica habilitar botón retiro
             const btnW = document.getElementById('btnWithdrawAction');
-            if(state.score >= 5000) { btnW.disabled = false; btnW.innerText = "RETIRAR AHORA"; }
-            else { btnW.disabled = true; btnW.innerText = "FALTAN " + (5000 - state.score); }
+            if(state.score >= 5000) { btnW.disabled = false; btnW.style.background = "var(--primary)"; }
         }
+
+        document.getElementById('tapZone').onclick = (e) => {
+            if(state.energy < 3) return;
+            state.energy -= 3; state.score += 1; updateUI();
+            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        };
 
         setInterval(() => { if(state.energy < 100){ state.energy += 0.5; updateUI(); } }, 2000);
 
-        function requestWithdraw() {
-            alert("Solicitud de retiro enviada. Se procesará en un plazo de 24h a tu wallet conectada.");
+        function nav(t, b) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('tab-'+t).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            b.classList.add('active'); if(t !== 'arena') stopArena();
         }
 
-        // --- MOTOR SURVIVOR ---
+        function copyWallet() {
+            const el = document.createElement('textarea'); el.value = MY_WALLET; document.body.appendChild(el);
+            el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("Wallet copiada!");
+        }
+
+        // --- MOTOR ARENA INFINITO ---
         const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
-        let gameActive=false, loopId, kills=0, frame=0, difficulty=1, player = { x: 0, y: 0, visualX: 0, visualY: 0, hp: 100 }, enemies=[], bullets=[], drops=[];
+        let gameActive=false, kills=0, frame=0, difficulty=1, player = { x: 0, y: 0, visualX: 0, visualY: 0, hp: 100 }, enemies=[], bullets=[], drops=[];
         let stick={active:false, sx:0, sy:0, nx:0, ny:0};
 
         function startArena() {
@@ -209,24 +233,18 @@
             document.getElementById('arenaStart').style.display='none';
             canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight;
             player = { x: 0, y: 0, visualX: canvas.width/2, visualY: canvas.height/2, hp: 100 };
-            enemies=[]; bullets=[]; drops=[]; kills=0; difficulty=1.0; frame=0; particles=[];
+            enemies=[]; bullets=[]; drops=[]; kills=0; difficulty=1.0; frame=0;
             gameActive=true; loop();
-        }
-
-        function createExplosion(x, y, color) {
-            for(let i=0; i<8; i++) {
-                particles.push({ x, y, vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12, life: 15, color });
-            }
         }
 
         function loop() {
             if(!gameActive) return;
             frame++;
             const W = canvas.width, H = canvas.height;
-            if(frame % 1000 === 0) difficulty += 0.25;
 
             if(stick.active) {
-                const dx = stick.nx - stick.sx, dy = stick.ny - stick.sy, dist = Math.hypot(dx, dy);
+                const dx = stick.nx - stick.sx, dy = stick.ny - stick.sy;
+                const dist = Math.hypot(dx, dy);
                 if(dist > 5) {
                     const ang = Math.atan2(dy, dx);
                     player.x += Math.cos(ang) * 6; player.y += Math.sin(ang) * 6;
@@ -234,10 +252,10 @@
                 }
             }
 
-            const threshold = 70;
-            const driftX = player.visualX - W/2, driftY = player.visualY - H/2;
-            if(Math.abs(driftX) > threshold) player.visualX -= driftX * 0.1;
-            if(Math.abs(driftY) > threshold) player.visualY -= driftY * 0.1;
+            const centerX = W/2, centerY = H/2;
+            const camDriftX = player.visualX - centerX, camDriftY = player.visualY - centerY;
+            if(Math.abs(camDriftX) > 60) player.visualX -= camDriftX * 0.1;
+            if(Math.abs(camDriftY) > 60) player.visualY -= camDriftY * 0.1;
             const camX = player.x - player.visualX, camY = player.y - player.visualY;
 
             // Render Fondo Infinito
@@ -245,41 +263,39 @@
             const startX = Math.floor(camX / bgS) * bgS, startY = Math.floor(camY / bgS) * bgS;
             for(let x = startX - bgS; x < camX + W + bgS; x += bgS) {
                 for(let y = startY - bgS; y < camY + H + bgS; y += bgS) {
-                    if(imgs.bg.complete) ctx.drawImage(imgs.bg, x - camX, y - camY, bgS, bgS);
+                    ctx.drawImage(imgs.bg, x - camX, y - camY, bgS, bgS);
                 }
             }
             ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H);
 
-            particles.forEach((p, i) => {
-                p.x += p.vx; p.y += p.vy; p.life--;
-                ctx.fillStyle = p.color; ctx.fillRect(p.x - camX, p.y - camY, 5, 5);
-                if(p.life <= 0) particles.splice(i, 1);
-            });
+            // Spawn Enemigos
+            if(frame % 35 === 0) {
+                const ang = Math.random()*6.28, dist = Math.max(W,H);
+                enemies.push({ x: player.x+Math.cos(ang)*dist, y: player.y+Math.sin(ang)*dist, type: Math.random()>0.8?'whale':'bear', hp: 4*difficulty, spd: 2.5 });
+            }
 
-            // Disparo Daño en Área
-            if(frame % (state.dmgBoost > 1 ? 10 : 22) === 0 && enemies.length > 0) {
-                const target = enemies.reduce((a, b) => Math.hypot(a.x - player.x, a.y - player.y) < Math.hypot(b.x - player.x, b.y - player.y) ? a : b);
+            // Balas automáticas
+            if(frame % 20 === 0 && enemies.length > 0) {
+                const target = enemies[0];
                 const ang = Math.atan2(target.y - player.y, target.x - player.x);
-                bullets.push({x: player.x, y: player.y, vx: Math.cos(ang)*13, vy: Math.sin(ang)*13, life: 80});
+                bullets.push({x: player.x, y: player.y, vx: Math.cos(ang)*12, vy: Math.sin(ang)*12, life: 80});
             }
 
             bullets.forEach((b, i) => {
                 b.x += b.vx; b.y += b.vy; b.life--;
-                ctx.drawImage(imgs.bullet, b.x - camX - 12, b.y - camY - 12, 24, 24);
+                const rx = b.x - camX, ry = b.y - camY;
+                ctx.drawImage(imgs.bullet, rx-12, ry-12, 24, 24);
                 
-                enemies.forEach((e) => {
-                    if(Math.hypot(b.x - e.x, b.y - e.y) < 45) {
-                        createExplosion(e.x, e.y, '#ff6600');
+                enemies.forEach((e, ei) => {
+                    if(Math.hypot(b.x - e.x, b.y - e.y) < 40) {
                         bullets.splice(i, 1);
-                        // DAÑO EN AREA RADIAL
                         enemies.forEach(nearby => {
-                            if(Math.hypot(e.x - nearby.x, e.y - nearby.y) < 110) {
-                                nearby.hp -= (state.dmgBoost || 1);
+                            if(Math.hypot(e.x - nearby.x, e.y - nearby.y) < 100) {
+                                nearby.hp -= state.dmgBoost;
                                 if(nearby.hp <= 0) {
                                     kills++; document.getElementById('killsTxt').innerText = kills;
-                                    // LOGICA DE BOTIN: Fuego (25%), Escudo (20%), Moneda (20%)
                                     let r = Math.random();
-                                    if(r < 0.25) drops.push({x: nearby.x, y: nearby.y, type: 'fire'}); 
+                                    if(r < 0.25) drops.push({x: nearby.x, y: nearby.y, type: 'fire'});
                                     else if(r < 0.45) drops.push({x: nearby.x, y: nearby.y, type: 'shield'});
                                     else if(r < 0.65) drops.push({x: nearby.x, y: nearby.y, type: 'coin'});
                                     enemies.splice(enemies.indexOf(nearby), 1);
@@ -291,30 +307,16 @@
                 if(b.life <= 0) bullets.splice(i, 1);
             });
 
-            // Drops
             drops.forEach((d, i) => {
                 const rx = d.x - camX, ry = d.y - camY;
-                ctx.save(); ctx.translate(rx, ry + Math.sin(frame/10)*8);
-                let img = imgs.coin;
-                if(d.type==='fire') img = imgs.s_fire;
-                if(d.type==='shield') img = imgs.b_shield;
-                ctx.drawImage(img, -22, -22, 44, 44);
-                ctx.restore();
-
+                ctx.drawImage(d.type==='coin'?imgs.coin:(d.type==='fire'?imgs.s_fire:imgs.b_shield), rx-20, ry-20, 40, 40);
                 if(Math.hypot(player.visualX - rx, player.visualY - ry) < 35) {
-                    if(d.type === 'coin') state.score += 50;
-                    if(d.type === 'shield') { invincible = true; setTimeout(()=>invincible=false, 10000); }
-                    if(d.type === 'fire') { state.dmgBoost = 4; setTimeout(()=>state.dmgBoost=1, 15000); }
-                    updateUI(); drops.splice(i, 1);
-                    if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                    if(d.type==='coin') state.score += 50;
+                    if(d.type==='shield') { invincible=true; setTimeout(()=>invincible=false, 10000); }
+                    if(d.type==='fire') { state.dmgBoost=4; setTimeout(()=>state.dmgBoost=1, 15000); }
+                    updateUI(); drops.splice(i,1);
                 }
             });
-
-            // Enemigos
-            if(frame % 35 === 0) {
-                const ang = Math.random()*6.28, dist = W;
-                enemies.push({ x: player.x+Math.cos(ang)*dist, y: player.y+Math.sin(ang)*dist, type: Math.random()>0.8?'whale':'bear', hp: 4*difficulty, spd: 2.8 });
-            }
 
             enemies.forEach((e) => {
                 const ang = Math.atan2(player.y - e.y, player.x - e.x);
@@ -326,12 +328,7 @@
                 }
             });
 
-            // Player Visual
-            ctx.save(); ctx.translate(player.visualX, player.visualY);
-            if(invincible) { ctx.beginPath(); ctx.arc(0,0,45,0,6.28); ctx.strokeStyle=var(--blue); ctx.lineWidth=3; ctx.stroke(); }
-            ctx.drawImage(imgs.common, -35, -35, 70, 70);
-            ctx.restore();
-
+            ctx.drawImage(imgs.common, player.visualX-35, player.visualY-35, 70, 70);
             loopId = requestAnimationFrame(loop);
         }
 
@@ -342,14 +339,12 @@
             updateUI();
         }
 
-        function nav(t, b) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('tab-'+t).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            b.classList.add('active'); if(t !== 'arena') stopArena();
-        }
-
+        function stopArena() { gameActive = false; cancelAnimationFrame(loopId); }
         function closeArena() { document.getElementById('arenaStart').style.display='flex'; document.getElementById('arenaEnd').style.display='none'; }
+        
+        canvas.addEventListener('touchstart', e => { e.preventDefault(); stick.active=true; stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; stick.nx=stick.sx; stick.ny=stick.sy; });
+        canvas.addEventListener('touchmove', e => { e.preventDefault(); if(stick.active){ stick.nx=e.touches[0].clientX; stick.ny=e.touches[0].clientY; } });
+        canvas.addEventListener('touchend', () => { stick.active=false; });
     </script>
 </body>
 </html>
