@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>El Duende Survivor - Scroll Infinito</title>
+    <title>El Duende Survivor - Ecosistema $DUENDE</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -35,23 +35,49 @@
             text-align: center; backdrop-filter: blur(10px); border-top: 3px solid var(--primary);
         }
         .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* --- UI ELEMENTS --- */
-        .header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10; }
-        .balance-val { font-size: 1.5rem; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px; }
-        .coin-icon { width: 22px; height: 22px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 10px var(--gold); }
+        .header {
+            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10;
+        }
+        .balance-val { font-size: 1.6rem; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .coin-icon { width: 24px; height: 24px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 15px var(--gold); }
 
-        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; width: 100%; overflow-y: auto; padding-bottom: 100px; }
+        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; width: 100%; overflow-y: auto; padding-bottom: 110px; }
         .screen.active { display: flex; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        canvas { display: block; width: 100%; height: 100%; touch-action: none; background: #000; }
-        .arena-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; }
-        .arena-btn { background: linear-gradient(135deg, var(--danger), #800000); border: none; color: white; padding: 15px 40px; border-radius: 12px; font-size: 1.3rem; font-weight: 900; cursor: pointer; }
+        /* --- TIENDA --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 94%; margin-top: 15px; }
+        .card { background: var(--card); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .card img { width: 65px; height: 65px; object-fit: contain; margin-bottom: 10px; }
+        .btn-price { background: #333; color: #fff; padding: 10px; border-radius: 10px; font-size: 0.85rem; font-weight: bold; width: 100%; border: none; cursor: pointer; }
+        .btn-ton { background: var(--blue); } .btn-gold { background: var(--gold); color: #000; }
 
-        .nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; background: rgba(14, 16, 19, 0.98); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; padding-bottom: 10px; z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.7rem; font-weight: 700; width: 33%; }
+        /* --- STATUS TAP --- */
+        .tap-area { position: relative; margin-top: 40px; width: 300px; height: 300px; display: flex; justify-content: center; align-items: center; }
+        .main-character { width: 260px; height: 260px; z-index: 2; object-fit: contain; cursor: pointer; animation: breathe 3s ease-in-out infinite; }
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04) translateY(-8px); } }
+
+        .status-card { width: 90%; max-width: 400px; margin-top: 30px; background: var(--card); padding: 20px; border-radius: 20px; }
+        .energy-bar { height: 12px; width: 100%; background: #111; border-radius: 6px; margin-top: 12px; overflow: hidden; }
+        .energy-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--gold), var(--primary)); transition: width 0.3s; }
+
+        /* --- NAV --- */
+        .nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 85px; background: rgba(14, 16, 19, 0.98); backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.75rem; font-weight: 700; width: 25%; }
         .nav-item.active { color: #fff; } .nav-item.active i { color: var(--primary); }
+
+        /* --- ARENA --- */
+        #arena-container { width: 100%; height: 100%; position: relative; overflow: hidden; background: #000; }
+        canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+        .arena-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; }
+        .arena-btn { background: linear-gradient(135deg, var(--danger), #800000); border: none; color: white; padding: 20px 50px; border-radius: 15px; font-size: 1.5rem; font-weight: 900; box-shadow: 0 0 25px rgba(255, 0, 85, 0.4); cursor: pointer; }
+        
+        .float-num { position: absolute; font-weight: 900; font-size: 2rem; color: var(--gold); pointer-events: none; animation: floatUp 0.7s forwards; z-index: 200; }
+        @keyframes floatUp { to { transform: translateY(-100px); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -59,75 +85,177 @@
     <div id="loader">
         <div class="loader-footer">
             <div class="spinner"></div>
-            <h2 style="margin:0; color:var(--primary); letter-spacing:2px;">$DUENDE HUB</h2>
-            <p style="color:#888; font-size:0.8rem;">RECALIBRANDO MUNDO INFINITO...</p>
+            <h2 style="margin:0; color:var(--primary); letter-spacing:3px;">$DUENDE HUB</h2>
+            <p style="color:#888; font-size:0.9rem;">RECALIBRANDO MUNDO INFINITO...</p>
         </div>
     </div>
 
     <div class="header">
         <div id="ton-connect-header"></div>
         <div style="text-align:right;">
-            <div style="font-size:0.7rem; color:var(--gold);">BALANCE $DUENDE</div>
+            <div style="font-size:0.75rem; color:var(--gold); font-weight:bold;">BALANCE $DUENDE</div>
             <div class="balance-val"><span class="coin-icon"></span> <span id="scoreDisplay">0</span></div>
         </div>
     </div>
 
-    <div id="tab-arena" class="screen active">
-        <div style="width:100%; height:100%; position:relative;">
+    <div id="tab-tap" class="screen active">
+        <div class="tap-area" id="tapZone">
+            <img id="charImg" src="" class="main-character">
+        </div>
+        <div class="status-card">
+            <div style="display:flex; justify-content:space-between; font-weight:900;">
+                <span>⚡ ENERGÍA</span>
+                <span style="color:var(--primary);"><span id="energyVal">100</span> / 100</span>
+            </div>
+            <div class="energy-bar"><div class="energy-fill" id="energyFill"></div></div>
+        </div>
+    </div>
+
+    <div id="tab-arena" class="screen">
+        <div id="arena-container">
             <canvas id="gameCanvas"></canvas>
-            
             <div style="position:absolute; top:20px; left:20px; z-index:10; pointer-events:none; background:rgba(0,0,0,0.5); padding:10px; border-radius:10px;">
                 <div style="font-size:1.2rem; font-weight:900;">💀 KILLS: <span id="killsTxt">0</span></div>
                 <div style="font-size:1.1rem; font-weight:bold; color:var(--danger);">HP: <span id="hpTxt">100</span>%</div>
             </div>
-
             <div id="arenaStart" class="arena-overlay">
-                <h1 style="color:var(--danger);">SURVIVOR IO STYLE</h1>
-                <button class="arena-btn" onclick="startArena()">JUGAR (10⚡)</button>
+                <h1 style="font-size:3.5rem; color:var(--danger); margin:0;">SURVIVOR</h1>
+                <button class="arena-btn" onclick="startArena()">INICIAR (10⚡)</button>
             </div>
             <div id="arenaEnd" class="arena-overlay" style="display:none;">
-                <h1 id="endTitle">DERROTADO</h1>
-                <p id="rewardTxt" style="font-size:1.5rem; color:var(--gold);"></p>
-                <button class="arena-btn" style="background:#333;" onclick="closeArena()">REGRESAR</button>
+                <h1 id="endTitle" style="font-size:3rem;">RESULTADO</h1>
+                <p id="rewardTxt" style="font-size:2rem; color:var(--gold); margin:20px 0;"></p>
+                <button class="arena-btn" style="background:#333; box-shadow:none;" onclick="closeArena()">REGRESAR</button>
             </div>
         </div>
     </div>
 
+    <div id="tab-shop" class="screen">
+        <h2 style="color:var(--gold); margin-top:20px;">MERCADO NEGRO</h2>
+        <div id="ton-connect-header-shop" style="margin-bottom:15px;"></div>
+        
+        <div style="width:94%; text-align:left; color:#888; font-size:0.8rem; font-weight:bold;">SKINS PREMIUM (TON)</div>
+        <div class="grid-container">
+            <div class="card"><img src="static/skin_DUENDE_HACKER.png"><b>HACKER</b><button class="btn-price btn-ton" onclick="payTon('hacker', 0.2)">0.2 TON</button></div>
+            <div class="card"><img src="static/skin_DUENDE_BOX.png"><b>BOXER</b><button class="btn-price btn-ton" onclick="payTon('boxer', 0.5)">0.5 TON</button></div>
+            <div class="card"><img src="static/skin_REY_DUENDE.png"><b>EL REY</b><button class="btn-price btn-ton" onclick="payTon('king', 1.0)">1.0 TON</button></div>
+            <div class="card"><img src="static/skin_DUENDE_MAESTRO.png"><b>MAESTRO</b><button class="btn-price btn-ton" onclick="payTon('maestro', 2.0)">2.0 TON</button></div>
+        </div>
+
+        <div style="width:94%; text-align:left; color:#888; font-size:0.8rem; font-weight:bold; margin-top:20px;">POTENCIADORES</div>
+        <div class="grid-container">
+            <div class="card"><img src="static/booster_RAYOTON.png"><b>RECARGA</b><button class="btn-price btn-gold" onclick="buyItem('refill', 500)">500</button></div>
+            <div class="card"><img src="static/booster_INVENCIBLE_90S.png"><b>ESCUDO</b><button class="btn-price btn-gold" onclick="buyItem('shield', 2000)">2k</button></div>
+        </div>
+    </div>
+
+    <div id="tab-donate" class="screen">
+        <div style="background: linear-gradient(145deg, #1e2228, #14171c); border: 2px solid var(--blue); border-radius: 20px; width: 92%; padding: 25px; margin-top: 40px; text-align: center;">
+            <i class="fas fa-hand-holding-heart" style="color:var(--blue); font-size:2rem;"></i>
+            <h3>APOYAR AL DEV</h3>
+            <div style="background: #000; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 0.7rem; color: var(--blue); word-break: break-all; margin: 15px 0;">UQAm2w4HcJ1tW8RBNj7BZQh0Q-ckpzlxzD-r8p2JduHkpQnc</div>
+            <button class="arena-btn" style="padding:10px 25px; font-size:1rem; background:var(--blue); box-shadow:none;" onclick="copyWallet()">COPIAR WALLET</button>
+        </div>
+    </div>
+
     <nav class="nav">
-        <div class="nav-item" onclick="nav('tap', this)"><i class="fas fa-hammer"></i><span>MINAR</span></div>
-        <div class="nav-item active" onclick="nav('arena', this)"><i class="fas fa-skull"></i><span>ARENA</span></div>
+        <div class="nav-item active" onclick="nav('tap', this)"><i class="fas fa-hammer"></i><span>MINAR</span></div>
+        <div class="nav-item" onclick="nav('arena', this)"><i class="fas fa-skull"></i><span>ARENA</span></div>
         <div class="nav-item" onclick="nav('shop', this)"><i class="fas fa-shopping-cart"></i><span>TIENDA</span></div>
+        <div class="nav-item" onclick="nav('donate', this)"><i class="fas fa-donate"></i><span>DONAR</span></div>
     </nav>
 
     <script>
         const tg = window.Telegram.WebApp; tg.expand();
+        const MY_WALLET = "UQAm2w4HcJ1tW8RBNj7BZQh0Q-ckpzlxzD-r8p2JduHkpQnc";
+
         const assets = {
             common: 'static/skin_duende_comunparatodos.png',
+            hacker: 'static/skin_DUENDE_HACKER.png',
+            boxer: 'static/skin_DUENDE_BOX.png',
+            king: 'static/skin_REY_DUENDE.png',
+            maestro: 'static/skin_DUENDE_MAESTRO.png',
             bear: 'static/enemy_BEAR_MARKET.png',
             rug: 'static/enemy_RUG_PULL.png',
             whale: 'static/enemy_WHALE.png',
+            bullet: 'static/loot_COIN.png',
             coin: 'static/coin.png',
-            bg: 'static/imagen_portada_home.png',
-            bullet: 'static/loot_COIN.png'
+            bg: 'static/imagen_portada_home.png'
         };
-        const imgs = {}; let loaded = 0;
+
+        const imgs = {}; let loadedCount = 0;
         Object.keys(assets).forEach(k => {
             imgs[k] = new Image();
-            imgs[k].onload = () => { loaded++; if(loaded === Object.keys(assets).length) initApp(); };
-            imgs[k].onerror = () => { loaded++; };
+            imgs[k].onload = () => { loadedCount++; if(loadedCount === Object.keys(assets).length) initApp(); };
+            imgs[k].onerror = () => { loadedCount++; };
             imgs[k].src = assets[k];
         });
 
         function initApp() {
             document.getElementById('loader').style.opacity = '0';
             setTimeout(() => document.getElementById('loader').style.display='none', 800);
+            document.getElementById('charImg').src = assets.common;
             updateUI();
         }
 
-        let state = { score: 1000, energy: 100 };
-        function updateUI() { document.getElementById('scoreDisplay').innerText = state.score.toLocaleString(); }
+        let state = { score: 1000, energy: 100, maxEnergy: 100, power: 1, skin: 'common', dmgBoost: 1 };
+        let invincible = false;
 
-        // --- MOTOR DE ARENA: SCROLL INFINITO + MOVIMIENTO LIBRE ---
+        const tonUi = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: window.location.origin + '/static/tonconnect-manifest.json', buttonRootId: 'ton-connect-header' });
+
+        function updateUI() {
+            document.getElementById('scoreDisplay').innerText = Math.floor(state.score).toLocaleString();
+            document.getElementById('energyVal').innerText = Math.floor(state.energy);
+            document.getElementById('energyFill').style.width = (state.energy/state.maxEnergy*100) + '%';
+        }
+
+        document.getElementById('tapZone').addEventListener('click', (e) => {
+            if(state.energy < 3) return;
+            state.energy -= 3; state.score += state.power; updateUI();
+            const float = document.createElement('div'); float.className = 'float-num'; float.innerText = "+"+state.power;
+            float.style.left = e.clientX + 'px'; float.style.top = e.clientY + 'px';
+            document.body.appendChild(float); setTimeout(() => float.remove(), 700);
+            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        });
+
+        setInterval(() => { if(state.energy < state.maxEnergy){ state.energy++; updateUI(); } }, 2000);
+
+        async function payTon(skin, price) {
+            if(!tonUi.connected) return alert("Conecta tu Wallet primero");
+            try { await tonUi.sendTransaction({ validUntil: Math.floor(Date.now()/1000)+3600, messages: [{address: MY_WALLET, amount: Math.floor(price*1000000000).toString()}] }); state.skin = skin; updateSkin(); alert("¡Skin comprada!"); } catch(e){ alert("Error o cancelación"); }
+        }
+
+        function buyItem(type, cost) {
+            if(state.score < cost) return alert("Faltan monedas");
+            state.score -= cost;
+            if(type==='refill') state.energy = state.maxEnergy;
+            if(type==='shield') { invincible=true; document.getElementById('invincibleTag').style.display='block'; setTimeout(()=>{invincible=false;document.getElementById('invincibleTag').style.display='none';}, 90000); }
+            updateUI();
+        }
+
+        function updateSkin() {
+            let src = assets.common; state.power = 1;
+            if(state.skin==='hacker'){src=assets.hacker; state.power=2;}
+            if(state.skin==='boxer'){src=assets.boxer; state.power=3;}
+            if(state.skin==='king'){src=assets.king; state.power=2;}
+            if(state.skin==='maestro'){src=assets.maestro; state.power=5;}
+            document.getElementById('charImg').src = src;
+        }
+
+        function nav(tab, btn) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('tab-'+tab).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            btn.classList.add('active');
+            if(tab !== 'arena') stopArena();
+        }
+
+        function copyWallet() {
+            const el = document.createElement('textarea'); el.value = MY_WALLET; document.body.appendChild(el);
+            el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("Copiada!");
+        }
+
+        // --- MOTOR SURVIVOR: SCROLL INFINITO + MOVIMIENTO LIBRE ---
         const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
         let gameActive=false, loopId, kills=0, frame=0, difficulty=1;
         let player = { x: 0, y: 0, visualX: 0, visualY: 0, hp: 100 };
@@ -136,10 +264,10 @@
 
         function startArena() {
             if(state.energy < 10) return alert("Falta Energía");
-            state.energy -= 10;
+            state.energy -= 10; updateUI();
             document.getElementById('arenaStart').style.display='none';
             resize(); 
-            // El jugador inicia en el centro visual
+            // Posición inicial: coordenadas globales (0,0), visuales al centro
             player = { x: 0, y: 0, visualX: canvas.width/2, visualY: canvas.height/2, hp: 100 };
             enemies=[]; bullets=[]; drops=[]; kills=0; difficulty=1.0; frame=0;
             gameActive=true; loop();
@@ -147,7 +275,7 @@
 
         function stopArena() { gameActive=false; cancelAnimationFrame(loopId); }
         function closeArena() { document.getElementById('arenaStart').style.display='flex'; document.getElementById('arenaEnd').style.display='none'; }
-        function resize() { canvas.width=canvas.clientWidth; canvas.height=canvas.clientHeight; }
+        function resize() { canvas.width=canvas.parentElement.clientWidth; canvas.height=canvas.parentElement.clientHeight; }
 
         canvas.addEventListener('touchstart', e => { e.preventDefault(); stick.active=true; stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; stick.nx=stick.sx; stick.ny=stick.sy; });
         canvas.addEventListener('touchmove', e => { e.preventDefault(); if(stick.active){ stick.nx=e.touches[0].clientX; stick.ny=e.touches[0].clientY; } });
@@ -157,109 +285,121 @@
             if(!gameActive) return;
             frame++;
             const W = canvas.width; const H = canvas.height;
+            if(frame % 1200 === 0) difficulty += 0.3;
 
-            // 1. Lógica de Movimiento
+            // 1. Lógica Joystick (Movimiento libre con inercia de cámara)
             if(stick.active) {
                 const dx = stick.nx - stick.sx;
                 const dy = stick.ny - stick.sy;
                 const dist = Math.hypot(dx, dy);
                 if(dist > 5) {
                     const ang = Math.atan2(dy, dx);
-                    const spd = 5;
-                    
-                    // Movimiento en coordenadas globales
-                    player.x += Math.cos(ang) * spd;
-                    player.y += Math.sin(ang) * spd;
-
-                    // Movimiento en coordenadas visuales (Personaje se mueve en pantalla)
-                    player.visualX += Math.cos(ang) * spd;
-                    player.visualY += Math.sin(ang) * spd;
+                    const speed = 5;
+                    player.x += Math.cos(ang) * speed;
+                    player.y += Math.sin(ang) * speed;
+                    player.visualX += Math.cos(ang) * speed;
+                    player.visualY += Math.sin(ang) * speed;
                 }
             }
 
-            // 2. EFECTO CÁMARA: Si el personaje se aleja mucho del centro, la cámara lo sigue
+            // 2. Sistema de Cámara (Scroll suave cuando el personaje llega a los bordes)
             const centerX = W/2, centerY = H/2;
-            const followThreshold = 50; // Margen de libertad antes de que el mapa haga scroll
+            const threshold = 60; // Margen de libertad antes de mover el mundo
+            const camDriftX = player.visualX - centerX;
+            const camDriftY = player.visualY - centerY;
 
-            const driftX = player.visualX - centerX;
-            const driftY = player.visualY - centerY;
+            if(Math.abs(camDriftX) > threshold) player.visualX -= camDriftX * 0.1;
+            if(Math.abs(camDriftY) > threshold) player.visualY -= camDriftY * 0.1;
 
-            if(Math.abs(driftX) > followThreshold) player.visualX -= driftX * 0.1;
-            if(Math.abs(driftY) > followThreshold) player.visualY -= driftY * 0.1;
-
-            // 3. Render Fondo Infinito (Loop dinámico)
-            const bgS = 600; // Tamaño del bloque de fondo
+            // Coordenada de cámara para renderizar
             const camX = player.x - player.visualX;
             const camY = player.y - player.visualY;
 
+            // 3. Render Fondo Infinito (Tiling Dinámico)
+            const bgS = 600; 
             const startX = Math.floor(camX / bgS) * bgS;
             const startY = Math.floor(camY / bgS) * bgS;
 
             for(let x = startX - bgS; x < camX + W + bgS; x += bgS) {
                 for(let y = startY - bgS; y < camY + H + bgS; y += bgS) {
-                    ctx.drawImage(imgs.bg, x - camX, y - camY, bgS, bgS);
+                    if(imgs.bg.complete) ctx.drawImage(imgs.bg, x - camX, y - camY, bgS, bgS);
                 }
             }
             ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H);
 
-            // 4. Spawn Infinito de Enemigos
+            // 4. Spawn de Enemigos Perimetrales
             if(frame % 35 === 0) {
                 const ang = Math.random() * Math.PI * 2;
-                const spawnDist = Math.max(W, H);
+                const dist = Math.max(W, H);
+                const rand = Math.random();
+                let type='bear', hp=4, spd=2;
+                if(rand > 0.75) { type='rug'; hp=2; spd=3.8; }
+                if(rand > 0.96) { type='whale'; hp=20; spd=1.2; }
+                
                 enemies.push({
-                    x: player.x + Math.cos(ang) * spawnDist,
-                    y: player.y + Math.sin(ang) * spawnDist,
-                    type: Math.random() > 0.8 ? (Math.random() > 0.9 ? 'whale' : 'rug') : 'bear',
-                    hp: 3 * difficulty, spd: 2 + Math.random()
+                    x: player.x + Math.cos(ang) * dist,
+                    y: player.y + Math.sin(ang) * dist,
+                    type: type, hp: hp * difficulty, spd: spd
                 });
             }
 
-            // 5. Entidades
-            // Balas
+            // 5. Lógica de Disparo (Automático)
             if(frame % 20 === 0 && enemies.length > 0) {
-                const target = enemies[0];
+                // Target al más cercano
+                const target = enemies.reduce((a, b) => Math.hypot(a.x - player.x, a.y - player.y) < Math.hypot(b.x - player.x, b.y - player.y) ? a : b);
                 const ang = Math.atan2(target.y - player.y, target.x - player.x);
-                bullets.push({x: player.x, y: player.y, vx: Math.cos(ang)*12, vy: Math.sin(ang)*12, life: 100});
+                bullets.push({x: player.x, y: player.y, vx: Math.cos(ang)*11, vy: Math.sin(ang)*11, life: 120});
             }
 
+            // 6. Actualizar y Renderizar Balas
             bullets.forEach((b, i) => {
                 b.x += b.vx; b.y += b.vy; b.life--;
-                ctx.drawImage(imgs.bullet, b.x - camX - 10, b.y - camY - 10, 20, 20);
+                const rx = b.x - camX, ry = b.y - camY;
+                ctx.drawImage(imgs.bullet, rx-10, ry-10, 20, 20);
                 if(b.life <= 0) bullets.splice(i, 1);
             });
 
-            // Drops
+            // 7. Drops
             drops.forEach((d, i) => {
-                ctx.drawImage(imgs.coin, d.x - camX - 18, d.y - camY - 18, 36, 36);
-                if(Math.hypot(player.x - d.x, player.y - d.y) < 30) {
+                const rx = d.x - camX, ry = d.y - camY;
+                ctx.save(); ctx.translate(rx, ry + Math.sin(frame/15)*5);
+                ctx.drawImage(imgs.coin, -18, -18, 36, 36);
+                ctx.restore();
+                if(Math.hypot(player.visualX - rx, player.visualY - ry) < 30) {
                     state.score += 50; updateUI(); drops.splice(i, 1);
                 }
             });
 
-            // Enemigos
+            // 8. Lógica Enemigos
             enemies.forEach((e, i) => {
                 const ang = Math.atan2(player.y - e.y, player.x - e.x);
                 e.x += Math.cos(ang) * e.spd; e.y += Math.sin(ang) * e.spd;
-                ctx.drawImage(imgs[e.type], e.x - camX - 22, e.y - camY - 22, 44, 44);
+                const rx = e.x - camX, ry = e.y - camY;
+                ctx.drawImage(imgs[e.type], rx-22, ry-22, 44, 44);
 
-                if(Math.hypot(player.x - e.x, player.y - e.y) < 28) {
-                    player.hp -= 0.4; document.getElementById('hpTxt').innerText = Math.ceil(player.hp);
+                if(Math.hypot(player.visualX - rx, player.visualY - ry) < 28 && !invincible) {
+                    player.hp -= 0.5; document.getElementById('hpTxt').innerText = Math.ceil(player.hp);
                     if(player.hp <= 0) { gameActive = false; endGame(); }
                 }
 
                 bullets.forEach((b, bi) => {
                     if(Math.hypot(b.x - e.x, b.y - e.y) < 30) {
-                        bullets.splice(bi, 1); e.hp -= 1;
+                        bullets.splice(bi, 1); e.hp -= state.dmgBoost;
                         if(e.hp <= 0) {
-                            enemies.splice(i,1); kills++; document.getElementById('killsTxt').innerText = kills;
+                            enemies.splice(i, 1); kills++; document.getElementById('killsTxt').innerText = kills;
                             if(Math.random() < 0.35) drops.push({x: e.x, y: e.y});
                         }
                     }
                 });
             });
 
-            // 6. Dibujar Personaje (En su posición visual fluida)
-            ctx.drawImage(imgs.common, player.visualX - 30, player.visualY - 30, 60, 60);
+            // 9. Dibujar Duende (Visual)
+            const charSkin = state.skin === 'common' ? imgs.common : imgs[state.skin];
+            ctx.save();
+            ctx.translate(player.visualX, player.visualY);
+            if(invincible) ctx.globalAlpha = 0.5;
+            ctx.drawImage(charSkin, -30, -30, 60, 60);
+            ctx.restore();
 
             loopId = requestAnimationFrame(loop);
         }
@@ -269,14 +409,6 @@
             document.getElementById('rewardTxt').innerText = `+${reward} $DUENDE`;
             document.getElementById('arenaEnd').style.display='flex';
             updateUI();
-        }
-
-        function nav(tab, btn) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('tab-'+tab).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            btn.classList.add('active');
-            if(tab !== 'arena') stopArena();
         }
     </script>
 </body>
