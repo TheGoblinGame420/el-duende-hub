@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>$DUENDE Survivor</title>
+    <title>El Duende Survivor - Ecosistema $DUENDE</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -15,103 +15,122 @@
             --bg-dark: #121418; --card: #1e2228; --nav: #0e1013;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; outline: none; }
-        body { margin: 0; padding: 0; background: #000; color: #fff; font-family: 'Rajdhani', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        body {
+            margin: 0; padding: 0;
+            background: radial-gradient(circle at top, #1a202c 0%, #000 100%);
+            color: #fff; font-family: 'Rajdhani', sans-serif;
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+        }
 
-        /* --- LOADER SEGURO --- */
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        /* --- LOADER --- */
+        #loader { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; z-index: 9999; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; transition: opacity 0.8s ease; 
+        }
         .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* --- HEADER --- */
-        .header { padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; background: var(--nav); border-bottom: 2px solid var(--primary); z-index: 10; }
-        .balance-box { display: flex; align-items: center; background: rgba(0,0,0,0.5); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--gold); }
-        .balance-box span { font-size: 1.3rem; font-weight: 900; }
-        .token-img { width: 24px; height: 24px; margin-left: 8px; border-radius: 50%; }
+        .header { padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(14, 16, 19, 0.9); border-bottom: 2px solid var(--primary); z-index: 10; }
+        .token-balance-container { display: flex; align-items: center; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 25px; border: 1px solid var(--gold); }
+        .token-logo-header { width: 26px; height: 26px; margin-left: 8px; border-radius: 50%; object-fit: cover; }
 
-        /* --- PANTALLAS --- */
-        .screen { display: none; flex-grow: 1; width: 100%; overflow-y: auto; padding-bottom: 100px; flex-direction: column; align-items: center; }
-        .screen.active { display: flex; }
+        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; width: 100%; overflow-y: auto; padding-bottom: 110px; }
+        .screen.active { display: flex; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- UI --- */
-        .card { background: var(--card); border-radius: 15px; width: 92%; padding: 20px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .btn-action { background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; margin-top: 15px; cursor: pointer; }
-        .btn-action:disabled { background: #333; color: #666; }
+        /* --- UI CARDS --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 94%; margin-top: 15px; }
+        .card { background: var(--card); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .btn-price { background: var(--blue); color: #fff; padding: 10px; border-radius: 10px; font-weight: bold; width: 100%; border: none; cursor: pointer; margin-top: 10px; }
+
+        .withdraw-card { background: var(--card); border-radius: 20px; width: 92%; padding: 25px; margin-top: 30px; border: 1px solid var(--blue); text-align: center; }
+        .withdraw-btn { background: var(--blue); border: none; color: white; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 20px; width: 100%; }
+        .withdraw-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
 
         /* --- ARENA --- */
-        #arena-wrap { width: 100%; height: 100%; position: relative; overflow: hidden; background: #000; }
+        #arena-container { width: 100%; height: 100%; position: relative; overflow: hidden; }
         canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-        .overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; text-align: center; }
+        .arena-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; }
 
-        /* --- NAV --- */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: var(--nav); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #333; z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 1.5rem; margin-bottom: 4px; }
+        .nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 85px; background: var(--nav); border-top: 1px solid #333; display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.7rem; font-weight: 700; width: 20%; cursor: pointer; }
+        .nav-item.active { color: #fff; } .nav-item.active i { color: var(--primary); }
+
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     </style>
 </head>
 <body>
 
     <div id="loader">
         <div class="spinner"></div>
-        <h2 style="color:var(--primary); margin-top:20px;">INICIANDO...</h2>
+        <h2 style="margin-top:20px; color:var(--primary);">CARGANDO...</h2>
     </div>
 
     <div class="header">
-        <div id="ton-connect"></div>
-        <div class="balance-box">
-            <span id="scoreHeader">0</span>
-            <img src="static/coin.png" class="token-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/217/217853.png'">
+        <div id="ton-connect-header"></div>
+        <div class="token-balance-container">
+            <span id="scoreDisplay">0</span>
+            <img src="static/coin.png" class="token-logo-header">
         </div>
     </div>
 
     <div id="tab-tap" class="screen active">
-        <div style="margin-top:40px; cursor:pointer;" id="tapAction">
-            <img id="mainCharImg" src="static/skin_duende_comunparatodos.png" style="width: 220px; height: 220px; pointer-events: none;">
+        <div style="margin-top:50px; cursor:pointer;" id="tapZone">
+            <img id="charImg" src="static/skin_duende_comunparatodos.png" style="width: 240px; height: 240px; animation: breathe 3s infinite; pointer-events: none;">
         </div>
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:10px;">
+        <div class="card" style="width:90%; border: 1px solid var(--primary);">
+            <div style="display:flex; justify-content:space-between; font-weight:900;">
                 <span>⚡ ENERGÍA</span>
-                <span id="energyText">100 / 100</span>
+                <span id="energyValText">100 / 100</span>
             </div>
-            <div style="width:100%; height:12px; background:#111; border-radius:6px; overflow:hidden;">
-                <div id="energyBar" style="width:100%; height:100%; background: var(--primary); transition: 0.3s;"></div>
+            <div style="height:12px; background:#111; border-radius:6px; margin-top:10px; overflow:hidden;">
+                <div id="energyFill" style="height:100%; width:100%; background:linear-gradient(90deg, var(--gold), var(--primary)); transition: 0.3s;"></div>
             </div>
         </div>
     </div>
 
     <div id="tab-arena" class="screen">
-        <div id="arena-wrap">
+        <div id="arena-container">
             <canvas id="gameCanvas"></canvas>
-            <div id="arenaStart" class="overlay">
-                <h1 style="color:var(--danger);">ARENA</h1>
-                <button class="btn-action" style="width:180px; background:var(--danger);" onclick="startArena()">JUGAR (10⚡)</button>
-            </div>
-            <div id="arenaEnd" class="overlay" style="display:none;">
-                <h2 id="endTitle">RESULTADO</h2>
-                <div style="font-size:2rem; font-weight:900; color:var(--gold); margin:15px 0;">
-                    + <span id="rewardNum">0</span> <img src="static/coin.png" style="width:30px; border-radius:50%;">
+            <div style="position:absolute; top:20px; left:20px; z-index:10; pointer-events:none; background:rgba(0,0,0,0.6); padding:10px; border-radius:10px;">
+                <div style="font-weight:900; color:var(--gold); display:flex; align-items:center; gap:5px;">
+                    <span id="arenaBalance">0</span> <img src="static/coin.png" style="width:16px; height:16px;">
                 </div>
-                <button class="btn-action" style="width:180px; background:#333;" onclick="closeArena()">REGRESAR</button>
+                <div style="color:var(--danger);">❤️ <span id="hpTxt">100</span>%</div>
+            </div>
+            <div id="arenaStart" class="arena-overlay">
+                <h1 style="color:var(--danger);">ARENA SURVIVOR</h1>
+                <button class="withdraw-btn" style="width:180px;" onclick="startArena()">INICIAR (10⚡)</button>
+            </div>
+            <div id="arenaEnd" class="arena-overlay" style="display:none;">
+                <h1 id="endTitle">RESULTADO</h1>
+                <div style="font-size:2rem; font-weight:900; color:var(--gold); margin:20px 0;">
+                    + <span id="rewardNum">0</span> <img src="static/coin.png" style="width:40px; vertical-align:middle;">
+                </div>
+                <button class="withdraw-btn" style="width:180px; background:#333;" onclick="closeArena()">REGRESAR</button>
             </div>
         </div>
     </div>
 
     <div id="tab-shop" class="screen">
         <h2 style="color:var(--gold); margin-top:20px;">MERCADO NEGRO</h2>
-        <div class="card">
-            <img src="static/skin_DUENDE_HACKER.png" style="width:60px; height:60px;" onerror="this.style.display='none'">
-            <div style="margin:10px 0; font-weight:bold;">SKIN HACKER</div>
-            <button class="btn-action">0.2 TON</button>
+        <div class="grid-container">
+            <div class="card"><img src="static/skin_DUENDE_HACKER.png" style="width:60px;"><b>HACKER</b><button class="btn-price">0.2 TON</button></div>
+            <div class="card"><img src="static/skin_REY_DUENDE.png" style="width:60px;"><b>EL REY</b><button class="btn-price">1.0 TON</button></div>
         </div>
     </div>
 
     <div id="tab-withdraw" class="screen">
-        <h2 style="color:var(--blue); margin-top:20px;">RETIROS</h2>
-        <div class="card" style="border-color: var(--blue);">
-            <div style="font-size:2rem; font-weight:900;">
-                <span id="withBalance">0</span> <img src="static/coin.png" style="width:30px; border-radius:50%;">
+        <h2 style="color:var(--blue); margin-top:30px;">RETIRAR</h2>
+        <div class="withdraw-card">
+            <div style="font-size:2.5rem; font-weight:900; margin:15px 0;">
+                <span id="withdrawBalance">0</span> <img src="static/coin.png" style="width:35px;">
             </div>
-            <button id="withdrawBtn" class="btn-action" disabled>MÍNIMO 5,000</button>
+            <button id="withdrawBtn" class="withdraw-btn" disabled onclick="alert('Retiro procesado')">MÍNIMO 5,000</button>
+            <p style="font-size:0.8rem; color:#888; margin-top:10px;">Mínimo: 5,000 $DUENDE</p>
         </div>
     </div>
 
@@ -125,7 +144,7 @@
     <script>
         const tg = window.Telegram.WebApp; tg.expand();
         
-        // --- SISTEMA DE CARGA ULTRA-SEGURO ---
+        // --- SISTEMA DE CARGA BLINDADA ---
         const assets = {
             coin: 'static/coin.png', bg: 'static/imagen_portada_home.png',
             bear: 'static/enemy_BEAR_MARKET.png', char: 'static/skin_duende_comunparatodos.png',
@@ -134,8 +153,8 @@
         const imgs = {}; let loaded = 0;
         const total = Object.keys(assets).length;
 
-        // Inicia el juego pase lo que pase tras 3.5 segundos (Fail-Safe)
-        const forceStart = setTimeout(() => { if(loaded < total) init(); }, 3500);
+        // Fail-safe: Si a los 3 segundos no ha cargado, iniciar igual
+        const forceStart = setTimeout(() => { if(loaded < total) init(); }, 3000);
 
         Object.keys(assets).forEach(k => {
             imgs[k] = new Image();
@@ -156,16 +175,17 @@
 
         function updateUI() {
             const s = state.score.toLocaleString();
-            document.getElementById('scoreHeader').innerText = s;
-            document.getElementById('withBalance').innerText = s;
-            document.getElementById('energyText').innerText = Math.floor(state.energy) + " / 100";
-            document.getElementById('energyBar').style.width = state.energy + "%";
+            document.getElementById('scoreDisplay').innerText = s;
+            document.getElementById('arenaBalance').innerText = s;
+            document.getElementById('withdrawBalance').innerText = s;
+            document.getElementById('energyValText').innerText = Math.floor(state.energy) + " / 100";
+            document.getElementById('energyFill').style.width = state.energy + "%";
             
             const wBtn = document.getElementById('withdrawBtn');
-            if(state.score >= 5000) { wBtn.disabled = false; wBtn.innerText = "RETIRAR"; }
+            if(state.score >= 5000) { wBtn.disabled = false; wBtn.innerText = "RETIRAR $DUENDE"; wBtn.style.background = "var(--primary)"; }
         }
 
-        document.getElementById('tapAction').onclick = () => {
+        document.getElementById('tapZone').onclick = () => {
             if(state.energy >= 3) { state.energy -= 3; state.score += 1; updateUI(); }
         };
 
@@ -176,26 +196,25 @@
             document.getElementById('tab-'+t).classList.add('active');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             b.classList.add('active');
+            if(t !== 'arena') stopArena();
         }
 
-        // --- MOTOR ARENA SURVIVOR IO ---
+        // --- MOTOR ARENA INFINITO ---
         const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
-        let gameActive=false, loopId, player={x:0, y:0, vx:0, vy:0, hp:100}, enemies=[], bullets=[], drops=[], stick={active:false, sx:0, sy:0, nx:0, ny:0};
+        let gameActive=false, loopId, kills=0, frame=0, player={x:0, y:0, vx:0, vy:0, hp:100}, enemies=[], bullets=[], drops=[], stick={active:false, sx:0, sy:0, nx:0, ny:0};
 
         function startArena() {
             if(state.energy < 10) return alert("Falta Energía");
             state.energy -= 10; document.getElementById('arenaStart').style.display='none';
             canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
             player = { x: 0, y: 0, vx: canvas.width/2, vy: canvas.height/2, hp: 100 };
-            enemies=[]; bullets=[]; drops=[]; gameActive=true; loop();
+            enemies=[]; bullets=[]; drops=[]; kills=0; frame=0; gameActive=true; loop();
         }
 
         function loop() {
             if(!gameActive) return;
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            const W = canvas.width, H = canvas.height;
+            frame++; const W = canvas.width, H = canvas.height;
 
-            // Movimiento
             if(stick.active) {
                 const dx=stick.nx-stick.sx, dy=stick.ny-stick.sy, dist=Math.hypot(dx,dy);
                 if(dist>5) {
@@ -211,31 +230,31 @@
             const camX = player.x - player.vx, camY = player.y - player.vy;
 
             // Fondo Mosaico
-            const s=500; const startX=Math.floor(camX/s)*s, startY=Math.floor(camY/s)*s;
+            const s=600; const startX=Math.floor(camX/s)*s, startY=Math.floor(camY/s)*s;
             for(let x=startX-s; x<camX+W+s; x+=s) {
                 for(let y=startY-s; y<camY+H+s; y+=s) {
-                    ctx.drawImage(imgs.bg, x-camX, y-camY, s, s);
+                    if(imgs.bg.complete) ctx.drawImage(imgs.bg, x-camX, y-camY, s, s);
                 }
             }
             ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H);
 
-            // Spawner
-            if(Math.random() < 0.05) enemies.push({x:player.x+(Math.random()-0.5)*W*2, y:player.y+(Math.random()-0.5)*H*2, hp:3});
+            // Spawner Enemigos
+            if(frame % 40 === 0) enemies.push({x:player.x+(Math.random()-0.5)*W*2, y:player.y+(Math.random()-0.5)*H*2, hp:3, t:Math.random()>0.8?'whale':'bear'});
 
             // Disparo automático AREA
-            if(Math.random()<0.05 && enemies.length>0) {
+            if(frame % 20 === 0 && enemies.length > 0) {
                 const e = enemies[0]; const ang=Math.atan2(e.y-player.y, e.x-player.x);
-                bullets.push({x:player.x, y:player.y, vx:Math.cos(ang)*10, vy:Math.sin(ang)*10, life:60});
+                bullets.push({x:player.x, y:player.y, vx:Math.cos(ang)*11, vy:Math.sin(ang)*11, life:80});
             }
 
             bullets.forEach((b,i) => {
                 b.x+=b.vx; b.y+=b.vy; b.life--;
-                ctx.fillStyle="yellow"; ctx.beginPath(); ctx.arc(b.x-camX, b.y-camY, 8, 0, 6.28); ctx.fill();
+                ctx.drawImage(imgs.bullet || imgs.coin, b.x-camX-10, b.y-camY-10, 20, 20);
                 enemies.forEach((e,ei) => {
                     if(Math.hypot(b.x-e.x, b.y-e.y)<40) {
                         e.hp -= state.dmg; bullets.splice(i,1);
                         if(e.hp<=0) {
-                            enemies.splice(ei,1);
+                            enemies.splice(ei,1); kills++;
                             let r=Math.random();
                             if(r<0.25) drops.push({x:e.x, y:e.y, t:'fire'});
                             else if(r<0.45) drops.push({x:e.x, y:e.y, t:'shield'});
@@ -248,7 +267,7 @@
 
             drops.forEach((d,i) => {
                 const rx=d.x-camX, ry=d.y-camY;
-                ctx.drawImage(imgs[d.t==='coin'?'coin':(d.t==='fire'?'fire':'shield')], rx-20, ry-20, 40, 40);
+                ctx.drawImage(d.t==='coin'?imgs.coin:(d.t==='fire'?imgs.fire:imgs.shield), rx-20, ry-20, 40, 40);
                 if(Math.hypot(player.vx-rx, player.vy-ry)<30) {
                     if(d.t==='coin') state.score+=50;
                     if(d.t==='fire') { state.dmg=5; setTimeout(()=>state.dmg=1, 10000); }
@@ -260,9 +279,9 @@
             enemies.forEach(e => {
                 const ang=Math.atan2(player.y-e.y, player.x-e.x);
                 e.x+=Math.cos(ang)*2.2; e.y+=Math.sin(ang)*2.2;
-                ctx.drawImage(imgs.bear, e.x-camX-25, e.y-camY-25, 50, 50);
+                ctx.drawImage(imgs[e.t==='whale'?'whale':'bear'] || imgs.bear, e.x-camX-25, e.y-camY-25, 50, 50);
                 if(Math.hypot(player.vx-(e.x-camX), player.vy-(e.y-camY))<30 && !invincible) {
-                    player.hp-=1; document.getElementById('hpText').innerText=Math.ceil(player.hp);
+                    player.hp-=0.8; document.getElementById('hpTxt').innerText=Math.ceil(player.hp);
                     if(player.hp<=0) { gameActive=false; endGame(); }
                 }
             });
@@ -272,9 +291,11 @@
         }
 
         function endGame() {
-            document.getElementById('rewardNum').innerText = "500"; state.score += 500;
+            const r = kills*10; state.score += r;
+            document.getElementById('rewardNum').innerText = r;
             document.getElementById('arenaEnd').style.display='flex'; updateUI();
         }
+        function stopArena() { gameActive=false; cancelAnimationFrame(loopId); }
         function closeArena() { document.getElementById('arenaStart').style.display='flex'; document.getElementById('arenaEnd').style.display='none'; }
 
         canvas.addEventListener('touchstart', e => { stick.active=true; stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; stick.nx=stick.sx; stick.ny=stick.sy; });
