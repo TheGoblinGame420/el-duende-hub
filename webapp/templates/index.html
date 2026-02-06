@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>El Duende Survivor - Ecosistema $DUENDE</title>
+    <title>El Duende Survivor - Movilidad Total</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -34,7 +34,7 @@
             background: rgba(0,0,0,0.85); width: 100%; padding: 40px 20px;
             text-align: center; backdrop-filter: blur(10px); border-top: 3px solid var(--primary);
         }
-        .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* --- HEADER --- */
@@ -43,40 +43,30 @@
             background: rgba(20, 20, 20, 0.85); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10;
         }
-        .balance-val { font-size: 1.6rem; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px; }
-        .coin-icon { width: 24px; height: 24px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 15px var(--gold); }
+        .balance-val { font-size: 1.5rem; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .coin-icon { width: 22px; height: 22px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 10px var(--gold); }
 
-        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; width: 100%; overflow-y: auto; padding-bottom: 110px; }
+        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; width: 100%; overflow-y: auto; padding-bottom: 100px; }
         .screen.active { display: flex; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- TIENDA --- */
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 94%; margin-top: 15px; }
-        .card { background: var(--card); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .card img { width: 70px; height: 70px; object-fit: contain; margin-bottom: 10px; }
-        .btn-price { background: #333; color: #fff; padding: 10px; border-radius: 10px; margin-top: auto; font-size: 0.85rem; font-weight: bold; width: 100%; border: none; cursor: pointer; }
-        .btn-ton { background: var(--blue); } .btn-gold { background: var(--gold); color: #000; }
-
-        #ton-connect-container { margin: 20px 0; width: 94%; display: flex; justify-content: center; }
-
-        /* --- UI ELEMENTS --- */
-        .tap-area { position: relative; margin-top: 40px; width: 300px; height: 300px; display: flex; justify-content: center; align-items: center; }
-        .main-character { width: 260px; height: 260px; z-index: 2; object-fit: contain; cursor: pointer; animation: breathe 3s ease-in-out infinite; }
-        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04) translateY(-8px); } }
-
-        .status-card { width: 90%; max-width: 400px; margin-top: 30px; background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .energy-bar { height: 12px; width: 100%; background: #111; border-radius: 6px; margin-top: 12px; overflow: hidden; border: 1px solid #333; }
+        /* --- STATUS --- */
+        .status-card { width: 90%; max-width: 400px; margin-top: 20px; background: var(--card); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .energy-bar { height: 10px; width: 100%; background: #111; border-radius: 5px; margin-top: 10px; overflow: hidden; }
         .energy-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--gold), var(--primary)); transition: width 0.3s; }
 
-        .nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 85px; background: rgba(14, 16, 19, 0.98); backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.75rem; font-weight: 700; width: 25%; }
+        /* --- ARENA --- */
+        canvas { display: block; width: 100%; height: 100%; touch-action: none; background: #000; }
+        .arena-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; }
+        .arena-btn { background: linear-gradient(135deg, var(--danger), #800000); border: none; color: white; padding: 15px 40px; border-radius: 12px; font-size: 1.3rem; font-weight: 900; cursor: pointer; }
+
+        /* --- NAV --- */
+        .nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; background: rgba(14, 16, 19, 0.98); backdrop-filter: blur(15px); border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-around; align-items: center; padding-bottom: 10px; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.7rem; font-weight: 700; width: 25%; transition: 0.3s; }
         .nav-item.active { color: #fff; } .nav-item.active i { color: var(--primary); }
 
-        canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-        .arena-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; }
-        .arena-btn { background: linear-gradient(135deg, var(--danger), #800000); border: none; color: white; padding: 20px 50px; border-radius: 15px; font-size: 1.5rem; font-weight: 900; box-shadow: 0 0 25px rgba(255, 0, 85, 0.4); cursor: pointer; }
-        .float-num { position: absolute; font-weight: 900; font-size: 2rem; color: var(--gold); pointer-events: none; animation: floatUp 0.7s forwards; z-index: 200; }
-        @keyframes floatUp { to { transform: translateY(-100px); opacity: 0; } }
+        .float-num { position: absolute; font-weight: 900; font-size: 1.8rem; color: var(--gold); pointer-events: none; animation: floatUp 0.6s forwards; z-index: 200; }
+        @keyframes floatUp { to { transform: translateY(-80px); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -84,27 +74,27 @@
     <div id="loader">
         <div class="loader-footer">
             <div class="spinner"></div>
-            <h2 style="margin:0; color:var(--primary); letter-spacing:3px;">$DUENDE HUB</h2>
-            <p style="color:#888; font-size:0.9rem;">CONECTANDO CON EL ECOSISTEMA...</p>
+            <h2 style="margin:0; color:var(--primary); letter-spacing:2px;">$DUENDE HUB</h2>
+            <p style="color:#888; font-size:0.8rem;">ESTABLECIENDO CONEXIÓN SEGURA...</p>
         </div>
     </div>
 
     <div class="header">
-        <div id="ton-connect-container"></div>
+        <div id="ton-connect-header"></div>
         <div style="text-align:right;">
-            <div style="font-size:0.75rem; color:var(--gold); font-weight:bold;">BALANCE $DUENDE</div>
+            <div style="font-size:0.7rem; color:var(--gold);">BALANCE $DUENDE</div>
             <div class="balance-val"><span class="coin-icon"></span> <span id="scoreDisplay">0</span></div>
         </div>
     </div>
 
     <div id="tab-tap" class="screen active">
-        <div class="tap-area" id="tapZone">
-            <img id="charImg" src="" class="main-character">
+        <div style="margin-top:40px; position:relative;" id="tapZone">
+            <img id="charImg" src="" style="width:240px; height:240px; object-fit:contain;">
         </div>
         <div class="status-card">
             <div style="display:flex; justify-content:space-between; font-weight:900;">
                 <span>⚡ ENERGÍA</span>
-                <span style="color:var(--primary);"><span id="energyVal">100</span> / 100</span>
+                <span><span id="energyVal">100</span> / 100</span>
             </div>
             <div class="energy-bar"><div class="energy-fill" id="energyFill"></div></div>
         </div>
@@ -113,26 +103,21 @@
     <div id="tab-arena" class="screen">
         <div style="width:100%; height:100%; position:relative;">
             <canvas id="gameCanvas"></canvas>
+            
+            <div style="position:absolute; top:20px; left:20px; z-index:10; pointer-events:none; background:rgba(0,0,0,0.5); padding:10px; border-radius:10px;">
+                <div style="font-size:1.2rem; font-weight:900;">💀 KILLS: <span id="killsTxt">0</span></div>
+                <div style="font-size:1.1rem; font-weight:bold; color:var(--danger);">HP: <span id="hpTxt">100</span>%</div>
+            </div>
+
             <div id="arenaStart" class="arena-overlay">
-                <h1 style="font-size:3.5rem; color:var(--danger); margin:0;">SURVIVOR</h1>
+                <h1 style="color:var(--danger);">SURVIVOR MODE</h1>
                 <button class="arena-btn" onclick="startArena()">INICIAR (10⚡)</button>
             </div>
             <div id="arenaEnd" class="arena-overlay" style="display:none;">
-                <h1 id="endTitle" style="font-size:3rem;">RESULTADO</h1>
-                <p id="rewardTxt" style="font-size:2rem; color:var(--gold); margin:20px 0;"></p>
-                <button class="arena-btn" style="background:#333; box-shadow:none;" onclick="closeArena()">REGRESAR</button>
+                <h1 id="endTitle">RESULTADO</h1>
+                <p id="rewardTxt" style="font-size:1.5rem; color:var(--gold);"></p>
+                <button class="arena-btn" style="background:#333;" onclick="closeArena()">REGRESAR</button>
             </div>
-        </div>
-    </div>
-
-    <div id="tab-shop" class="screen">
-        <h2 style="color:var(--gold); margin-top:20px;">MERCADO NEGRO</h2>
-        <div style="width:94%; text-align:left; color:#888; font-size:0.8rem; font-weight:bold; margin-top:10px;">SKINS PREMIUM (TON)</div>
-        <div class="grid-container">
-            <div class="card"><img src="static/skin_DUENDE_HACKER.png"><b>HACKER</b><button class="btn-price btn-ton" onclick="payTon('hacker', 0.2)">0.2 TON</button></div>
-            <div class="card"><img src="static/skin_DUENDE_BOX.png"><b>BOXER</b><button class="btn-price btn-ton" onclick="payTon('boxer', 0.5)">0.5 TON</button></div>
-            <div class="card"><img src="static/skin_REY_DUENDE.png"><b>EL REY</b><button class="btn-price btn-ton" onclick="payTon('king', 1.0)">1.0 TON</button></div>
-            <div class="card"><img src="static/skin_DUENDE_MAESTRO.png"><b>MAESTRO</b><button class="btn-price btn-ton" onclick="payTon('maestro', 2.0)">2.0 TON</button></div>
         </div>
     </div>
 
@@ -156,70 +141,40 @@
         const tg = window.Telegram.WebApp; tg.expand();
         const MY_WALLET = "UQAm2w4HcJ1tW8RBNj7BZQh0Q-ckpzlxzD-r8p2JduHkpQnc";
 
-        // NOTA: Se eliminó la barra inclinada inicial "/" para rutas relativas más compatibles con GitHub Pages
         const assets = {
             common: 'static/skin_duende_comunparatodos.png',
-            hacker: 'static/skin_DUENDE_HACKER.png',
-            boxer: 'static/skin_DUENDE_BOX.png',
-            king: 'static/skin_REY_DUENDE.png',
-            maestro: 'static/skin_DUENDE_MAESTRO.png',
             bear: 'static/enemy_BEAR_MARKET.png',
-            bullet: 'static/loot_COIN.png',
+            rug: 'static/enemy_RUG_PULL.png',
+            whale: 'static/enemy_WHALE.png',
             coin: 'static/coin.png',
-            bg: 'static/imagen_portada_home.png'
+            bg: 'static/imagen_portada_home.png',
+            bullet: 'static/loot_COIN.png'
         };
 
-        const imgs = {}; let loadedCount = 0;
-        const totalAssets = Object.keys(assets).length;
-
-        // Función unificada para manejar carga o error
-        function assetDone() {
-            loadedCount++;
-            if (loadedCount >= totalAssets) {
-                initApp();
-            }
-        }
-
-        // CARGA DE IMÁGENES CON GESTIÓN DE ERRORES (Fail-safe)
+        const imgs = {}; let loaded = 0;
         Object.keys(assets).forEach(k => {
             imgs[k] = new Image();
-            imgs[k].onload = assetDone;
-            imgs[k].onerror = () => {
-                console.warn("No se pudo cargar: " + assets[k]);
-                assetDone(); // Continuar aunque falle una imagen
-            };
+            imgs[k].onload = () => { loaded++; if(loaded === Object.keys(assets).length) initApp(); };
+            imgs[k].onerror = () => { loaded++; };
             imgs[k].src = assets[k];
         });
 
-        // TIMEOUT GLOBAL: Si a los 6 segundos no ha cargado, forzar inicio
-        setTimeout(() => {
-            if (document.getElementById('loader').style.display !== 'none') {
-                console.log("Forzando inicio por tiempo de espera...");
-                initApp();
-            }
-        }, 6000);
+        setTimeout(() => { if(document.getElementById('loader').style.display !== 'none') initApp(); }, 5000);
 
         function initApp() {
             document.getElementById('loader').style.opacity = '0';
             setTimeout(() => document.getElementById('loader').style.display='none', 800);
-            // Asegurar imagen común si existe
-            if(imgs.common.complete && imgs.common.naturalWidth > 0) {
-                document.getElementById('charImg').src = assets.common;
-            }
+            document.getElementById('charImg').src = assets.common;
             updateUI();
         }
 
-        let state = { score: 1000, energy: 100, maxEnergy: 100, power: 1, skin: 'common' };
-        
-        const tonUi = new TON_CONNECT_UI.TonConnectUI({ 
-            manifestUrl: window.location.origin + '/static/tonconnect-manifest.json', 
-            buttonRootId: 'ton-connect-container' 
-        });
+        let state = { score: 1000, energy: 100, maxEnergy: 100, power: 1 };
+        let invincible = false;
 
         function updateUI() {
-            document.getElementById('scoreDisplay').innerText = Math.floor(state.score).toLocaleString();
+            document.getElementById('scoreDisplay').innerText = state.score.toLocaleString();
             document.getElementById('energyVal').innerText = Math.floor(state.energy);
-            document.getElementById('energyFill').style.width = (state.energy/state.maxEnergy*100) + '%';
+            document.getElementById('energyFill').style.width = (state.energy/100*100) + '%';
         }
 
         document.getElementById('tapZone').addEventListener('click', (e) => {
@@ -228,11 +183,10 @@
             const float = document.createElement('div');
             float.className = 'float-num'; float.innerText = "+"+state.power;
             float.style.left = e.clientX + 'px'; float.style.top = e.clientY + 'px';
-            document.body.appendChild(float); setTimeout(() => float.remove(), 700);
-            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            document.body.appendChild(float); setTimeout(() => float.remove(), 600);
         });
 
-        setInterval(() => { if(state.energy < state.maxEnergy){ state.energy++; updateUI(); } }, 2000);
+        setInterval(() => { if(state.energy < 100){ state.energy++; updateUI(); } }, 2000);
 
         function nav(tab, btn) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -244,101 +198,137 @@
 
         function copyWallet() {
             const el = document.createElement('textarea'); el.value = MY_WALLET; document.body.appendChild(el);
-            el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("¡Copiada!");
+            el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("Wallet copiada!");
         }
 
+        // --- ARENA SURVIVOR: MOVIMIENTO LIBRE E INFINITO ---
         const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
-        let gameActive=false, loopId, player={x:0,y:0,hp:100}, enemies=[], bullets=[], drops=[], kills=0, frame=0, difficulty=1, gameTime=0;
+        let gameActive=false, loopId, player={x:0,y:0,hp:100}, enemies=[], bullets=[], drops=[], kills=0, frame=0, difficulty=1;
         let stick={active:false, sx:0, sy:0, nx:0, ny:0};
 
         function startArena() {
             if(state.energy < 10) return alert("Falta Energía");
             state.energy -= 10; updateUI();
             document.getElementById('arenaStart').style.display='none';
-            resize(); player={x:0,y:0,hp:100}; enemies=[]; bullets=[]; drops=[]; kills=0; difficulty=1.0; gameTime=0;
+            resize(); 
+            player={x: canvas.width/2, y: canvas.height/2, hp:100}; 
+            enemies=[]; bullets=[]; drops=[]; kills=0; difficulty=1.0; frame=0;
             gameActive=true; loop();
         }
 
         function stopArena() { gameActive=false; cancelAnimationFrame(loopId); }
         function closeArena() { document.getElementById('arenaStart').style.display='flex'; document.getElementById('arenaEnd').style.display='none'; }
-        function resize() { const dpr=window.devicePixelRatio||1; canvas.width=canvas.clientWidth*dpr; canvas.height=canvas.clientHeight*dpr; ctx.scale(dpr,dpr); }
+        function resize() { canvas.width=canvas.clientWidth; canvas.height=canvas.clientHeight; }
 
-        canvas.addEventListener('touchstart', e => { e.preventDefault(); stick.active=true; stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; stick.nx=stick.sx; stick.ny=stick.sy; });
-        canvas.addEventListener('touchmove', e => { e.preventDefault(); if(stick.active){ stick.nx=e.touches[0].clientX; stick.ny=e.touches[0].clientY; } });
-        canvas.addEventListener('touchend', e => { e.preventDefault(); stick.active=false; });
+        canvas.addEventListener('touchstart', e => { 
+            e.preventDefault(); stick.active=true; 
+            stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; 
+            stick.nx=stick.sx; stick.ny=stick.sy; 
+        });
+        canvas.addEventListener('touchmove', e => { 
+            e.preventDefault(); if(stick.active){ stick.nx=e.touches[0].clientX; stick.ny=e.touches[0].clientY; } 
+        });
+        canvas.addEventListener('touchend', () => { stick.active=false; });
 
         function loop() {
             if(!gameActive) return;
-            const W=canvas.width/(window.devicePixelRatio||1); const H=canvas.height/(window.devicePixelRatio||1);
-            gameTime++; if(gameTime % 1200 === 0) difficulty += 0.5;
+            frame++;
+            if(frame % 1000 === 0) difficulty += 0.2;
 
+            // Render Fondo Portada
+            if(imgs.bg.complete) ctx.drawImage(imgs.bg, 0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+
+            // MOVIMIENTO LIBRE
             if(stick.active) {
                 const dx=stick.nx-stick.sx; const dy=stick.ny-stick.sy; const dist=Math.hypot(dx,dy);
-                if(dist>5) { const ang=Math.atan2(dy,dx); player.x+=Math.cos(ang)*5.5; player.y+=Math.sin(ang)*5.5; }
+                if(dist>5) {
+                    const ang=Math.atan2(dy,dx);
+                    player.x += Math.cos(ang)*4.5;
+                    player.y += Math.sin(ang)*4.5;
+                }
+                // Límites de pantalla
+                player.x = Math.max(25, Math.min(canvas.width - 25, player.x));
+                player.y = Math.max(25, Math.min(canvas.height - 25, player.y));
             }
-            const camX=player.x-W/2; const camY=player.y-H/2;
 
-            // FONDO
-            if (imgs.bg.complete && imgs.bg.naturalWidth > 0) {
-                ctx.drawImage(imgs.bg, 0, 0, W, H);
-            } else {
-                ctx.fillStyle='#050505'; ctx.fillRect(0,0,W,H);
+            // SPAWNER INFINITO: Usa Bear, Rug y Whale
+            if(frame % Math.max(20, (40 - Math.floor(difficulty * 5))) === 0) {
+                const edge = Math.floor(Math.random()*4);
+                let ex, ey;
+                if(edge===0) { ex=Math.random()*canvas.width; ey=-50; }
+                else if(edge===1) { ex=Math.random()*canvas.width; ey=canvas.height+50; }
+                else if(edge===2) { ex=-50; ey=Math.random()*canvas.height; }
+                else { ex=canvas.width+50; ey=Math.random()*canvas.height; }
+                
+                // Variedad de enemigos
+                const rand = Math.random();
+                let type='bear', hp=3, spd=2;
+                if(rand > 0.7) { type='rug'; hp=2; spd=3.5; }
+                if(rand > 0.95) { type='whale'; hp=15; spd=1.2; }
+
+                enemies.push({x:ex, y:ey, type:type, hp:hp*difficulty, spd:spd});
             }
-            ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H);
 
+            // Lógica Proyectiles (Auto-target)
+            if(frame % 20 === 0 && enemies.length > 0) {
+                const target = enemies[0];
+                const ang = Math.atan2(target.y-player.y, target.x-player.x);
+                bullets.push({x:player.x, y:player.y, vx:Math.cos(ang)*10, vy:Math.sin(ang)*10});
+            }
+
+            bullets.forEach((b,i) => {
+                b.x+=b.vx; b.y+=b.vy;
+                ctx.drawImage(imgs.bullet, b.x-10, b.y-10, 20, 20);
+                if(b.x<0 || b.x>canvas.width || b.y<0 || b.y>canvas.height) bullets.splice(i,1);
+            });
+
+            // Drops de Monedas
             drops.forEach((d, i) => {
-                const dx = d.x-camX; const dy = d.y-camY;
-                ctx.save(); ctx.translate(dx, dy + Math.sin(gameTime/20)*5);
-                if(imgs.coin.complete) ctx.drawImage(imgs.coin, -18, -18, 36, 36);
-                ctx.restore();
+                ctx.drawImage(imgs.coin, d.x-18, d.y-18, 36, 36);
                 if(Math.hypot(player.x-d.x, player.y-d.y) < 30) {
                     state.score += 50; updateUI(); drops.splice(i, 1);
                 }
             });
 
-            ctx.save(); ctx.translate(W/2, H/2);
-            ctx.drawImage(imgs.common, -30, -30, 60, 60);
-            ctx.restore();
-
-            if(frame % (Math.max(15, 45 - Math.floor(difficulty*6))) === 0) {
-                const ang=Math.random()*6.28; const dist=W/2+150;
-                enemies.push({x:player.x+Math.cos(ang)*dist, y:player.y+Math.sin(ang)*dist, hp:5*difficulty, spd:(1.8+difficulty/10)});
-            }
-
-            if(frame % 18 === 0 && enemies.length > 0) {
-                const target = enemies.reduce((a,b)=>Math.hypot(a.x-player.x, a.y-player.y)<Math.hypot(b.x-player.x, b.y-player.y)?a:b);
-                const ang = Math.atan2(target.y-player.y, target.x-player.x);
-                bullets.push({x:player.x, y:player.y, vx:Math.cos(ang)*12, vy:Math.sin(ang)*12, life:60});
-            }
-
-            bullets.forEach((b,i) => { b.x+=b.vx; b.y+=b.vy; b.life--; ctx.drawImage(imgs.bullet, b.x-camX-10, b.y-camY-10, 20, 20); if(b.life<=0) bullets.splice(i,1); });
-
+            // Lógica Enemigos
             enemies.forEach((e,i) => {
-                const ang = Math.atan2(player.y-e.y, player.x-e.x); 
-                e.x+=Math.cos(ang)*e.spd; e.y+=Math.sin(ang)*e.spd;
-                ctx.drawImage(imgs.bear, e.x-camX-22, e.y-camY-22, 44, 44);
+                const ang = Math.atan2(player.y-e.y, player.x-e.x);
+                e.x += Math.cos(ang)*e.spd; e.y += Math.sin(ang)*e.spd;
+                ctx.drawImage(imgs[e.type], e.x-22, e.y-22, 44, 44);
 
-                if(Math.hypot(player.x-e.x, player.y-e.y)<28) {
-                    player.hp -= 15; if(player.hp<=0) { gameActive=false; endGame(false); }
+                // Colisión Jugador
+                if(Math.hypot(player.x-e.x, player.y-e.y)<28 && !invincible) {
+                    player.hp -= 10; document.getElementById('hpTxt').innerText=player.hp;
+                    if(player.hp<=0) { gameActive=false; endGame(); }
+                    else { invincible=true; setTimeout(()=>invincible=false, 1000); }
                 }
 
+                // Colisión Balas
                 bullets.forEach((b,bi) => {
-                    if(Math.hypot(b.x-e.x, b.y-e.y)<35) {
+                    if(Math.hypot(b.x-e.x, b.y-e.y)<30) {
                         bullets.splice(bi,1); e.hp -= 1;
                         if(e.hp<=0) {
-                            enemies.splice(i,1); kills++;
-                            if(Math.random() < 0.35) drops.push({x:e.x, y:e.y, type:'token'}); 
+                            enemies.splice(i,1); kills++; document.getElementById('killsTxt').innerText=kills;
+                            if(Math.random() < 0.35) drops.push({x:e.x, y:e.y});
                         }
                     }
                 });
             });
 
-            frame++; loopId = requestAnimationFrame(loop);
+            // Dibujar Jugador
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            if(invincible) ctx.globalAlpha = 0.5;
+            ctx.drawImage(imgs.common, -25, -25, 50, 50);
+            ctx.restore();
+
+            loopId = requestAnimationFrame(loop);
         }
 
-        function endGame(win) {
+        function endGame() {
             const reward = kills * 10; state.score += reward;
-            document.getElementById('rewardTxt').innerText = `+${reward} $DUENDE`;
+            document.getElementById('rewardTxt').innerText = `RECOMPENSA: +${reward} $DUENDE`;
             document.getElementById('arenaEnd').style.display='flex';
             updateUI();
         }
