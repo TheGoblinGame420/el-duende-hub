@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>El Duende Survivor - Ecosistema $DUENDE</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,22 +14,33 @@
             --primary: #39ff14; --gold: #ffd700; --danger: #ff0055; --blue: #0098EA;
             --bg-dark: #121418; --card: #1e2228; --nav: #0e1013;
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; outline: none; }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none; 
+            outline: none; 
+            touch-action: none; /* BLOQUEO CRÍTICO: Evita el scroll del navegador */
+        }
         
         body {
             margin: 0; padding: 0;
-            background: radial-gradient(circle at top, #1a202c 0%, #000 100%);
+            background: #000;
             color: #fff; font-family: 'Rajdhani', sans-serif;
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; height: 100vh; 
+            overflow: hidden; /* Evita scroll vertical accidental */
+            position: fixed; /* Mantiene la app pegada arriba */
+            width: 100%;
         }
 
         /* --- LOADER --- */
         #loader { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000; z-index: 9999; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; transition: opacity 0.8s ease; 
+            background: #000 url('static/imagen_portada_home.png') no-repeat center center; 
+            background-size: cover; z-index: 9999; display: flex; flex-direction: column; 
+            justify-content: flex-end; align-items: center; transition: opacity 0.8s ease; 
         }
-        .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        .loader-footer { background: rgba(0,0,0,0.85); width: 100%; padding: 40px 20px; text-align: center; border-top: 3px solid var(--primary); }
+        .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* --- HEADER --- */
@@ -37,22 +48,18 @@
         .token-balance-container { display: flex; align-items: center; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 25px; border: 1px solid var(--gold); }
         .token-logo-header { width: 26px; height: 26px; margin-left: 8px; border-radius: 50%; object-fit: cover; }
 
-        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; width: 100%; overflow-y: auto; padding-bottom: 110px; }
+        /* --- PANTALLAS --- */
+        .screen { display: none; flex-grow: 1; width: 100%; overflow-y: auto; padding-bottom: 110px; flex-direction: column; align-items: center; }
         .screen.active { display: flex; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- UI CARDS --- */
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 94%; margin-top: 15px; }
-        .card { background: var(--card); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        /* --- UI COMPONENTS --- */
+        .card { background: var(--card); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255,255,255,0.05); width: 90%; margin-top: 20px; }
         .btn-price { background: var(--blue); color: #fff; padding: 10px; border-radius: 10px; font-weight: bold; width: 100%; border: none; cursor: pointer; margin-top: 10px; }
 
-        .withdraw-card { background: var(--card); border-radius: 20px; width: 92%; padding: 25px; margin-top: 30px; border: 1px solid var(--blue); text-align: center; }
-        .withdraw-btn { background: var(--blue); border: none; color: white; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 20px; width: 100%; }
-        .withdraw-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
-
         /* --- ARENA --- */
-        #arena-container { width: 100%; height: 100%; position: relative; overflow: hidden; }
-        canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+        #arena-container { width: 100%; height: 100%; position: relative; overflow: hidden; touch-action: none; }
+        canvas { display: block; width: 100%; height: 100%; }
         .arena-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; }
 
         .nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 85px; background: var(--nav); border-top: 1px solid #333; display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; z-index: 100; }
@@ -65,8 +72,10 @@
 <body>
 
     <div id="loader">
-        <div class="spinner"></div>
-        <h2 style="margin-top:20px; color:var(--primary);">CARGANDO...</h2>
+        <div class="loader-footer">
+            <div class="spinner"></div>
+            <h2 style="color:var(--primary);">CARGANDO...</h2>
+        </div>
     </div>
 
     <div class="header">
@@ -79,14 +88,14 @@
 
     <div id="tab-tap" class="screen active">
         <div style="margin-top:50px; cursor:pointer;" id="tapZone">
-            <img id="charImg" src="static/skin_duende_comunparatodos.png" style="width: 240px; height: 240px; animation: breathe 3s infinite; pointer-events: none;">
+            <img id="charImg" src="static/skin_duende_comunparatodos.png" style="width: 240px; height: 240px; animation: breathe 3s infinite;">
         </div>
-        <div class="card" style="width:90%; border: 1px solid var(--primary);">
-            <div style="display:flex; justify-content:space-between; font-weight:900;">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; width: 100%; font-weight:900;">
                 <span>⚡ ENERGÍA</span>
-                <span id="energyValText">100 / 100</span>
+                <span id="energyText">100 / 100</span>
             </div>
-            <div style="height:12px; background:#111; border-radius:6px; margin-top:10px; overflow:hidden;">
+            <div style="height:12px; width:100%; background:#111; border-radius:6px; margin-top:10px; overflow:hidden;">
                 <div id="energyFill" style="height:100%; width:100%; background:linear-gradient(90deg, var(--gold), var(--primary)); transition: 0.3s;"></div>
             </div>
         </div>
@@ -96,41 +105,35 @@
         <div id="arena-container">
             <canvas id="gameCanvas"></canvas>
             <div style="position:absolute; top:20px; left:20px; z-index:10; pointer-events:none; background:rgba(0,0,0,0.6); padding:10px; border-radius:10px;">
-                <div style="font-weight:900; color:var(--gold); display:flex; align-items:center; gap:5px;">
-                    <span id="arenaBalance">0</span> <img src="static/coin.png" style="width:16px; height:16px;">
-                </div>
+                <div style="font-weight:900; color:var(--gold);">💰 <span id="arenaBalance">0</span></div>
                 <div style="color:var(--danger);">❤️ <span id="hpTxt">100</span>%</div>
             </div>
             <div id="arenaStart" class="arena-overlay">
                 <h1 style="color:var(--danger);">ARENA SURVIVOR</h1>
-                <button class="withdraw-btn" style="width:180px;" onclick="startArena()">INICIAR (10⚡)</button>
+                <button class="btn-price" style="width:180px; padding:15px;" onclick="startArena()">INICIAR (10⚡)</button>
             </div>
             <div id="arenaEnd" class="arena-overlay" style="display:none;">
-                <h1 id="endTitle">RESULTADO</h1>
+                <h1>RESULTADO</h1>
                 <div style="font-size:2rem; font-weight:900; color:var(--gold); margin:20px 0;">
-                    + <span id="rewardNum">0</span> <img src="static/coin.png" style="width:40px; vertical-align:middle;">
+                    + <span id="rewardNum">0</span> <img src="static/coin.png" style="width:40px;">
                 </div>
-                <button class="withdraw-btn" style="width:180px; background:#333;" onclick="closeArena()">REGRESAR</button>
+                <button class="btn-price" style="width:180px; background:#333;" onclick="closeArena()">REGRESAR</button>
             </div>
         </div>
     </div>
 
     <div id="tab-shop" class="screen">
-        <h2 style="color:var(--gold); margin-top:20px;">MERCADO NEGRO</h2>
-        <div class="grid-container">
-            <div class="card"><img src="static/skin_DUENDE_HACKER.png" style="width:60px;"><b>HACKER</b><button class="btn-price">0.2 TON</button></div>
-            <div class="card"><img src="static/skin_REY_DUENDE.png" style="width:60px;"><b>EL REY</b><button class="btn-price">1.0 TON</button></div>
-        </div>
+        <h2 style="color:var(--gold); margin-top:20px;">TIENDA</h2>
+        <div class="card"><img src="static/skin_DUENDE_HACKER.png" style="width:60px;"><b>HACKER</b><button class="btn-price">0.2 TON</button></div>
     </div>
 
     <div id="tab-withdraw" class="screen">
-        <h2 style="color:var(--blue); margin-top:30px;">RETIRAR</h2>
-        <div class="withdraw-card">
-            <div style="font-size:2.5rem; font-weight:900; margin:15px 0;">
+        <h2 style="color:var(--blue); margin-top:30px;">RETIRO</h2>
+        <div class="card">
+            <div style="font-size:2.5rem; font-weight:900;">
                 <span id="withdrawBalance">0</span> <img src="static/coin.png" style="width:35px;">
             </div>
-            <button id="withdrawBtn" class="withdraw-btn" disabled onclick="alert('Retiro procesado')">MÍNIMO 5,000</button>
-            <p style="font-size:0.8rem; color:#888; margin-top:10px;">Mínimo: 5,000 $DUENDE</p>
+            <button id="withdrawBtn" class="btn-price" style="background:#333;" disabled>MÍNIMO 5,000</button>
         </div>
     </div>
 
@@ -142,26 +145,21 @@
     </nav>
 
     <script>
-        const tg = window.Telegram.WebApp; tg.expand();
-        
-        // --- SISTEMA DE CARGA BLINDADA ---
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.disableVerticalSwipe(); // BLOQUEO CLAVE: Evita que la app se cierre al deslizar abajo
+        tg.enableClosingConfirmation();
+
         const assets = {
             coin: 'static/coin.png', bg: 'static/imagen_portada_home.png',
             bear: 'static/enemy_BEAR_MARKET.png', char: 'static/skin_duende_comunparatodos.png',
-            fire: 'static/skill_fire.png', shield: 'static/booster_INVENCIBLE_90S.png'
+            fire: 'static/skill_fire.png', shield: 'static/booster_INVENCIBLE_90S.png',
+            bullet: 'static/loot_COIN.png'
         };
         const imgs = {}; let loaded = 0;
-        const total = Object.keys(assets).length;
-
-        // Fail-safe: Si a los 3 segundos no ha cargado, iniciar igual
-        const forceStart = setTimeout(() => { if(loaded < total) init(); }, 3000);
-
         Object.keys(assets).forEach(k => {
             imgs[k] = new Image();
-            imgs[k].onload = imgs[k].onerror = () => {
-                loaded++;
-                if(loaded === total) { clearTimeout(forceStart); init(); }
-            };
+            imgs[k].onload = imgs[k].onerror = () => { loaded++; if(loaded === Object.keys(assets).length) init(); };
             imgs[k].src = assets[k];
         });
 
@@ -174,22 +172,22 @@
         }
 
         function updateUI() {
-            const s = state.score.toLocaleString();
-            document.getElementById('scoreDisplay').innerText = s;
-            document.getElementById('arenaBalance').innerText = s;
-            document.getElementById('withdrawBalance').innerText = s;
-            document.getElementById('energyValText').innerText = Math.floor(state.energy) + " / 100";
+            const val = state.score.toLocaleString();
+            document.getElementById('scoreDisplay').innerText = val;
+            document.getElementById('arenaBalance').innerText = val;
+            document.getElementById('withdrawBalance').innerText = val;
+            document.getElementById('energyText').innerText = Math.floor(state.energy) + " / 100";
             document.getElementById('energyFill').style.width = state.energy + "%";
             
             const wBtn = document.getElementById('withdrawBtn');
-            if(state.score >= 5000) { wBtn.disabled = false; wBtn.innerText = "RETIRAR $DUENDE"; wBtn.style.background = "var(--primary)"; }
+            if(state.score >= 5000) { wBtn.disabled = false; wBtn.style.background = "var(--primary)"; wBtn.innerText = "RETIRAR"; }
         }
 
-        document.getElementById('tapZone').onclick = () => {
-            if(state.energy >= 3) { state.energy -= 3; state.score += 1; updateUI(); }
+        document.getElementById('tapZone').onclick = (e) => {
+            if(state.energy >= 3) { state.energy -= 3; state.score += 1; updateUI(); tg.HapticFeedback.impactOccurred('light'); }
         };
 
-        setInterval(() => { if(state.energy < 100) { state.energy += 0.5; updateUI(); } }, 2000);
+        setInterval(() => { if(state.energy < 100){ state.energy += 0.5; updateUI(); } }, 2000);
 
         function nav(t, b) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -199,7 +197,7 @@
             if(t !== 'arena') stopArena();
         }
 
-        // --- MOTOR ARENA INFINITO ---
+        // --- MOTOR ARENA ---
         const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
         let gameActive=false, loopId, kills=0, frame=0, player={x:0, y:0, vx:0, vy:0, hp:100}, enemies=[], bullets=[], drops=[], stick={active:false, sx:0, sy:0, nx:0, ny:0};
 
@@ -208,7 +206,7 @@
             state.energy -= 10; document.getElementById('arenaStart').style.display='none';
             canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
             player = { x: 0, y: 0, vx: canvas.width/2, vy: canvas.height/2, hp: 100 };
-            enemies=[]; bullets=[]; drops=[]; kills=0; frame=0; gameActive=true; loop();
+            enemies=[]; bullets=[]; drops=[]; kills=0; gameActive=true; loop();
         }
 
         function loop() {
@@ -224,69 +222,62 @@
                 }
             }
 
-            // Scroll Infinito (Cámara)
+            // Scroll Infinito
             if(Math.abs(player.vx - W/2) > 50) player.vx -= (player.vx - W/2)*0.1;
             if(Math.abs(player.vy - H/2) > 50) player.vy -= (player.vy - H/2)*0.1;
             const camX = player.x - player.vx, camY = player.y - player.vy;
 
-            // Fondo Mosaico
+            // Render Fondo
             const s=600; const startX=Math.floor(camX/s)*s, startY=Math.floor(camY/s)*s;
             for(let x=startX-s; x<camX+W+s; x+=s) {
                 for(let y=startY-s; y<camY+H+s; y+=s) {
-                    if(imgs.bg.complete) ctx.drawImage(imgs.bg, x-camX, y-camY, s, s);
+                    ctx.drawImage(imgs.bg, x-camX, y-camY, s, s);
                 }
             }
             ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H);
 
-            // Spawner Enemigos
-            if(frame % 40 === 0) enemies.push({x:player.x+(Math.random()-0.5)*W*2, y:player.y+(Math.random()-0.5)*H*2, hp:3, t:Math.random()>0.8?'whale':'bear'});
+            // Spawner
+            if(frame % 40 === 0) enemies.push({x:player.x+(Math.random()-0.5)*W*2, y:player.y+(Math.random()-0.5)*H*2, hp:3});
 
-            // Disparo automático AREA
+            // Lógica Proyectiles
             if(frame % 20 === 0 && enemies.length > 0) {
                 const e = enemies[0]; const ang=Math.atan2(e.y-player.y, e.x-player.x);
                 bullets.push({x:player.x, y:player.y, vx:Math.cos(ang)*11, vy:Math.sin(ang)*11, life:80});
             }
 
-            bullets.forEach((b,i) => {
+            bullets.forEach((b, i) => {
                 b.x+=b.vx; b.y+=b.vy; b.life--;
-                ctx.drawImage(imgs.bullet || imgs.coin, b.x-camX-10, b.y-camY-10, 20, 20);
-                enemies.forEach((e,ei) => {
+                ctx.drawImage(imgs.bullet, b.x-camX-10, b.y-camY-10, 20, 20);
+                enemies.forEach((e, ei) => {
                     if(Math.hypot(b.x-e.x, b.y-e.y)<40) {
                         e.hp -= state.dmg; bullets.splice(i,1);
-                        if(e.hp<=0) {
-                            enemies.splice(ei,1); kills++;
-                            let r=Math.random();
-                            if(r<0.25) drops.push({x:e.x, y:e.y, t:'fire'});
-                            else if(r<0.45) drops.push({x:e.x, y:e.y, t:'shield'});
-                            else if(r<0.65) drops.push({x:e.x, y:e.y, t:'coin'});
-                        }
+                        if(e.hp<=0) { enemies.splice(ei,1); kills++; drops.push({x:e.x, y:e.y, t:Math.random()<0.3?'fire':'coin'}); }
                     }
                 });
-                if(b.life<=0) bullets.splice(i,1);
+                if(b.life <= 0) bullets.splice(i, 1);
             });
 
-            drops.forEach((d,i) => {
+            drops.forEach((d, i) => {
                 const rx=d.x-camX, ry=d.y-camY;
-                ctx.drawImage(d.t==='coin'?imgs.coin:(d.t==='fire'?imgs.fire:imgs.shield), rx-20, ry-20, 40, 40);
-                if(Math.hypot(player.vx-rx, player.vy-ry)<30) {
-                    if(d.t==='coin') state.score+=50;
+                ctx.drawImage(imgs[d.t], rx-20, ry-20, 40, 40);
+                if(Math.hypot(player.vx-rx, player.vy-ry)<35) {
+                    if(d.t==='coin') state.score += 50;
                     if(d.t==='fire') { state.dmg=5; setTimeout(()=>state.dmg=1, 10000); }
-                    if(d.t==='shield') { invincible=true; setTimeout(()=>invincible=false, 10000); }
-                    drops.splice(i,1); updateUI();
+                    updateUI(); drops.splice(i,1);
                 }
             });
 
             enemies.forEach(e => {
                 const ang=Math.atan2(player.y-e.y, player.x-e.x);
                 e.x+=Math.cos(ang)*2.2; e.y+=Math.sin(ang)*2.2;
-                ctx.drawImage(imgs[e.t==='whale'?'whale':'bear'] || imgs.bear, e.x-camX-25, e.y-camY-25, 50, 50);
-                if(Math.hypot(player.vx-(e.x-camX), player.vy-(e.y-camY))<30 && !invincible) {
-                    player.hp-=0.8; document.getElementById('hpTxt').innerText=Math.ceil(player.hp);
+                ctx.drawImage(imgs.bear, e.x-camX-25, e.y-camY-25, 50, 50);
+                if(Math.hypot(player.vx-(e.x-camX), player.vy-(e.y-camY))<30) {
+                    player.hp-=0.5; document.getElementById('hpTxt').innerText=Math.ceil(player.hp);
                     if(player.hp<=0) { gameActive=false; endGame(); }
                 }
             });
 
-            ctx.drawImage(imgs.char, player.vx-35, player.vy-35, 70, 70);
+            ctx.drawImage(imgs.char, player.visualX || player.vx-35, player.visualY || player.vy-35, 70, 70);
             loopId = requestAnimationFrame(loop);
         }
 
@@ -298,9 +289,26 @@
         function stopArena() { gameActive=false; cancelAnimationFrame(loopId); }
         function closeArena() { document.getElementById('arenaStart').style.display='flex'; document.getElementById('arenaEnd').style.display='none'; }
 
-        canvas.addEventListener('touchstart', e => { stick.active=true; stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; stick.nx=stick.sx; stick.ny=stick.sy; });
-        canvas.addEventListener('touchmove', e => { stick.nx=e.touches[0].clientX; stick.ny=e.touches[0].clientY; });
+        // MANEJO DE EVENTOS TÁCTILES MEJORADO
+        canvas.addEventListener('touchstart', e => { 
+            e.preventDefault(); 
+            stick.active=true; 
+            stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; 
+            stick.nx=stick.sx; stick.ny=stick.sy; 
+        }, {passive: false});
+
+        canvas.addEventListener('touchmove', e => { 
+            e.preventDefault(); 
+            stick.nx=e.touches[0].clientX; stick.ny=e.touches[0].clientY; 
+        }, {passive: false});
+
         canvas.addEventListener('touchend', () => stick.active=false);
+
+        // Bloqueo preventivo de scroll en toda la ventana
+        window.addEventListener('touchmove', e => {
+            if (gameActive) e.preventDefault();
+        }, { passive: false });
+
     </script>
 </body>
 </html>
