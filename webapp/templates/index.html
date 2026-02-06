@@ -26,7 +26,7 @@
         /* --- LOADER --- */
         #loader { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000 url('/static/imagen_portada_home.png') no-repeat center center; 
+            background: #000 url('static/imagen_portada_home.png') no-repeat center center; 
             background-size: cover; z-index: 9999; display: flex; flex-direction: column; 
             justify-content: flex-end; align-items: center; transition: opacity 0.8s ease; 
         }
@@ -35,6 +35,7 @@
             text-align: center; backdrop-filter: blur(10px); border-top: 3px solid var(--primary);
         }
         .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* --- HEADER --- */
         .header {
@@ -89,7 +90,7 @@
     </div>
 
     <div class="header">
-        <div id="header-wallet-btn"></div>
+        <div id="ton-connect-container"></div>
         <div style="text-align:right;">
             <div style="font-size:0.75rem; color:var(--gold); font-weight:bold;">BALANCE $DUENDE</div>
             <div class="balance-val"><span class="coin-icon"></span> <span id="scoreDisplay">0</span></div>
@@ -106,7 +107,6 @@
                 <span style="color:var(--primary);"><span id="energyVal">100</span> / 100</span>
             </div>
             <div class="energy-bar"><div class="energy-fill" id="energyFill"></div></div>
-            <div id="invincibleTag" style="color:var(--blue); font-weight:900; text-align:center; margin-top:5px; display:none;">🛡️ ESCUDO ACTIVO</div>
         </div>
     </div>
 
@@ -127,23 +127,12 @@
 
     <div id="tab-shop" class="screen">
         <h2 style="color:var(--gold); margin-top:20px;">MERCADO NEGRO</h2>
-        
-        <div id="ton-connect-container"></div>
-
         <div style="width:94%; text-align:left; color:#888; font-size:0.8rem; font-weight:bold; margin-top:10px;">SKINS PREMIUM (TON)</div>
         <div class="grid-container">
-            <div class="card"><img src="/static/skin_DUENDE_HACKER.png"><div style="font-weight:bold;">HACKER</div><button class="btn-price btn-ton" onclick="payTon('hacker', 0.2)">0.2 TON</button></div>
-            <div class="card"><img src="/static/skin_DUENDE_BOX.png"><div style="font-weight:bold;">BOXER</div><button class="btn-price btn-ton" onclick="payTon('boxer', 0.5)">0.5 TON</button></div>
-            <div class="card"><img src="/static/skin_REY_DUENDE.png"><div style="font-weight:bold;">EL REY</div><button class="btn-price btn-ton" onclick="payTon('king', 1.0)">1.0 TON</button></div>
-            <div class="card"><img src="/static/skin_DUENDE_MAESTRO.png"><div style="font-weight:bold;">MAESTRO</div><button class="btn-price btn-ton" onclick="payTon('maestro', 2.0)">2.0 TON</button></div>
-        </div>
-
-        <div style="width:94%; text-align:left; color:#888; font-size:0.8rem; font-weight:bold; margin-top:20px;">POTENCIADORES (MONEDAS)</div>
-        <div class="grid-container">
-            <div class="card"><img src="/static/booster_RAYOTON.png"><b>RECARGA</b><button class="btn-price btn-gold" onclick="buyItem('refill', 500)">500</button></div>
-            <div class="card"><img src="/static/booster_INVENCIBLE_90S.png"><b>ESCUDO</b><button class="btn-price btn-gold" onclick="buyItem('shield', 2000)">2k</button></div>
-            <div class="card"><img src="/static/booster_x100_ENERGIA.png"><b>MAX +100</b><button class="btn-price btn-gold" onclick="buyItem('max', 5000)">5k</button></div>
-            <div class="card"><img src="/static/loot_COIN.png"><b>DAÑO +</b><button class="btn-price btn-gold" onclick="buyItem('dmg', 3000)">3k</button></div>
+            <div class="card"><img src="static/skin_DUENDE_HACKER.png"><b>HACKER</b><button class="btn-price btn-ton" onclick="payTon('hacker', 0.2)">0.2 TON</button></div>
+            <div class="card"><img src="static/skin_DUENDE_BOX.png"><b>BOXER</b><button class="btn-price btn-ton" onclick="payTon('boxer', 0.5)">0.5 TON</button></div>
+            <div class="card"><img src="static/skin_REY_DUENDE.png"><b>EL REY</b><button class="btn-price btn-ton" onclick="payTon('king', 1.0)">1.0 TON</button></div>
+            <div class="card"><img src="static/skin_DUENDE_MAESTRO.png"><b>MAESTRO</b><button class="btn-price btn-ton" onclick="payTon('maestro', 2.0)">2.0 TON</button></div>
         </div>
     </div>
 
@@ -167,29 +156,61 @@
         const tg = window.Telegram.WebApp; tg.expand();
         const MY_WALLET = "UQAm2w4HcJ1tW8RBNj7BZQh0Q-ckpzlxzD-r8p2JduHkpQnc";
 
+        // NOTA: Se eliminó la barra inclinada inicial "/" para rutas relativas más compatibles con GitHub Pages
         const assets = {
-            common: '/static/skin_duende_comunparatodos.png',
-            hacker: '/static/skin_DUENDE_HACKER.png', boxer: '/static/skin_DUENDE_BOX.png', king: '/static/skin_REY_DUENDE.png', maestro: '/static/skin_DUENDE_MAESTRO.png',
-            bear: '/static/enemy_BEAR_MARKET.png', bullet: '/static/loot_COIN.png', token_duende: '/static/coin.png', bg_survival: '/static/imagen_portada_home.png'
+            common: 'static/skin_duende_comunparatodos.png',
+            hacker: 'static/skin_DUENDE_HACKER.png',
+            boxer: 'static/skin_DUENDE_BOX.png',
+            king: 'static/skin_REY_DUENDE.png',
+            maestro: 'static/skin_DUENDE_MAESTRO.png',
+            bear: 'static/enemy_BEAR_MARKET.png',
+            bullet: 'static/loot_COIN.png',
+            coin: 'static/coin.png',
+            bg: 'static/imagen_portada_home.png'
         };
-        const imgs = {}; let loadedCount = 0;
 
+        const imgs = {}; let loadedCount = 0;
+        const totalAssets = Object.keys(assets).length;
+
+        // Función unificada para manejar carga o error
+        function assetDone() {
+            loadedCount++;
+            if (loadedCount >= totalAssets) {
+                initApp();
+            }
+        }
+
+        // CARGA DE IMÁGENES CON GESTIÓN DE ERRORES (Fail-safe)
         Object.keys(assets).forEach(k => {
-            imgs[k] = new Image(); imgs[k].src = assets[k];
-            imgs[k].onload = () => { loadedCount++; if(loadedCount === Object.keys(assets).length) setTimeout(initApp, 2500); };
-            imgs[k].onerror = () => { loadedCount++; };
+            imgs[k] = new Image();
+            imgs[k].onload = assetDone;
+            imgs[k].onerror = () => {
+                console.warn("No se pudo cargar: " + assets[k]);
+                assetDone(); // Continuar aunque falle una imagen
+            };
+            imgs[k].src = assets[k];
         });
+
+        // TIMEOUT GLOBAL: Si a los 6 segundos no ha cargado, forzar inicio
+        setTimeout(() => {
+            if (document.getElementById('loader').style.display !== 'none') {
+                console.log("Forzando inicio por tiempo de espera...");
+                initApp();
+            }
+        }, 6000);
 
         function initApp() {
             document.getElementById('loader').style.opacity = '0';
             setTimeout(() => document.getElementById('loader').style.display='none', 800);
-            document.getElementById('charImg').src = imgs.common.src; updateUI();
+            // Asegurar imagen común si existe
+            if(imgs.common.complete && imgs.common.naturalWidth > 0) {
+                document.getElementById('charImg').src = assets.common;
+            }
+            updateUI();
         }
 
-        let state = { score: 1000, energy: 100, maxEnergy: 100, power: 1, skin: 'common', dmgBoost: 1 };
-        let invincible = false;
-
-        // Configuración de TON Connect con botón en Tienda y Header
+        let state = { score: 1000, energy: 100, maxEnergy: 100, power: 1, skin: 'common' };
+        
         const tonUi = new TON_CONNECT_UI.TonConnectUI({ 
             manifestUrl: window.location.origin + '/static/tonconnect-manifest.json', 
             buttonRootId: 'ton-connect-container' 
@@ -204,43 +225,14 @@
         document.getElementById('tapZone').addEventListener('click', (e) => {
             if(state.energy < 3) return;
             state.energy -= 3; state.score += state.power; updateUI();
-            const float = document.createElement('div'); float.className = 'float-num'; float.innerText = "+"+state.power;
+            const float = document.createElement('div');
+            float.className = 'float-num'; float.innerText = "+"+state.power;
             float.style.left = e.clientX + 'px'; float.style.top = e.clientY + 'px';
             document.body.appendChild(float); setTimeout(() => float.remove(), 700);
             if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         });
 
         setInterval(() => { if(state.energy < state.maxEnergy){ state.energy++; updateUI(); } }, 2000);
-
-        async function payTon(skin, price) {
-            if(!tonUi.connected) return alert("Por favor, conecta tu Wallet en la sección de Tienda");
-            try { 
-                await tonUi.sendTransaction({
-                    validUntil: Math.floor(Date.now()/1000)+3600, 
-                    messages: [{address: MY_WALLET, amount: Math.floor(price*1000000000).toString()}]
-                }); 
-                state.skin = skin; updateSkin(); alert("¡Skin desbloqueada con éxito!"); 
-            } catch(e){ alert("Transacción cancelada o error de red"); }
-        }
-
-        function buyItem(type, cost) {
-            if(state.score < cost) return alert("Fondos insuficientes");
-            state.score -= cost;
-            if(type==='refill') state.energy = state.maxEnergy;
-            if(type==='max') state.maxEnergy += 100;
-            if(type==='dmg') { state.dmgBoost = 2; setTimeout(()=>state.dmgBoost=1, 60000); }
-            if(type==='shield') { invincible=true; document.getElementById('invincibleTag').style.display='block'; setTimeout(()=>{invincible=false;document.getElementById('invincibleTag').style.display='none';}, 90000); }
-            updateUI();
-        }
-
-        function updateSkin() {
-            let src = imgs.common.src; state.power = 1;
-            if(state.skin==='hacker'){src=imgs.hacker.src; state.power=2;}
-            if(state.skin==='boxer'){src=imgs.boxer.src; state.power=3;}
-            if(state.skin==='king'){src=imgs.king.src; state.power=2;}
-            if(state.skin==='maestro'){src=imgs.maestro.src; state.power=5;}
-            document.getElementById('charImg').src = src;
-        }
 
         function nav(tab, btn) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -255,13 +247,12 @@
             el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("¡Copiada!");
         }
 
-        // --- ARENA ENGINE ---
         const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
         let gameActive=false, loopId, player={x:0,y:0,hp:100}, enemies=[], bullets=[], drops=[], kills=0, frame=0, difficulty=1, gameTime=0;
         let stick={active:false, sx:0, sy:0, nx:0, ny:0};
 
         function startArena() {
-            if(state.energy < 10) return alert("Necesitas al menos 10⚡ de energía");
+            if(state.energy < 10) return alert("Falta Energía");
             state.energy -= 10; updateUI();
             document.getElementById('arenaStart').style.display='none';
             resize(); player={x:0,y:0,hp:100}; enemies=[]; bullets=[]; drops=[]; kills=0; difficulty=1.0; gameTime=0;
@@ -287,14 +278,18 @@
             }
             const camX=player.x-W/2; const camY=player.y-H/2;
 
-            // FONDO DINÁMICO
-            ctx.drawImage(imgs.bg_survival, 0, 0, W, H);
+            // FONDO
+            if (imgs.bg.complete && imgs.bg.naturalWidth > 0) {
+                ctx.drawImage(imgs.bg, 0, 0, W, H);
+            } else {
+                ctx.fillStyle='#050505'; ctx.fillRect(0,0,W,H);
+            }
             ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H);
 
             drops.forEach((d, i) => {
                 const dx = d.x-camX; const dy = d.y-camY;
                 ctx.save(); ctx.translate(dx, dy + Math.sin(gameTime/20)*5);
-                ctx.drawImage(imgs.token_duende, -18, -18, 36, 36);
+                if(imgs.coin.complete) ctx.drawImage(imgs.coin, -18, -18, 36, 36);
                 ctx.restore();
                 if(Math.hypot(player.x-d.x, player.y-d.y) < 30) {
                     state.score += 50; updateUI(); drops.splice(i, 1);
@@ -302,10 +297,10 @@
             });
 
             ctx.save(); ctx.translate(W/2, H/2);
-            ctx.drawImage(imgs[state.skin] || imgs.common, -30, -30, 60, 60);
+            ctx.drawImage(imgs.common, -30, -30, 60, 60);
             ctx.restore();
 
-            if(frame % (Math.max(15, 45 - Math.floor(difficulty*5))) === 0) {
+            if(frame % (Math.max(15, 45 - Math.floor(difficulty*6))) === 0) {
                 const ang=Math.random()*6.28; const dist=W/2+150;
                 enemies.push({x:player.x+Math.cos(ang)*dist, y:player.y+Math.sin(ang)*dist, hp:5*difficulty, spd:(1.8+difficulty/10)});
             }
@@ -323,16 +318,16 @@
                 e.x+=Math.cos(ang)*e.spd; e.y+=Math.sin(ang)*e.spd;
                 ctx.drawImage(imgs.bear, e.x-camX-22, e.y-camY-22, 44, 44);
 
-                if(Math.hypot(player.x-e.x, player.y-e.y)<28 && !invincible) {
+                if(Math.hypot(player.x-e.x, player.y-e.y)<28) {
                     player.hp -= 15; if(player.hp<=0) { gameActive=false; endGame(false); }
                 }
 
                 bullets.forEach((b,bi) => {
                     if(Math.hypot(b.x-e.x, b.y-e.y)<35) {
-                        bullets.splice(bi,1); e.hp -= state.dmgBoost;
+                        bullets.splice(bi,1); e.hp -= 1;
                         if(e.hp<=0) {
                             enemies.splice(i,1); kills++;
-                            if(Math.random() < 0.35) drops.push({x:e.x, y:e.y, type:'token'});
+                            if(Math.random() < 0.35) drops.push({x:e.x, y:e.y, type:'token'}); 
                         }
                     }
                 });
