@@ -18,8 +18,8 @@
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent; 
             user-select: none; 
-            outline: none; 
-            touch-action: none; /* BLOQUEO CRÍTICO: Evita el scroll del navegador */
+            outline: none;
+            touch-action: none; /* BLOQUEO CRÍTICO DE SCROLL DEL NAVEGADOR */
         }
         
         body {
@@ -27,8 +27,8 @@
             background: #000;
             color: #fff; font-family: 'Rajdhani', sans-serif;
             display: flex; flex-direction: column; height: 100vh; 
-            overflow: hidden; /* Evita scroll vertical accidental */
-            position: fixed; /* Mantiene la app pegada arriba */
+            overflow: hidden; /* Evita rebotes */
+            position: fixed; /* Fija la ventana para que no se mueva */
             width: 100%;
         }
 
@@ -48,14 +48,17 @@
         .token-balance-container { display: flex; align-items: center; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 25px; border: 1px solid var(--gold); }
         .token-logo-header { width: 26px; height: 26px; margin-left: 8px; border-radius: 50%; object-fit: cover; }
 
-        /* --- PANTALLAS --- */
         .screen { display: none; flex-grow: 1; width: 100%; overflow-y: auto; padding-bottom: 110px; flex-direction: column; align-items: center; }
         .screen.active { display: flex; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- UI COMPONENTS --- */
-        .card { background: var(--card); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255,255,255,0.05); width: 90%; margin-top: 20px; }
+        /* --- GRID TIENDA --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 94%; margin-top: 15px; padding: 10px; }
+        .card { background: var(--card); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .card img { width: 65px; height: 65px; object-fit: contain; margin-bottom: 10px; }
         .btn-price { background: var(--blue); color: #fff; padding: 10px; border-radius: 10px; font-weight: bold; width: 100%; border: none; cursor: pointer; margin-top: 10px; }
+
+        .withdraw-card { background: var(--card); border-radius: 20px; width: 92%; padding: 25px; margin-top: 30px; border: 1px solid var(--blue); text-align: center; }
 
         /* --- ARENA --- */
         #arena-container { width: 100%; height: 100%; position: relative; overflow: hidden; touch-action: none; }
@@ -93,7 +96,7 @@
         <div class="card">
             <div style="display:flex; justify-content:space-between; width: 100%; font-weight:900;">
                 <span>⚡ ENERGÍA</span>
-                <span id="energyText">100 / 100</span>
+                <span id="energyValText">100 / 100</span>
             </div>
             <div style="height:12px; width:100%; background:#111; border-radius:6px; margin-top:10px; overflow:hidden;">
                 <div id="energyFill" style="height:100%; width:100%; background:linear-gradient(90deg, var(--gold), var(--primary)); transition: 0.3s;"></div>
@@ -105,7 +108,9 @@
         <div id="arena-container">
             <canvas id="gameCanvas"></canvas>
             <div style="position:absolute; top:20px; left:20px; z-index:10; pointer-events:none; background:rgba(0,0,0,0.6); padding:10px; border-radius:10px;">
-                <div style="font-weight:900; color:var(--gold);">💰 <span id="arenaBalance">0</span></div>
+                <div style="font-weight:900; color:var(--gold); display:flex; align-items:center; gap:5px;">
+                    <span id="arenaBalance">0</span> <img src="static/coin.png" style="width:16px; height:16px;">
+                </div>
                 <div style="color:var(--danger);">❤️ <span id="hpTxt">100</span>%</div>
             </div>
             <div id="arenaStart" class="arena-overlay">
@@ -113,7 +118,6 @@
                 <button class="btn-price" style="width:180px; padding:15px;" onclick="startArena()">INICIAR (10⚡)</button>
             </div>
             <div id="arenaEnd" class="arena-overlay" style="display:none;">
-                <h1>RESULTADO</h1>
                 <div style="font-size:2rem; font-weight:900; color:var(--gold); margin:20px 0;">
                     + <span id="rewardNum">0</span> <img src="static/coin.png" style="width:40px;">
                 </div>
@@ -123,13 +127,18 @@
     </div>
 
     <div id="tab-shop" class="screen">
-        <h2 style="color:var(--gold); margin-top:20px;">TIENDA</h2>
-        <div class="card"><img src="static/skin_DUENDE_HACKER.png" style="width:60px;"><b>HACKER</b><button class="btn-price">0.2 TON</button></div>
+        <h2 style="color:var(--gold); margin-top:20px;">MERCADO NEGRO</h2>
+        <div class="grid-container">
+            <div class="card"><img src="static/skin_DUENDE_HACKER.png"><b>HACKER</b><button class="btn-price">0.2 TON</button></div>
+            <div class="card"><img src="static/skin_DUENDE_BOX.png"><b>BOXER</b><button class="btn-price">0.5 TON</button></div>
+            <div class="card"><img src="static/skin_REY_DUENDE.png"><b>EL REY</b><button class="btn-price">1.0 TON</button></div>
+            <div class="card"><img src="static/skin_DUENDE_MAESTRO.png"><b>MAESTRO</b><button class="btn-price">2.0 TON</button></div>
+        </div>
     </div>
 
     <div id="tab-withdraw" class="screen">
-        <h2 style="color:var(--blue); margin-top:30px;">RETIRO</h2>
-        <div class="card">
+        <h2 style="color:var(--blue); margin-top:30px;">RETIRAR</h2>
+        <div class="withdraw-card">
             <div style="font-size:2.5rem; font-weight:900;">
                 <span id="withdrawBalance">0</span> <img src="static/coin.png" style="width:35px;">
             </div>
@@ -147,19 +156,26 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.disableVerticalSwipe(); // BLOQUEO CLAVE: Evita que la app se cierre al deslizar abajo
+        tg.disableVerticalSwipe(); // EVITA QUE SE CIERRE LA APP AL DESLIZAR ABAJO
         tg.enableClosingConfirmation();
 
         const assets = {
             coin: 'static/coin.png', bg: 'static/imagen_portada_home.png',
-            bear: 'static/enemy_BEAR_MARKET.png', char: 'static/skin_duende_comunparatodos.png',
-            fire: 'static/skill_fire.png', shield: 'static/booster_INVENCIBLE_90S.png',
-            bullet: 'static/loot_COIN.png'
+            bear: 'static/enemy_BEAR_MARKET.png', rug: 'static/enemy_RUG_PULL.png', whale: 'static/enemy_WHALE.png',
+            char: 'static/skin_duende_comunparatodos.png', bullet: 'static/loot_COIN.png',
+            fire: 'static/skill_fire.png', shield: 'static/booster_INVENCIBLE_90S.png'
         };
         const imgs = {}; let loaded = 0;
+        const total = Object.keys(assets).length;
+
+        const forceStart = setTimeout(() => { if(loaded < total) init(); }, 3000);
+
         Object.keys(assets).forEach(k => {
             imgs[k] = new Image();
-            imgs[k].onload = imgs[k].onerror = () => { loaded++; if(loaded === Object.keys(assets).length) init(); };
+            imgs[k].onload = imgs[k].onerror = () => {
+                loaded++;
+                if(loaded === total) { clearTimeout(forceStart); init(); }
+            };
             imgs[k].src = assets[k];
         });
 
@@ -176,14 +192,14 @@
             document.getElementById('scoreDisplay').innerText = val;
             document.getElementById('arenaBalance').innerText = val;
             document.getElementById('withdrawBalance').innerText = val;
-            document.getElementById('energyText').innerText = Math.floor(state.energy) + " / 100";
+            document.getElementById('energyValText').innerText = Math.floor(state.energy) + " / 100";
             document.getElementById('energyFill').style.width = state.energy + "%";
             
             const wBtn = document.getElementById('withdrawBtn');
             if(state.score >= 5000) { wBtn.disabled = false; wBtn.style.background = "var(--primary)"; wBtn.innerText = "RETIRAR"; }
         }
 
-        document.getElementById('tapZone').onclick = (e) => {
+        document.getElementById('tapZone').onclick = () => {
             if(state.energy >= 3) { state.energy -= 3; state.score += 1; updateUI(); tg.HapticFeedback.impactOccurred('light'); }
         };
 
@@ -197,14 +213,14 @@
             if(t !== 'arena') stopArena();
         }
 
-        // --- MOTOR ARENA ---
+        // --- MOTOR ARENA INFINITO ---
         const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
         let gameActive=false, loopId, kills=0, frame=0, player={x:0, y:0, vx:0, vy:0, hp:100}, enemies=[], bullets=[], drops=[], stick={active:false, sx:0, sy:0, nx:0, ny:0};
 
         function startArena() {
             if(state.energy < 10) return alert("Falta Energía");
             state.energy -= 10; document.getElementById('arenaStart').style.display='none';
-            canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+            canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight;
             player = { x: 0, y: 0, vx: canvas.width/2, vy: canvas.height/2, hp: 100 };
             enemies=[]; bullets=[]; drops=[]; kills=0; gameActive=true; loop();
         }
@@ -222,12 +238,13 @@
                 }
             }
 
-            // Scroll Infinito
-            if(Math.abs(player.vx - W/2) > 50) player.vx -= (player.vx - W/2)*0.1;
-            if(Math.abs(player.vy - H/2) > 50) player.vy -= (player.vy - H/2)*0.1;
+            // Cámara (Scroll suave)
+            const cX = W/2, cY = H/2;
+            if(Math.abs(player.vx - cX) > 60) player.vx -= (player.vx - cX)*0.1;
+            if(Math.abs(player.vy - cY) > 60) player.vy -= (player.vy - cY)*0.1;
             const camX = player.x - player.vx, camY = player.y - player.vy;
 
-            // Render Fondo
+            // Render Fondo Infinito Mosaico
             const s=600; const startX=Math.floor(camX/s)*s, startY=Math.floor(camY/s)*s;
             for(let x=startX-s; x<camX+W+s; x+=s) {
                 for(let y=startY-s; y<camY+H+s; y+=s) {
@@ -237,9 +254,9 @@
             ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H);
 
             // Spawner
-            if(frame % 40 === 0) enemies.push({x:player.x+(Math.random()-0.5)*W*2, y:player.y+(Math.random()-0.5)*H*2, hp:3});
+            if(frame % 40 === 0) enemies.push({x:player.x+(Math.random()-0.5)*W*2, y:player.y+(Math.random()-0.5)*H*2, hp:3, t:Math.random()>0.8?'whale':'bear'});
 
-            // Lógica Proyectiles
+            // Balas automáticas
             if(frame % 20 === 0 && enemies.length > 0) {
                 const e = enemies[0]; const ang=Math.atan2(e.y-player.y, e.x-player.x);
                 bullets.push({x:player.x, y:player.y, vx:Math.cos(ang)*11, vy:Math.sin(ang)*11, life:80});
@@ -247,11 +264,17 @@
 
             bullets.forEach((b, i) => {
                 b.x+=b.vx; b.y+=b.vy; b.life--;
-                ctx.drawImage(imgs.bullet, b.x-camX-10, b.y-camY-10, 20, 20);
+                ctx.drawImage(imgs.bullet || imgs.coin, b.x-camX-10, b.y-camY-10, 20, 20);
                 enemies.forEach((e, ei) => {
                     if(Math.hypot(b.x-e.x, b.y-e.y)<40) {
                         e.hp -= state.dmg; bullets.splice(i,1);
-                        if(e.hp<=0) { enemies.splice(ei,1); kills++; drops.push({x:e.x, y:e.y, t:Math.random()<0.3?'fire':'coin'}); }
+                        if(e.hp<=0) { 
+                            enemies.splice(ei,1); kills++; 
+                            let r=Math.random();
+                            if(r<0.25) drops.push({x:e.x, y:e.y, t:'fire'});
+                            else if(r<0.45) drops.push({x:e.x, y:e.y, t:'shield'});
+                            else if(r<0.65) drops.push({x:e.x, y:e.y, t:'coin'});
+                        }
                     }
                 });
                 if(b.life <= 0) bullets.splice(i, 1);
@@ -259,10 +282,11 @@
 
             drops.forEach((d, i) => {
                 const rx=d.x-camX, ry=d.y-camY;
-                ctx.drawImage(imgs[d.t], rx-20, ry-20, 40, 40);
+                ctx.drawImage(d.t==='coin'?imgs.coin:(d.t==='fire'?imgs.fire:imgs.shield), rx-20, ry-20, 40, 40);
                 if(Math.hypot(player.vx-rx, player.vy-ry)<35) {
                     if(d.t==='coin') state.score += 50;
-                    if(d.t==='fire') { state.dmg=5; setTimeout(()=>state.dmg=1, 10000); }
+                    if(d.t==='fire') { state.dmg=5; setTimeout(()=>state.dmg=1, 15000); }
+                    if(d.t==='shield') { invincible=true; setTimeout(()=>invincible=false, 10000); }
                     updateUI(); drops.splice(i,1);
                 }
             });
@@ -270,9 +294,9 @@
             enemies.forEach(e => {
                 const ang=Math.atan2(player.y-e.y, player.x-e.x);
                 e.x+=Math.cos(ang)*2.2; e.y+=Math.sin(ang)*2.2;
-                ctx.drawImage(imgs.bear, e.x-camX-25, e.y-camY-25, 50, 50);
-                if(Math.hypot(player.vx-(e.x-camX), player.vy-(e.y-camY))<30) {
-                    player.hp-=0.5; document.getElementById('hpTxt').innerText=Math.ceil(player.hp);
+                ctx.drawImage(imgs[e.t==='whale'?'whale':'bear'] || imgs.bear, e.x-camX-25, e.y-camY-25, 50, 50);
+                if(Math.hypot(player.vx-(e.x-camX), player.vy-(e.y-camY))<30 && !invincible) {
+                    player.hp-=0.8; document.getElementById('hpTxt').innerText=Math.ceil(player.hp);
                     if(player.hp<=0) { gameActive=false; endGame(); }
                 }
             });
@@ -289,25 +313,19 @@
         function stopArena() { gameActive=false; cancelAnimationFrame(loopId); }
         function closeArena() { document.getElementById('arenaStart').style.display='flex'; document.getElementById('arenaEnd').style.display='none'; }
 
-        // MANEJO DE EVENTOS TÁCTILES MEJORADO
+        // MANEJO DE EVENTOS TÁCTILES CON BLOQUEO DE SCROLL
         canvas.addEventListener('touchstart', e => { 
-            e.preventDefault(); 
-            stick.active=true; 
-            stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; 
-            stick.nx=stick.sx; stick.ny=stick.sy; 
+            e.preventDefault(); stick.active=true; stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; stick.nx=stick.sx; stick.ny=stick.sy; 
         }, {passive: false});
 
         canvas.addEventListener('touchmove', e => { 
-            e.preventDefault(); 
-            stick.nx=e.touches[0].clientX; stick.ny=e.touches[0].clientY; 
+            e.preventDefault(); stick.nx=e.touches[0].clientX; stick.ny=e.touches[0].clientY; 
         }, {passive: false});
 
         canvas.addEventListener('touchend', () => stick.active=false);
 
-        // Bloqueo preventivo de scroll en toda la ventana
-        window.addEventListener('touchmove', e => {
-            if (gameActive) e.preventDefault();
-        }, { passive: false });
+        // Bloqueo total de gestos en el body mientras se juega
+        document.body.addEventListener('touchmove', function(e){ if(gameActive) e.preventDefault(); }, {passive: false});
 
     </script>
 </body>
