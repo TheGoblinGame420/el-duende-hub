@@ -1,901 +1,272 @@
- <!DOCTYPE html>
-
+<!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <title>El Duende Survivor</title>
-
+    <title>El Duende Survivor - Ecosistema $DUENDE</title>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700;900&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 
-
-
     <style>
-
         :root {
-
             --primary: #39ff14; --gold: #ffd700; --danger: #ff0055; --blue: #0098EA;
-
             --bg-dark: #121418; --card: #1e2228; --nav: #0e1013;
-
         }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; outline: none; }
         
-
         body {
-
             margin: 0; padding: 0;
-
             background: radial-gradient(circle at top, #1a202c 0%, #000 100%);
-
             color: #fff; font-family: 'Rajdhani', sans-serif;
-
             display: flex; flex-direction: column; height: 100vh; overflow: hidden;
-
         }
-
-
 
         /* --- LOADER --- */
-
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
-
+        #loader { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; z-index: 9999; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; transition: opacity 0.8s ease; 
+        }
         .spinner { width: 50px; height: 50px; border: 5px solid #333; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-
         @keyframes spin { to { transform: rotate(360deg); } }
 
-
-
         /* --- HEADER --- */
+        .header { padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(14, 16, 19, 0.9); border-bottom: 2px solid var(--primary); z-index: 10; }
+        .token-balance-container { display: flex; align-items: center; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 25px; border: 1px solid var(--gold); }
+        .token-logo-header { width: 26px; height: 26px; margin-left: 8px; border-radius: 50%; object-fit: cover; }
 
-        .header {
-
-            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-
-            background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(10px);
-
-            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 10; flex-shrink: 0;
-
-        }
-
-        .balance-val { font-size: 1.5rem; font-weight: 900; color: #fff; display: flex; align-items: center; gap: 8px; }
-
-        .coin-icon { width: 22px; height: 22px; background: var(--gold); border-radius: 50%; box-shadow: 0 0 10px var(--gold); }
-
-
-
-        /* --- SCREENS --- */
-
-        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; width: 100%; overflow-y: auto; padding-bottom: 90px; }
-
-        .screen.active { display: flex; animation: fadeIn 0.3s ease-out; }
-
+        .screen { display: none; flex-grow: 1; flex-direction: column; align-items: center; width: 100%; overflow-y: auto; padding-bottom: 110px; }
+        .screen.active { display: flex; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-
-
-        /* --- HOME (TAP) --- */
-
-        .social-bar {
-
-            display: flex; gap: 15px; margin-top: 15px;
-
-        }
-
-        .social-icon { font-size: 1.8rem; color: #ccc; transition: 0.2s; }
-
-        .social-icon:hover { color: var(--primary); transform: scale(1.1); }
-
-
-
-        .tap-area {
-
-            position: relative; margin-top: 30px; width: 280px; height: 280px;
-
-            display: flex; justify-content: center; align-items: center;
-
-        }
-
-        .glow-bg {
-
-            position: absolute; width: 220px; height: 220px; background: radial-gradient(circle, rgba(57,255,20,0.15) 0%, transparent 70%);
-
-            border-radius: 50%; z-index: 1; animation: pulseGlow 4s infinite;
-
-        }
-
-        @keyframes pulseGlow { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.3); opacity: 0.6; } }
-
-
-
-        /* ANIMACIÓN DE RESPIRACIÓN EN MENÚ */
-
-        .main-character {
-
-            width: 240px; height: 240px; z-index: 2; object-fit: contain;
-
-            cursor: pointer; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
-
-            animation: breathe 3s ease-in-out infinite;
-
-        }
-
-        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03) translateY(-5px); } }
-
-        .main-character:active { animation: none; transform: scale(0.95) rotate(3deg); transition: 0.05s; }
-
-
-
-        .energy-status {
-
-            width: 90%; max-width: 350px; margin-top: 25px;
-
-            background: var(--card); padding: 15px; border-radius: 15px;
-
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-
-        }
-
-        .energy-bar { height: 10px; width: 100%; background: #111; border-radius: 5px; margin-top: 10px; overflow: hidden; }
-
-        .energy-fill { height: 100%; width: 100%; background: linear-gradient(90deg, var(--gold), var(--primary)); transition: width 0.3s; }
-
-
-
-        /* --- ARENA (IMPORTANTE: touch-action: none) --- */
-
-        #screen-arena { padding: 0; overflow: hidden; }
-
-        .arena-container { width: 100%; height: 100%; position: relative; background: #080808; }
-
-        canvas { display: block; width: 100%; height: 100%; touch-action: none; } /* CRÍTICO PARA MOVIMIENTO */
-
-        
-
-        .arena-overlay {
-
-            position: absolute; top:0; left:0; width:100%; height:100%;
-
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
-
-            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20;
-
-        }
-
-        .arena-btn {
-
-            background: linear-gradient(135deg, var(--danger), #990000);
-
-            border: none; color: white; padding: 18px 40px; border-radius: 12px;
-
-            font-size: 1.4rem; font-weight: 900; letter-spacing: 1px;
-
-            box-shadow: 0 0 20px rgba(255, 59, 59, 0.4); cursor: pointer;
-
-            animation: pulseBtn 2s infinite;
-
-        }
-
-        @keyframes pulseBtn { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-
-
-
-        /* --- SHOP --- */
-
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; width: 94%; margin-top: 15px; }
-
-        .card {
-
-            background: var(--card); border-radius: 14px; padding: 12px;
-
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-
-            border: 1px solid rgba(255,255,255,0.03);
-
-        }
-
-        .card img { width: 65px; height: 65px; object-fit: contain; margin-bottom: 8px; }
-
-        .btn-price {
-
-            background: #333; color: #fff; padding: 10px; border-radius: 8px; margin-top: auto;
-
-            font-size: 0.8rem; font-weight: bold; width: 100%; border: none; cursor: pointer;
-
-        }
-
-        .btn-ton { background: var(--blue); } .btn-gold { background: var(--gold); color: #000; }
-
-
-
-        /* --- NAV --- */
-
-        .nav {
-
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
-
-            background: rgba(14, 16, 19, 0.95); backdrop-filter: blur(10px);
-
-            border-top: 1px solid rgba(255,255,255,0.05);
-
-            display: flex; justify-content: space-around; align-items: center;
-
-            padding-bottom: 10px; z-index: 100;
-
-        }
-
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 0.7rem; font-weight: bold; width: 25%; }
-
-        .nav-item i { font-size: 1.5rem; margin-bottom: 5px; transition: 0.2s; }
-
-        .nav-item.active { color: #fff; }
-
-        .nav-item.active i { color: var(--primary); transform: translateY(-4px); text-shadow: 0 0 12px var(--primary); }
-
-
-
-        .float-num { position: absolute; font-weight: 900; font-size: 1.8rem; color: var(--gold); pointer-events: none; animation: floatUp 0.6s forwards; z-index: 200; text-shadow: 0 2px 0 #000; }
-
-        @keyframes floatUp { to { transform: translateY(-80px); opacity: 0; } }
-
+        /* --- UI CARDS --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 94%; margin-top: 15px; }
+        .card { background: var(--card); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .btn-price { background: var(--blue); color: #fff; padding: 10px; border-radius: 10px; font-weight: bold; width: 100%; border: none; cursor: pointer; margin-top: 10px; }
+
+        .withdraw-card { background: var(--card); border-radius: 20px; width: 92%; padding: 25px; margin-top: 30px; border: 1px solid var(--blue); text-align: center; }
+        .withdraw-btn { background: var(--blue); border: none; color: white; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 20px; width: 100%; }
+        .withdraw-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+        /* --- ARENA --- */
+        #arena-container { width: 100%; height: 100%; position: relative; overflow: hidden; }
+        canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+        .arena-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; }
+
+        .nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 85px; background: var(--nav); border-top: 1px solid #333; display: flex; justify-content: space-around; align-items: center; padding-bottom: 15px; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.7rem; font-weight: 700; width: 20%; cursor: pointer; }
+        .nav-item.active { color: #fff; } .nav-item.active i { color: var(--primary); }
+
+        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     </style>
-
 </head>
-
 <body>
 
-
-
     <div id="loader">
-
         <div class="spinner"></div>
-
-        <p style="margin-top:20px; font-weight:bold; color:#666;">CARGANDO RECURSOS...</p>
-
+        <h2 style="margin-top:20px; color:var(--primary);">CARGANDO...</h2>
     </div>
-
-
 
     <div class="header">
-
-        <div id="ton-connect"></div>
-
-        <div style="text-align:right;">
-
-            <div style="font-size:0.7rem; color:#888;">BALANCE TOTAL</div>
-
-            <div class="balance-val"><span class="coin-icon"></span> <span id="scoreDisplay">0</span></div>
-
+        <div id="ton-connect-header"></div>
+        <div class="token-balance-container">
+            <span id="scoreDisplay">0</span>
+            <img src="static/coin.png" class="token-logo-header">
         </div>
-
     </div>
-
-
 
     <div id="tab-tap" class="screen active">
-
-        <div class="social-bar">
-
-            <a href="https://t.me/elduende420peru" target="_blank" class="social-icon"><i class="fab fa-telegram"></i></a>
-
-            <a href="https://wa.me/51900877863" target="_blank" class="social-icon"><i class="fab fa-whatsapp"></i></a>
-
-            <a href="https://www.facebook.com/profile.php?id=61586213196155" target="_blank" class="social-icon"><i class="fab fa-facebook"></i></a>
-
-            <a href="https://x.com/elduendesolana" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
-
+        <div style="margin-top:50px; cursor:pointer;" id="tapZone">
+            <img id="charImg" src="static/skin_duende_comunparatodos.png" style="width: 240px; height: 240px; animation: breathe 3s infinite; pointer-events: none;">
         </div>
-
-
-
-        <div class="tap-area" id="tapZone">
-
-            <div class="glow-bg"></div>
-
-            <img id="charImg" src="" class="main-character">
-
-        </div>
-
-
-
-        <div class="energy-status">
-
-            <div style="display:flex; justify-content:space-between; font-weight:bold;">
-
+        <div class="card" style="width:90%; border: 1px solid var(--primary);">
+            <div style="display:flex; justify-content:space-between; font-weight:900;">
                 <span>⚡ ENERGÍA</span>
-
-                <span><span id="energyVal">500</span> / <span id="maxEnergyVal">500</span></span>
-
+                <span id="energyValText">100 / 100</span>
             </div>
-
-            <div class="energy-bar"><div class="energy-fill" id="energyFill"></div></div>
-
-            <div id="invincibleTag" style="color:var(--blue); font-weight:900; text-align:center; margin-top:5px; display:none;">🛡️ ESCUDO ACTIVO</div>
-
+            <div style="height:12px; background:#111; border-radius:6px; margin-top:10px; overflow:hidden;">
+                <div id="energyFill" style="height:100%; width:100%; background:linear-gradient(90deg, var(--gold), var(--primary)); transition: 0.3s;"></div>
+            </div>
         </div>
-
     </div>
-
-
 
     <div id="tab-arena" class="screen">
-
-        <div class="arena-container">
-
+        <div id="arena-container">
             <canvas id="gameCanvas"></canvas>
-
-            
-
-            <div style="position:absolute; top:20px; left:20px; z-index:10; pointer-events:none;">
-
-                <div style="font-size:1.2rem; font-weight:900; color:#fff;">💀 <span id="killsTxt">0</span></div>
-
-                <div style="font-size:1rem; font-weight:bold; color:var(--danger);">HP: <span id="hpTxt">100</span>%</div>
-
-                <div style="font-size:0.8rem; color:#888; margin-top:5px;">Dificultad: <span id="diffTxt">1</span>x</div>
-
+            <div style="position:absolute; top:20px; left:20px; z-index:10; pointer-events:none; background:rgba(0,0,0,0.6); padding:10px; border-radius:10px;">
+                <div style="font-weight:900; color:var(--gold); display:flex; align-items:center; gap:5px;">
+                    <span id="arenaBalance">0</span> <img src="static/coin.png" style="width:16px; height:16px;">
+                </div>
+                <div style="color:var(--danger);">❤️ <span id="hpTxt">100</span>%</div>
             </div>
-
-
-
             <div id="arenaStart" class="arena-overlay">
-
-                <h1 style="font-size:3rem; color:var(--danger); margin:0; text-shadow:0 0 20px red; font-style:italic;">SURVIVOR</h1>
-
-                <p style="color:#aaa; margin-bottom:30px;">Resiste la oleada bajista</p>
-
-                <button class="arena-btn" onclick="startArena()">JUGAR</button>
-
-                <p style="margin-top:15px; color:#666; font-size:0.9rem;">Costo: 50⚡ o 150 monedas</p>
-
+                <h1 style="color:var(--danger);">ARENA SURVIVOR</h1>
+                <button class="withdraw-btn" style="width:180px;" onclick="startArena()">INICIAR (10⚡)</button>
             </div>
-
-
-
             <div id="arenaEnd" class="arena-overlay" style="display:none;">
-
-                <h1 id="endTitle" style="color:var(--primary); font-size:2.5rem;">VICTORIA</h1>
-
-                <p id="rewardTxt" style="font-size:1.8rem; font-weight:900; margin-bottom:20px; color:var(--gold);">+0</p>
-
-                <button class="arena-btn" style="background:#333; font-size:1rem; padding:15px 30px; box-shadow:none; animation:none;" onclick="closeArena()">SALIR</button>
-
+                <h1 id="endTitle">RESULTADO</h1>
+                <div style="font-size:2rem; font-weight:900; color:var(--gold); margin:20px 0;">
+                    + <span id="rewardNum">0</span> <img src="static/coin.png" style="width:40px; vertical-align:middle;">
+                </div>
+                <button class="withdraw-btn" style="width:180px; background:#333;" onclick="closeArena()">REGRESAR</button>
             </div>
-
         </div>
-
     </div>
-
-
 
     <div id="tab-shop" class="screen">
-
-        <h2 style="margin-top:20px; color:var(--gold);">MERCADO NEGRO</h2>
-
-        
-
-        <div style="width:94%; text-align:left; margin-top:15px; color:#888; font-size:0.8rem; font-weight:bold;">SKINS PREMIUM (TON)</div>
-
+        <h2 style="color:var(--gold); margin-top:20px;">MERCADO NEGRO</h2>
         <div class="grid-container">
-
-            <div class="card">
-
-                <img src="/static/skin_DUENDE_HACKER.png">
-
-                <div style="font-weight:bold;">HACKER</div>
-
-                <div style="font-size:0.7rem; color:#888;">Velocidad x2</div>
-
-                <button class="btn-price btn-ton" onclick="payTon('hacker', 0.2)">0.2 TON</button>
-
-            </div>
-
-            <div class="card">
-
-                <img src="/static/skin_DUENDE_BOX.png">
-
-                <div style="font-weight:bold;">BOXER</div>
-
-                <div style="font-size:0.7rem; color:#888;">Daño Crítico</div>
-
-                <button class="btn-price btn-ton" onclick="payTon('boxer', 0.5)">0.5 TON</button>
-
-            </div>
-
-            <div class="card">
-
-                <img src="/static/skin_REY_DUENDE.png">
-
-                <div style="font-weight:bold;">EL REY</div>
-
-                <div style="font-size:0.7rem; color:#888;">Ganancia x2</div>
-
-                <button class="btn-price btn-ton" onclick="payTon('king', 1.0)">1.0 TON</button>
-
-            </div>
-
-            <div class="card">
-
-                <img src="/static/skin_DUENDE_MAESTRO.png">
-
-                <div style="font-weight:bold;">MAESTRO</div>
-
-                <div style="font-size:0.7rem; color:#888;">Legendario</div>
-
-                <button class="btn-price btn-ton" onclick="payTon('maestro', 2.0)">2.0 TON</button>
-
-            </div>
-
+            <div class="card"><img src="static/skin_DUENDE_HACKER.png" style="width:60px;"><b>HACKER</b><button class="btn-price">0.2 TON</button></div>
+            <div class="card"><img src="static/skin_REY_DUENDE.png" style="width:60px;"><b>EL REY</b><button class="btn-price">1.0 TON</button></div>
         </div>
-
-
-
-        <div style="width:94%; text-align:left; margin-top:25px; color:#888; font-size:0.8rem; font-weight:bold;">POTENCIADORES (MONEDAS)</div>
-
-        <div class="grid-container">
-
-            <div class="card">
-
-                <img src="/static/booster_RAYOTON.png">
-
-                <div style="font-weight:bold;">RECARGA</div>
-
-                <div style="font-size:0.7rem; color:#888;">Energía 100%</div>
-
-                <button class="btn-price btn-gold" onclick="buyItem('refill', 500)">500</button>
-
-            </div>
-
-            <div class="card">
-
-                <img src="/static/booster_INVENCIBLE_90S.png">
-
-                <div style="font-weight:bold;">ESCUDO</div>
-
-                <div style="font-size:0.7rem; color:#888;">Invencible 90s</div>
-
-                <button class="btn-price btn-gold" onclick="buyItem('shield', 2000)">2k</button>
-
-            </div>
-
-            <div class="card">
-
-                <img src="/static/booster_x100_ENERGIA.png">
-
-                <div style="font-weight:bold;">MAX +100</div>
-
-                <div style="font-size:0.7rem; color:#888;">Capacidad</div>
-
-                <button class="btn-price btn-gold" onclick="buyItem('max', 5000)">5k</button>
-
-            </div>
-
-             <div class="card">
-
-                <img src="/static/loot_COIN.png"> 
-
-                <div style="font-weight:bold;">DAÑO +</div>
-
-                <div style="font-size:0.7rem; color:#888;">Poder Temporal</div>
-
-                <button class="btn-price btn-gold" onclick="buyItem('dmg', 3000)">3k</button>
-
-            </div>
-
-        </div>
-
     </div>
 
-
-
-    <div class="nav">
-
-        <div class="nav-item active" onclick="nav('tap', this)"><i class="fas fa-hammer"></i><span>Minar</span></div>
-
-        <div class="nav-item" onclick="nav('arena', this)"><i class="fas fa-skull"></i><span>Arena</span></div>
-
-        <div class="nav-item" onclick="nav('shop', this)"><i class="fas fa-shopping-cart"></i><span>Tienda</span></div>
-
+    <div id="tab-withdraw" class="screen">
+        <h2 style="color:var(--blue); margin-top:30px;">RETIRAR</h2>
+        <div class="withdraw-card">
+            <div style="font-size:2.5rem; font-weight:900; margin:15px 0;">
+                <span id="withdrawBalance">0</span> <img src="static/coin.png" style="width:35px;">
+            </div>
+            <button id="withdrawBtn" class="withdraw-btn" disabled onclick="alert('Retiro procesado')">MÍNIMO 5,000</button>
+            <p style="font-size:0.8rem; color:#888; margin-top:10px;">Mínimo: 5,000 $DUENDE</p>
+        </div>
     </div>
 
-
+    <nav class="nav">
+        <div class="nav-item active" onclick="nav('tap', this)"><i class="fas fa-hammer"></i>TAP</div>
+        <div class="nav-item" onclick="nav('arena', this)"><i class="fas fa-skull"></i>ARENA</div>
+        <div class="nav-item" onclick="nav('shop', this)"><i class="fas fa-shopping-cart"></i>TIENDA</div>
+        <div class="nav-item" onclick="nav('withdraw', this)"><i class="fas fa-wallet"></i>RETIRO</div>
+    </nav>
 
     <script>
-
-        const tg = window.Telegram.WebApp; tg.expand(); tg.setHeaderColor('#1a202c');
-
-        const MY_WALLET = "UQAm2w4HcJ1tW8RBNj7BZQh0Q-ckpzlxzD-r8p2JduHkpQnc";
-
-
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.disableVerticalSwipe();
 
         const assets = {
-
-            common: '/static/skin_duende_comunparatodos.png',
-
-            hacker: '/static/skin_DUENDE_HACKER.png', boxer: '/static/skin_DUENDE_BOX.png', king: '/static/skin_REY_DUENDE.png', maestro: '/static/skin_DUENDE_MAESTRO.png',
-
-            bear: '/static/enemy_BEAR_MARKET.png', rug: '/static/enemy_RUG_PULL.png', whale: '/static/enemy_WHALE.png',
-
-            bullet: '/static/loot_COIN.png',
-
-            booster_shield: '/static/booster_INVENCIBLE_90S.png' // Usado para drop de escudo
-
+            coin: 'static/coin.png', bg: 'static/imagen_portada_home.png',
+            bear: 'static/enemy_BEAR_MARKET.png', char: 'static/skin_duende_comunparatodos.png',
+            fire: 'static/skill_fire.png', shield: 'static/booster_INVENCIBLE_90S.png',
+            bullet: 'static/loot_COIN.png'
         };
+        const imgs = {}; let loaded = 0;
+        const total = Object.keys(assets).length;
+        const forceStart = setTimeout(init, 3000);
 
-        const imgs = {}; let loadedCount = 0;
-
-
-
-        // SISTEMA DE CARGA ANTI-BLOQUEO
-
-        setTimeout(() => { if(document.getElementById('loader').style.display!=='none') initApp(); }, 3000);
-
-        Object.keys(assets).forEach(k => { imgs[k]=new Image(); imgs[k].src=assets[k]; imgs[k].onload=()=>{loadedCount++;if(loadedCount===Object.keys(assets).length)initApp();}; imgs[k].onerror=()=>{loadedCount++;if(loadedCount===Object.keys(assets).length)initApp();}; });
-
-
-
-        function initApp() {
-
-            document.getElementById('loader').style.opacity = '0'; setTimeout(()=>document.getElementById('loader').style.display='none',500);
-
-            document.getElementById('charImg').src = imgs.common.src; updateUI();
-
-        }
-
-
-
-        let state = { score: 1000, energy: 500, maxEnergy: 500, skin: 'common', power: 1, dmgBoost: 1 };
-
-        let invincible = false;
-
-
-
-        const tonUi = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: window.location.origin + '/static/tonconnect-manifest.json', buttonRootId: 'ton-connect', uiPreferences: {theme: TON_CONNECT_UI.THEME.DARK} });
-
-
-
-        function updateUI() {
-
-            document.getElementById('scoreDisplay').innerText = Math.floor(state.score).toLocaleString();
-
-            document.getElementById('energyVal').innerText = Math.floor(state.energy);
-
-            document.getElementById('maxEnergyVal').innerText = state.maxEnergy;
-
-            document.getElementById('energyFill').style.width = (state.energy/state.maxEnergy*100) + '%';
-
-        }
-
-        function nav(tab, btn) {
-
-            document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('tab-'+tab).classList.add('active');
-
-            document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
-
-            if(tab!=='arena') stopArena();
-
-        }
-
-
-
-        // TAP & SHOP
-
-        document.getElementById('tapZone').addEventListener('click', (e) => {
-
-            if(state.energy<1) return;
-
-            state.energy--; state.score += state.power; updateUI();
-
-            const float = document.createElement('div'); float.className='float-num'; float.innerText="+"+state.power; float.style.left=e.clientX+'px'; float.style.top=e.clientY+'px'; document.body.appendChild(float); setTimeout(()=>float.remove(),600);
-
-            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-
+        Object.keys(assets).forEach(k => {
+            imgs[k] = new Image();
+            imgs[k].onload = imgs[k].onerror = () => {
+                loaded++; if(loaded === total) { clearTimeout(forceStart); init(); }
+            };
+            imgs[k].src = assets[k];
         });
 
-        setInterval(()=>{if(state.energy<state.maxEnergy){state.energy++;updateUI();}},1000);
+        let state = { score: 1000, energy: 100, dmg: 1 };
+        let invincible = false;
 
+        function init() { document.getElementById('loader').style.display = 'none'; updateUI(); }
 
-
-        async function payTon(skin, price) {
-
-            if(!tonUi.connected) return alert("Conecta Wallet");
-
-            try { await tonUi.sendTransaction({validUntil:Math.floor(Date.now()/1000)+3600, messages:[{address:MY_WALLET, amount:Math.floor(price*1000000000).toString()}]}); state.skin=skin; updateSkin(); alert("Comprado!"); } catch(e){alert("Error pago");}
-
+        function updateUI() {
+            const val = state.score.toLocaleString();
+            document.getElementById('scoreDisplay').innerText = val;
+            document.getElementById('arenaBalance').innerText = val;
+            document.getElementById('withdrawBalance').innerText = val;
+            document.getElementById('energyValText').innerText = Math.floor(state.energy) + " / 100";
+            document.getElementById('energyFill').style.width = state.energy + "%";
+            const wBtn = document.getElementById('withdrawBtn');
+            if(state.score >= 5000) { wBtn.disabled = false; wBtn.style.background = "var(--primary)"; wBtn.style.color = "black"; }
         }
 
-        function buyItem(type, cost) {
+        document.getElementById('tapZone').onclick = () => {
+            if(state.energy >= 3) { state.energy -= 3; state.score += 1; updateUI(); }
+        };
 
-            if(state.score<cost) return alert("Faltan monedas");
+        setInterval(() => { if(state.energy < 100) { state.energy += 0.5; updateUI(); } }, 2000);
 
-            state.score-=cost;
-
-            if(type==='refill') state.energy=state.maxEnergy;
-
-            if(type==='max') state.maxEnergy+=100;
-
-            if(type==='dmg') { state.dmgBoost=2; setTimeout(()=>state.dmgBoost=1, 60000); alert("Daño x2 por 60s"); }
-
-            if(type==='shield') { invincible=true; document.getElementById('invincibleTag').style.display='block'; setTimeout(()=>{invincible=false;document.getElementById('invincibleTag').style.display='none';},90000); }
-
-            updateUI();
-
+        function nav(t, b) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('tab-'+t).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            b.classList.add('active');
+            if(t !== 'arena') stopArena();
         }
-
-        function updateSkin() {
-
-            let src=imgs.common.src; state.power=1;
-
-            if(state.skin==='hacker'){src=imgs.hacker.src;state.power=2;} if(state.skin==='boxer'){src=imgs.boxer.src;state.power=3;}
-
-            if(state.skin==='king'){src=imgs.king.src;state.power=2;} if(state.skin==='maestro'){src=imgs.maestro.src;state.power=5;}
-
-            document.getElementById('charImg').src=src;
-
-        }
-
-
-
-        // --- ARENA ENGINE TOTAL (MOVIMIENTO + ANIMACIÓN + DROPS) ---
 
         const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
-
-        let gameActive=false, loopId;
-
-        let player={x:0,y:0,hp:100}, enemies=[], bullets=[], drops=[], kills=0;
-
-        let stick={active:false, sx:0, sy:0, nx:0, ny:0};
-
-        let frame=0, difficulty=1, gameTime=0;
-
-
+        let gameActive=false, loopId, kills=0, frame=0, player={x:0, y:0, vx:0, vy:0, hp:100}, enemies=[], bullets=[], stick={active:false, sx:0, sy:0, nx:0, ny:0};
 
         function startArena() {
-
-            if(state.energy>=50) state.energy-=50; else if(state.score>=150) state.score-=150; else return alert("Falta Energía o Monedas");
-
-            updateUI(); document.getElementById('arenaStart').style.display='none'; document.getElementById('arenaEnd').style.display='none';
-
-            resize(); player={x:0,y:0,hp:100,maxHp:100}; enemies=[]; bullets=[]; drops=[]; kills=0; difficulty=1; gameTime=0;
-
-            gameActive=true; loop();
-
+            if(state.energy < 10) return alert("Falta Energía");
+            state.energy -= 10; document.getElementById('arenaStart').style.display='none';
+            canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight;
+            player = { x: 0, y: 0, vx: canvas.width/2, vy: canvas.height/2, hp: 100 };
+            enemies=[]; bullets=[]; kills=0; gameActive=true; loop();
         }
-
-        function stopArena() { gameActive=false; cancelAnimationFrame(loopId); }
-
-        function closeArena() { document.getElementById('arenaStart').style.display='flex'; document.getElementById('arenaEnd').style.display='none'; }
-
-        function resize() { const dpr=window.devicePixelRatio||1; canvas.width=canvas.parentElement.clientWidth*dpr; canvas.height=canvas.parentElement.clientHeight*dpr; ctx.scale(dpr,dpr); }
-
-
-
-        // JOYSTICK TÁCTIL MEJORADO
-
-        canvas.addEventListener('touchstart', e=>{ e.preventDefault(); stick.active=true; stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; stick.nx=stick.sx; stick.ny=stick.sy; });
-
-        canvas.addEventListener('touchmove', e=>{ e.preventDefault(); if(stick.active){ stick.nx=e.touches[0].clientX; stick.ny=e.touches[0].clientY; } });
-
-        canvas.addEventListener('touchend', e=>{ e.preventDefault(); stick.active=false; });
-
-
 
         function loop() {
-
             if(!gameActive) return;
-
-            const W=canvas.width/(window.devicePixelRatio||1); const H=canvas.height/(window.devicePixelRatio||1);
-
-            gameTime++; if(gameTime % 1800 === 0) { difficulty += 0.5; document.getElementById('diffTxt').innerText = difficulty + "x"; } // Sube dificultad cada 30s
-
-
-
-            // Movimiento Jugador
+            frame++; const W = canvas.width, H = canvas.height;
 
             if(stick.active) {
-
-                const dx=stick.nx-stick.sx; const dy=stick.ny-stick.sy; const dist=Math.hypot(dx,dy);
-
-                if(dist>5) { const ang=Math.atan2(dy,dx); player.x+=Math.cos(ang)*5; player.y+=Math.sin(ang)*5; }
-
-            }
-
-            const camX=player.x-W/2; const camY=player.y-H/2;
-
-
-
-            // Render
-
-            ctx.fillStyle='#080808'; ctx.fillRect(0,0,W,H);
-
-            ctx.strokeStyle='#1a1a1a'; ctx.lineWidth=3; const grid=100;
-
-            const ox=Math.floor(camX/grid)*grid; const oy=Math.floor(camY/grid)*grid;
-
-            for(let x=ox; x<camX+W+grid; x+=grid) for(let y=oy; y<camY+H+grid; y+=grid) ctx.strokeRect(x-camX,y-camY,grid,grid);
-
-
-
-            // DROPS (Items en el suelo)
-
-            drops.forEach((d, i) => {
-
-                const dx = d.x-camX; const dy = d.y-camY;
-
-                ctx.save(); ctx.translate(dx, dy + Math.sin(gameTime/20)*5); // Flotar
-
-                if(d.type==='health') { ctx.fillStyle='red'; ctx.beginPath(); ctx.arc(0,0,10,0,6.28); ctx.fill(); ctx.fillStyle='#fff'; ctx.font='bold 12px Arial'; ctx.fillText("HP",-8,4); }
-
-                if(d.type==='shield') { ctx.drawImage(imgs.booster_shield, -15, -15, 30, 30); }
-
-                ctx.restore();
-
-                
-
-                if(Math.hypot(player.x-d.x, player.y-d.y) < 30) {
-
-                    drops.splice(i,1);
-
-                    if(d.type==='health') { player.hp = Math.min(player.hp+20, player.maxHp); document.getElementById('hpTxt').innerText=player.hp; }
-
-                    if(d.type==='shield') { invincible=true; setTimeout(()=>invincible=false, 5000); }
-
-                    if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-
+                const dx=stick.nx-stick.sx, dy=stick.ny-stick.sy, dist=Math.hypot(dx,dy);
+                if(dist>5) {
+                    const ang=Math.atan2(dy,dx);
+                    player.x += Math.cos(ang)*5; player.y += Math.sin(ang)*5;
+                    player.vx += Math.cos(ang)*5; player.vy += Math.sin(ang)*5;
                 }
-
-            });
-
-
-
-            // DIBUJAR JUGADOR CON ANIMACIÓN
-
-            const px=W/2; const py=H/2;
-
-            const pImg = state.skin==='common' ? imgs.common : imgs[state.skin];
-
-            ctx.save(); ctx.translate(px, py);
-
-            if(stick.active) ctx.rotate(Math.sin(gameTime/10)*0.1); // Tambaleo al caminar
-
-            if(invincible) { ctx.beginPath(); ctx.arc(0,0,40,0,6.28); ctx.strokeStyle='#0ff'; ctx.lineWidth=3; ctx.stroke(); }
-
-            ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.beginPath(); ctx.ellipse(0,25,20,8,0,0,6.28); ctx.fill(); // Sombra
-
-            ctx.drawImage(pImg, -30, -30, 60, 60);
-
-            ctx.restore();
-
-
-
-            // Enemigos (Más pequeños y lentos al inicio)
-
-            if(frame%(Math.max(20, 60-difficulty*5))===0) {
-
-                const ang=Math.random()*6.28; const dist=W/2+150;
-
-                let type='bear', hp=3, spd=1.5;
-
-                if(Math.random()>0.8) { type='rug'; spd=2.5; hp=2; }
-
-                if(Math.random()>0.97) { type='whale'; spd=0.8; hp=15; }
-
-                enemies.push({x:player.x+Math.cos(ang)*dist, y:player.y+Math.sin(ang)*dist, type:type, hp:hp*difficulty, spd:spd*(1+difficulty/10)});
-
             }
 
+            if(Math.abs(player.vx - W/2) > 50) player.vx -= (player.vx - W/2)*0.1;
+            if(Math.abs(player.vy - H/2) > 50) player.vy -= (player.vy - H/2)*0.1;
+            const camX = player.x - player.vx, camY = player.y - player.vy;
 
-
-            // Disparo
-
-            if(frame%20===0 && enemies.length>0) {
-
-                const target = enemies.reduce((a,b)=>Math.hypot(a.x-player.x, a.y-player.y)<Math.hypot(b.x-player.x, b.y-player.y)?a:b);
-
-                const ang = Math.atan2(target.y-player.y, target.x-player.x);
-
-                bullets.push({x:player.x, y:player.y, vx:Math.cos(ang)*12, vy:Math.sin(ang)*12, life:60});
-
+            const s=600; const startX=Math.floor(camX/s)*s, startY=Math.floor(camY/s)*s;
+            for(let x=startX-s; x<camX+W+s; x+=s) for(let y=startY-s; y<camY+H+s; y+=s) {
+                if(imgs.bg.complete) ctx.drawImage(imgs.bg, x-camX, y-camY, s, s);
             }
+            ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(0,0,W,H);
 
+            if(frame%40===0) enemies.push({x:player.x+(Math.random()-0.5)*W*2, y:player.y+(Math.random()-0.5)*H*2, hp:3});
 
-
-            // Actualizar Entidades
+            if(frame%20===0 && enemies.length>0) bullets.push({x:player.x, y:player.y, vx:(enemies[0].x-player.x)/20, vy:(enemies[0].y-player.y)/20, life:60});
 
             bullets.forEach((b,i) => {
-
-                b.x+=b.vx; b.y+=b.vy; b.life--; ctx.drawImage(imgs.bullet, b.x-camX-10, b.y-camY-10, 20, 20); if(b.life<=0) bullets.splice(i,1);
-
+                b.x+=b.vx; b.y+=b.vy; b.life--;
+                ctx.drawImage(imgs.bullet || imgs.coin, b.x-camX-10, b.y-camY-10, 20, 20);
+                if(b.life<=0) bullets.splice(i,1);
             });
 
-
-
-            enemies.forEach((e,i) => {
-
-                const ang = Math.atan2(player.y-e.y, player.x-e.x); e.x+=Math.cos(ang)*e.spd; e.y+=Math.sin(ang)*e.spd;
-
-                const ex=e.x-camX; const ey=e.y-camY;
-
-                ctx.drawImage(imgs[e.type], ex-20, ey-20, 40, 40); // Enemigos más pequeños
-
-
-
-                if(Math.hypot(player.x-e.x, player.y-e.y)<25 && !invincible) {
-
-                    player.hp -= 10; document.getElementById('hpTxt').innerText=player.hp;
-
-                    if(player.hp<=0) { gameActive=false; endGame(false); } else { invincible=true; setTimeout(()=>invincible=false, 1000); }
-
+            enemies.forEach((e,ei) => {
+                const ang=Math.atan2(player.y-e.y, player.x-e.x);
+                e.x+=Math.cos(ang)*2.2; e.y+=Math.sin(ang)*2.2;
+                ctx.drawImage(imgs.bear, e.x-camX-25, e.y-camY-25, 50, 50);
+                if(Math.hypot(player.vx-(e.x-camX), player.vy-(e.y-camY))<30) {
+                    player.hp-=1; document.getElementById('hpTxt').innerText=Math.ceil(player.hp);
+                    if(player.hp<=0) { gameActive=false; endGame(); }
                 }
-
-
-
-                bullets.forEach((b,bi) => {
-
-                    if(Math.hypot(b.x-e.x, b.y-e.y)<30) {
-
-                        bullets.splice(bi,1); e.hp -= state.dmgBoost;
-
-                        if(e.hp<=0) {
-
-                            enemies.splice(i,1); kills++; document.getElementById('killsTxt').innerText=kills;
-
-                            // DROP CHANCE (15%)
-
-                            if(Math.random() < 0.15) {
-
-                                let dropType = Math.random() > 0.7 ? 'shield' : 'health';
-
-                                drops.push({x:e.x, y:e.y, type:dropType});
-
-                            }
-
-                        }
-
-                    }
-
-                });
-
             });
 
-
-
-            frame++; loopId = requestAnimationFrame(loop);
-
+            ctx.drawImage(imgs.char, player.vx-35, player.vy-35, 70, 70);
+            loopId = requestAnimationFrame(loop);
         }
 
-
-
-        function endGame(win) {
-
-            const reward = kills*10; state.score+=reward;
-
-            document.getElementById('endTitle').innerText = win ? "VICTORIA" : "DERROTADO";
-
-            document.getElementById('endTitle').style.color = win ? "var(--primary)" : "var(--danger)";
-
-            document.getElementById('rewardTxt').innerText = `+${reward}`;
-
-            document.getElementById('arenaEnd').style.display='flex';
-
-            updateUI();
-
+        function endGame() {
+            const r = kills*10; state.score += r;
+            document.getElementById('rewardNum').innerText = r;
+            document.getElementById('arenaEnd').style.display='flex'; updateUI();
         }
+        function stopArena() { gameActive=false; cancelAnimationFrame(loopId); }
+        function closeArena() { document.getElementById('arenaStart').style.display='flex'; document.getElementById('arenaEnd').style.display='none'; }
 
+        canvas.addEventListener('touchstart', e => { 
+            e.preventDefault(); stick.active=true; stick.sx=e.touches[0].clientX; stick.sy=e.touches[0].clientY; stick.nx=stick.sx; stick.ny=stick.sy; 
+        }, {passive: false});
+        canvas.addEventListener('touchmove', e => { 
+            e.preventDefault(); stick.nx=e.touches[0].clientX; stick.ny=e.touches[0].clientY; 
+        }, {passive: false});
+        canvas.addEventListener('touchend', () => stick.active=false);
     </script>
-
 </body>
-
 </html>
